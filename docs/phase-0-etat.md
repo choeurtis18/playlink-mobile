@@ -162,3 +162,67 @@ Trois jeux dépassent le simple swipe et demandent des écrans propres en phase 
 
 Les cinq autres (Mime, Action ou Vérité, Icebreaker, Dégât Débat, Dilemme) sont
 un portage direct du flux de carte swipeable.
+
+
+---
+
+# Phase 1 — journal
+
+## Base legacy : contenu extrait ✅ (2026-09-06)
+
+**Attention** : deux projets Supabase existent sur le compte. Le bon est
+`jrxejcxirkottncvigll` — l'autre (`fccbwopkxapmxogdgtys`) refuse
+l'authentification et ne contient pas le contenu Playlink.
+
+Inventaire vérifié en base, qui **confirme le blueprint au chiffre près** :
+
+| Table | Lignes |
+|-------|--------|
+| games | 8 |
+| categories | 28 |
+| cards | **1 521** (toutes actives) |
+| game_rule_slides | 56 (toutes avec image) |
+| badges | 5 |
+| legal_contents | 3 |
+| game_rules | 0 — *aucune règle markdown en base* |
+
+Cartes par jeu — identique aux totaux du wireframe, ce qui le valide :
+
+    Action ou Vérité 299 · Icebreaker 186 · Dégât Débat 200 · Qui de nous 229
+    Mime 163 · Thé ou café 118 · Dilemme 156 · Devine le mot 170
+
+Dump réalisé dans `scripts/dumps/playlink_content.sql` (297 Ko, gitignoré).
+
+### Points relevés
+
+- **`game_rules` est vide** : les règles markdown n'existent pas en base, seules
+  les 56 slides illustrées sont présentes. Le §02 mentionne « règles markdown +
+  slides » — à confirmer avec le produit : soit les règles vivent ailleurs
+  (en dur dans le code web ?), soit elles sont à écrire.
+- **56 slides, pas ~100 GIF** comme estimé au §06. Le poids embarqué sera donc
+  plus léger que prévu.
+- **5 badges en base** contre 12 proposés au §01 — les 7 nouveaux sont à créer
+  au back-office, leurs règles étant du code Dart.
+- Client PostgreSQL 17 requis (`brew install postgresql@17`) : le client 14
+  refuse un serveur 17. Binaires dans `/opt/homebrew/opt/postgresql@17/bin`.
+- Les valeurs du `.env` contenant `&` ou `?` doivent être entre guillemets,
+  sinon le parsing shell casse silencieusement.
+
+## Assets
+
+Les GIF sont dans un bucket **public** Supabase Storage :
+
+    https://jrxejcxirkottncvigll.supabase.co/storage/v1/object/public/game-assets
+
+Renseigné dans `LEGACY_ASSETS_BASE_URL`. Public, donc téléchargeable sans clé —
+`scripts/fetch-assets.ts` n'aura pas besoin d'authentification.
+
+## Neon + Vercel ✅
+
+Projet Neon provisionné via la Marketplace Vercel (région `eu-central-1`),
+`DATABASE_URL` et `DIRECT_URL` injectées. Le `.env.local` du back-office vient
+d'un `vercel env pull`.
+
+## Reste à fournir
+
+- `BLOB_READ_WRITE_TOKEN` — créer un store Blob sur Vercel (Storage → Create → Blob)
