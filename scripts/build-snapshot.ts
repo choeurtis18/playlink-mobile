@@ -6,7 +6,7 @@
 //
 //   node --experimental-strip-types build-snapshot.ts [--version N] [--out chemin]
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { PrismaClient } from '@prisma/client';
 import { SnapshotSchema, type Snapshot } from '@playlink/content-schema/snapshot.ts';
 
@@ -14,7 +14,6 @@ const prisma = new PrismaClient();
 const args = process.argv.slice(2);
 const argOf = (n: string) => { const i = args.indexOf(n); return i < 0 ? null : args[i + 1]; };
 
-const MANIFEST = new URL('../apps/mobile/assets/content/assets-manifest.json', import.meta.url).pathname;
 
 /** N'émet un bloc `translations` que s'il contient une langue autre que FR. */
 function pack<T extends { locale: string }>(rows: T[], build: (r: T) => unknown) {
@@ -51,8 +50,11 @@ async function main() {
   const badges = await prisma.badge.findMany({ orderBy: { order: 'asc' }, include: { translations: true } });
   const legal = await prisma.legalContent.findMany();
 
-  const assets = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : [];
-  if (!assets.length) console.warn('⚠ aucun asset — lance d\'abord fetch-assets.ts');
+  // Source unique avec le back-office : la table, pas le fichier. Le
+  // back-office déployé n'a pas accès au dossier apps/mobile.
+  const assetRows = await prisma.contentAsset.findMany({ orderBy: { ref: 'asc' } });
+  const assets = assetRows.map((a) => ({ ref: a.ref, file: a.file, hash: a.hash, bytes: a.bytes, type: a.type }));
+  if (!assets.length) console.warn('⚠ aucun asset en base — lance d\'abord fetch-assets.ts');
 
   const snapshot: Snapshot = {
     version,

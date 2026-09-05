@@ -29,6 +29,18 @@ async function main() {
   });
   console.log(`${slides.length} slides avec image\n`);
 
+  // Les refs déjà réécrites pointent vers `{hash}.ext`, un nom qui n'existe
+  // pas dans le bucket d'origine : ré-exécuter téléchargerait 0 fichier et
+  // écraserait le manifeste par un tableau vide. On refuse plutôt que de
+  // détruire silencieusement.
+  const alreadyHashed = slides.filter((s) => /^asset:\/\/[a-f0-9]{16}\./.test(s.imageRef!));
+  if (alreadyHashed.length && !process.argv.includes('--force')) {
+    console.error(`✗ ${alreadyHashed.length} slides ont déjà des références par hash.`);
+    console.error('  Les assets sont donc déjà récupérés. Relancer écraserait le manifeste.');
+    console.error('  Utilise --force seulement si tu sais ce que tu fais.');
+    process.exit(1);
+  }
+
   // imageRef vaut `asset://{fichier}` — le nom d'origine dans le bucket.
   const byFile = new Map<string, string[]>();
   for (const s of slides) {
@@ -75,7 +87,22 @@ async function main() {
     updated += r.count;
   }
 
+  // Ne jamais écraser un manifeste existant par du vide.
+  if (!manifest.length) {
+    console.error('\n✗ aucun asset récupéré — manifeste laissé intact');
+    process.exit(1);
+  }
   writeFileSync(join(OUT, 'assets-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+
+  // Miroir en base : c'est cette source que lit le back-office déployé, qui
+  // n'a pas accès au dossier apps/mobile.
+  for (const m of manifest) {
+    await prisma.contentAsset.upsert({
+      where: { ref: m.ref },
+      create: m,
+      update: { file: m.file, hash: m.hash, bytes: m.bytes, type: m.type },
+    });
+  }
 
   const total = manifest.reduce((s, m) => s + m.bytes, 0);
   console.log(`\ntéléchargés   ${downloaded}`);

@@ -10,6 +10,25 @@ import {
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
+/**
+ * Traduit les erreurs Prisma en messages lisibles.
+ *
+ * Brut, une violation de contrainte s'affiche
+ * « Invalid `prisma.game.create()` invocation… » : l'éditeur ne sait ni ce
+ * qui a échoué, ni quoi corriger.
+ */
+function humanize(e: unknown): string {
+  const err = e as { code?: string; meta?: { target?: string[]; field_name?: string } };
+  const field = err.meta?.target?.join(", ");
+  switch (err.code) {
+    case "P2002": return `Cette valeur existe déjà${field ? ` (${field})` : ""} — choisis-en une autre.`;
+    case "P2003": return "Référence invalide : le jeu ou la catégorie visé n'existe pas.";
+    case "P2025": return "Cet élément n'existe plus — il a peut-être été supprimé entre-temps.";
+    case "P2000": return `Valeur trop longue${field ? ` pour ${field}` : ""}.`;
+    default: return e instanceof Error ? e.message : "Erreur inconnue";
+  }
+}
+
 /** Enveloppe commune : éditeur requis, erreurs renvoyées plutôt que jetées. */
 async function run(fn: (adminId: string) => Promise<void>, paths: string[]): Promise<ActionResult> {
   try {
@@ -18,8 +37,7 @@ async function run(fn: (adminId: string) => Promise<void>, paths: string[]): Pro
     for (const p of paths) revalidatePath(p);
     return { ok: true };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Erreur inconnue";
-    return { ok: false, error: msg };
+    return { ok: false, error: humanize(e) };
   }
 }
 
@@ -270,7 +288,7 @@ export async function importCards(csvText: string): Promise<ActionResult & { cou
     revalidatePath("/cartes"); revalidatePath("/"); revalidatePath("/traductions");
     return { ok: true, count: ops.length };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erreur inconnue" };
+    return { ok: false, error: humanize(e) };
   }
 }
 
@@ -300,20 +318,38 @@ export async function publishRelease(changelog: string): Promise<ActionResult & 
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     if (!token) return { ok: false, error: "BLOB_READ_WRITE_TOKEN absent" };
 
-    const { put } = await import("@vercel/blob");
-    const blob = await put(`content/content_v${version}.json`, JSON.stringify(snapshot), {
-      access: "public", token, contentType: "application/json",
-      addRandomSuffix: false, allowOverwrite: false,
+    // La version est réservée AVANT l'upload. Sinon un échec entre l'upload
+    // et l'écriture en base laisserait un fichier orphelin sur Blob : la
+    // tentative suivante réutiliserait le même numéro, que Blob refuserait
+    // (allowOverwrite:false) — publication bloquée définitivement.
+    const reserved = await prisma.contentRelease.create({
+      data: { version, snapshotUrl: "", changelog: changelog.trim() || `Version ${version}` },
     });
 
-    await prisma.contentRelease.create({
-      data: { version, snapshotUrl: blob.url, changelog: changelog.trim() || `Version ${version}` },
+    let blobUrl: string;
+    try {
+      const { put } = await import("@vercel/blob");
+      const blob = await put(`content/content_v${version}.json`, JSON.stringify(snapshot), {
+        access: "public", token, contentType: "application/json",
+        addRandomSuffix: false, allowOverwrite: false,
+      });
+      blobUrl = blob.url;
+    } catch (e) {
+      // Libère le numéro pour que la prochaine tentative reparte proprement.
+      await prisma.contentRelease.delete({ where: { id: reserved.id } });
+      throw e;
+    }
+
+    await prisma.contentRelease.update({
+      where: { id: reserved.id },
+      data: { snapshotUrl: blobUrl },
     });
+    const blob = { url: blobUrl };
     await logAction(editor.id, "published_release", "release", String(version), { url: blob.url });
 
     revalidatePath("/publication"); revalidatePath("/");
     return { ok: true, version };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Erreur inconnue" };
+    return { ok: false, error: humanize(e) };
   }
 }

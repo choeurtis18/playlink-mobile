@@ -247,6 +247,22 @@ model LegalContent {
 // PUBLICATION — l'app ne consomme jamais le contenu live
 // ─────────────────────────────────────────────────────────────
 
+// Inventaire des assets de contenu, alimenté par scripts/fetch-assets.ts.
+// En base plutôt que sur disque : le back-office déployé sur Vercel n'a pas
+// accès au dossier apps/mobile, et un snapshot publié sans assets casserait
+// les slides de règles dans l'app.
+model ContentAsset {
+  ref   String @id // asset://{hash}.{ext}
+  file  String
+  hash  String
+  bytes Int
+  type  String
+
+  createdAt DateTime @default(now())
+
+  @@map("content_assets")
+}
+
 model ContentRelease {
   id          Int      @id @default(autoincrement())
   version     Int      @unique

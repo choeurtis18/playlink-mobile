@@ -11,6 +11,9 @@ export const revalidate = 300;
 
 export async function GET() {
   const release = await prisma.contentRelease.findFirst({
+    // Exclut une release en cours de publication (URL pas encore écrite) :
+    // l'app tenterait sinon de télécharger une chaîne vide.
+    where: { snapshotUrl: { not: "" } },
     orderBy: { version: "desc" },
     select: { version: true, snapshotUrl: true, changelog: true, publishedAt: true },
   });

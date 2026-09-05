@@ -1,5 +1,3 @@
-import { readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
 import { prisma } from "./prisma";
 import type { Snapshot } from "@playlink/content-schema/snapshot.ts";
 
@@ -29,8 +27,9 @@ export async function buildSnapshot(version: number): Promise<Snapshot> {
   const badges = await prisma.badge.findMany({ orderBy: { order: "asc" }, include: { translations: true } });
   const legal = await prisma.legalContent.findMany();
 
-  const manifestPath = join(process.cwd(), "../../apps/mobile/assets/content/assets-manifest.json");
-  const assets = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : [];
+  // Lus en base : le back-office déployé n'a pas accès au dossier apps/mobile.
+  const assetRows = await prisma.contentAsset.findMany({ orderBy: { ref: "asc" } });
+  const assets = assetRows.map((a) => ({ ref: a.ref, file: a.file, hash: a.hash, bytes: a.bytes, type: a.type }));
 
   return {
     version,
