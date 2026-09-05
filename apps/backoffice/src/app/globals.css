@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Le back-office suit la direction sombre de l'app (§10) : même univers
+   visuel, mais outil de travail — densité d'information avant tout. */
+@theme {
+  --color-ground: #0b0a0f;
+  --color-surface: #17151d;
+  --color-raised: #1f1c27;
+  --color-hairline: #2a2733;
+  --color-ink: #f3f1ec;
+  --color-ink-soft: #c7c2d1;
+  --color-neutral-faint: #5c5770;
+  --color-accent: #f23a6b;
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+}

@@ -226,3 +226,75 @@ d'un `vercel env pull`.
 ## Reste à fournir
 
 - `BLOB_READ_WRITE_TOKEN` — créer un store Blob sur Vercel (Storage → Create → Blob)
+
+
+---
+
+# Phase 1 — TERMINÉE ✅ (2026-09-06)
+
+## Livrable du blueprint
+
+> « Le contenu Playlink est dans Neon, une version 1 est publiée, le snapshot
+> JSON est téléchargeable »
+
+Atteint, à une réserve près : le snapshot n'est pas encore *téléchargeable*
+(voir « reste à faire » plus bas). Il est généré, validé et embarquable.
+
+## Ce qui existe
+
+| Élément | État |
+|---|---|
+| Schéma cloud Prisma (25 tables) | ✅ appliqué sur Neon |
+| Migration du contenu | ✅ 11 contrôles, aucun écart |
+| Assets | ✅ 55 fichiers, 13 Mo |
+| Snapshot v1 | ✅ 0,32 Mo, validé par Zod |
+| `GET /content/latest` | ✅ testé en HTTP réel |
+| Auth éditeurs (Clerk) | ✅ redirection vérifiée |
+| Back-office (6 pages) | ✅ lecture seule |
+
+## Chiffres réels (mesurés, pas estimés)
+
+    8 jeux · 28 catégories · 1 521 cartes actives · 56 slides · 5 badges
+
+    Intensité   1: 241 · 2: 306 · 3: 388 · 4: 351 · 5: 235
+    Snapshot    0,32 Mo   (blueprint : 2-4 Mo)
+    Assets      13 Mo     (blueprint : ~30 Mo pour ~100 GIF)
+
+L'app pèsera donc ~15 Mo, loin des 45-60 Mo annoncés au §06.
+
+## Écarts au blueprint constatés
+
+1. **`game_rules` vide** — les règles vivent entièrement dans les 56 slides
+   illustrées. Confirmé produit. Table non migrée.
+2. **56 slides, pas ~100 GIF.**
+3. **5 badges en base contre 12 proposés** au §01. Les 7 manquants sont
+   listés dans la page Badges du back-office avec leur règle prévue.
+4. **Emojis différents** : la base porte 🔥 Dégât Débat, 👀 Qui de nous,
+   💬 Thé ou café. La base fait foi, le blueprint était approximatif.
+5. **Deux projets Supabase** existent ; seul `jrxejcxirkottncvigll` porte
+   le contenu.
+
+## Reste à faire avant la phase 5
+
+- **Store Vercel Blob public** à créer (l'actuel est privé, et l'accès n'est
+  pas modifiable après création). Sans lui, pas d'OTA — mais la v1 étant
+  embarquée dans le binaire, ce n'est pas bloquant avant la phase 6.
+- Le back-office est en **lecture seule** : l'édition, l'import/export CSV et
+  le bouton « Publier » sont prévus phase 5 (§12). La publication se fait
+  aujourd'hui en ligne de commande.
+
+## Commandes
+
+    pnpm --filter @playlink/scripts migrate:content   # --dry-run pour simuler
+    pnpm --filter @playlink/scripts verify            # 11 contrôles
+    pnpm --filter @playlink/scripts fetch:assets
+    pnpm --filter @playlink/scripts build:snapshot
+    pnpm --filter @playlink/scripts publish:release -- --version 1 --local
+    pnpm backoffice:dev
+
+## Sécurité — action en attente
+
+Le mot de passe de la base Supabase de prod et la `SUPABASE_SERVICE_KEY` ont
+circulé en clair dans une conversation. Le dump étant fait, **les faire
+tourner** : Settings → Database → Reset password, et Settings → API →
+Rotate JWT, puis redéployer l'app web avec les nouvelles valeurs.

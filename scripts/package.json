@@ -6,7 +6,9 @@
   "scripts": {
     "migrate:content": "node --experimental-strip-types migrate-content.ts",
     "fetch:assets": "node --experimental-strip-types fetch-assets.ts",
-    "verify": "node --experimental-strip-types verify-migration.ts"
+    "verify": "node --experimental-strip-types verify-migration.ts",
+    "build:snapshot": "node --experimental-strip-types build-snapshot.ts",
+    "publish:release": "node --experimental-strip-types publish-release.ts"
   },
   "dependencies": {
     "@playlink/content-schema": "workspace:*",
