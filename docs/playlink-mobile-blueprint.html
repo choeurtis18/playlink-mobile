@@ -1,0 +1,1525 @@
+<title>Playlink Mobile Blueprint</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+<style>
+  /* Monde délibérément sombre — le blueprint incarne la direction visuelle
+     qu'il documente (§10). Palette fixe, pas d'adaptation au thème système :
+     comme une fiche Netflix, il n'existe qu'en un seul éclairage. */
+  :root {
+    --ground:        #0B0A0F;
+    --ground-deep:   #060509;
+    --surface:       #17151D;
+    --surface-raised:#1F1C27;
+    --surface-sunk:  #0F0D13;
+    --ink:           #F3F1EC;
+    --ink-soft:      #C7C2D1;
+    --neutral:       #948FA3;
+    --neutral-faint: #5C5770;
+    --hairline:      #2A2733;
+    --hairline-firm: #3A3548;
+    --accent:        #F23A6B;
+    --accent-deep:   #FF6B93;
+    --accent-glow:   rgba(242, 58, 107, 0.35);
+    --accent-wash:   #2B121C;
+    --blue:          #4FA0F5;
+    --blue-glow:     rgba(79, 160, 245, 0.3);
+    --blue-wash:     #101E30;
+    --success:       #4FCE87;
+    --warning:       #F5A94E;
+    --danger:        #FF6259;
+
+    --measure: 68ch;
+    --rail: 260px;
+
+    --step--1: clamp(0.82rem, 0.80rem + 0.1vw, 0.88rem);
+    --step-0:  clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+    --step-1:  clamp(1.2rem, 1.1rem + 0.4vw, 1.4rem);
+    --step-2:  clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+    --step-3:  clamp(2rem, 1.6rem + 1.9vw, 3.1rem);
+    --step-4:  clamp(2.6rem, 2rem + 2.8vw, 4.2rem);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+    gap: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Rail ---------- */
+  .rail {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 2.4rem 1.6rem 2.4rem 2rem;
+    border-right: 1px solid var(--hairline);
+    font-size: var(--step--1);
+  }
+  .rail-brand {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 0.2rem;
+  }
+  .rail-brand span { color: var(--accent); text-shadow: 0 0 18px var(--accent-glow); }
+  .rail-kicker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--neutral-faint);
+    margin-bottom: 2rem;
+  }
+  .rail nav { display: flex; flex-direction: column; gap: 0.1rem; }
+  .rail nav a {
+    color: var(--neutral);
+    text-decoration: none;
+    padding: 0.36rem 0.5rem;
+    border-radius: 6px;
+    line-height: 1.35;
+    display: flex;
+    gap: 0.6rem;
+    transition: background 0.15s, color 0.15s;
+  }
+  .rail nav a:hover { background: var(--surface-sunk); color: var(--ink); }
+  .rail nav a .n {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    color: var(--neutral-faint);
+    padding-top: 0.15rem;
+  }
+  .rail nav a.is-sub { padding-left: 1.9rem; font-size: 0.78rem; }
+
+  /* ---------- Main ---------- */
+  main {
+    padding: 0 clamp(1.2rem, 4vw, 4rem) 8rem;
+    min-width: 0;
+  }
+
+  .masthead {
+    position: relative;
+    padding: 4.5rem 0 3rem;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 3.5rem;
+  }
+  .masthead::before {
+    content: "";
+    position: absolute;
+    top: -6rem; left: -8rem;
+    width: 640px; height: 420px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 68%);
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.7;
+  }
+  .masthead .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1.2rem;
+  }
+  .masthead h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: var(--step-4);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0 0 1.4rem;
+  }
+  .masthead .standfirst {
+    font-size: var(--step-1);
+    color: var(--ink-soft);
+    max-width: 44ch;
+    margin: 0;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.6rem;
+    margin-top: 2.2rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+  }
+  .meta-row span {
+    border: 1px solid var(--hairline-firm);
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    color: var(--neutral);
+    letter-spacing: 0.03em;
+  }
+
+  section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .sec-head .num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-shadow: 0 0 14px var(--accent-glow);
+    flex-shrink: 0;
+  }
+  .sec-head h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: var(--step-2);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  h3 {
+    font-family: "Inter Tight", sans-serif;
+    font-weight: 700;
+    font-size: var(--step-1);
+    letter-spacing: -0.01em;
+    margin: 2.6rem 0 0.8rem;
+    color: var(--ink);
+  }
+  h4 {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    margin: 1.8rem 0 0.7rem;
+  }
+
+  p { max-width: var(--measure); margin: 0 0 1.1rem; }
+  ul, ol { max-width: var(--measure); margin: 0 0 1.2rem; padding-left: 1.3rem; }
+  li { margin-bottom: 0.5rem; }
+  li::marker { color: var(--accent); }
+  ul.plain { list-style: none; padding-left: 0; }
+  ul.plain li { padding-left: 1.4rem; position: relative; }
+  ul.plain li::before {
+    content: "→";
+    position: absolute; left: 0;
+    color: var(--accent);
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  strong { font-weight: 600; color: var(--ink); }
+  a.inline { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 2px; }
+
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.86em;
+    background: var(--surface-sunk);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 0.08em 0.36em;
+  }
+  pre {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    background: var(--surface-sunk);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    margin: 0 0 1.4rem;
+    max-width: 100%;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+  /* ---------- Callouts ---------- */
+  .note {
+    max-width: var(--measure);
+    border: 1px solid var(--hairline-firm);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.2rem;
+    margin: 0 0 1.4rem;
+    background: var(--surface-raised);
+    box-shadow: -6px 0 18px -14px var(--accent-glow), 0 6px 18px -14px rgba(0,0,0,0.5);
+    font-size: var(--step--1);
+  }
+  .note.blue { border-left-color: var(--blue); box-shadow: -6px 0 18px -14px var(--blue-glow), 0 6px 18px -14px rgba(0,0,0,0.5); }
+  .note.warn { border-left-color: var(--warning); box-shadow: -6px 0 18px -14px rgba(245, 169, 78, 0.3), 0 6px 18px -14px rgba(0,0,0,0.5); }
+  .note.ok   { border-left-color: var(--success); box-shadow: -6px 0 18px -14px rgba(79, 206, 135, 0.3), 0 6px 18px -14px rgba(0,0,0,0.5); }
+  .note .lbl {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .note p:last-child { margin-bottom: 0; }
+
+  /* ---------- Tables ---------- */
+  .table-wrap { overflow-x: auto; margin: 0 0 1.6rem; border: 1px solid var(--hairline); border-radius: 10px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+    min-width: 460px;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.7rem 0.95rem;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: top;
+  }
+  th {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    background: var(--surface-sunk);
+  }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; font-family: "JetBrains Mono", monospace; }
+
+  .pill {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+  }
+  .pill.local  { color: var(--success); }
+  .pill.cloud  { color: var(--blue); }
+  .pill.both   { color: var(--accent-deep); }
+  .pill.later  { color: var(--neutral); }
+
+  /* ---------- Cards grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+    margin: 0 0 1.6rem;
+    max-width: var(--measure);
+  }
+  .card {
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    background: var(--surface-raised);
+    box-shadow: 0 8px 24px -12px rgba(0,0,0,0.55);
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  }
+  .card:hover {
+    border-color: var(--accent-deep);
+    box-shadow: 0 10px 28px -10px rgba(0,0,0,0.6), 0 0 0 1px var(--accent-glow);
+    transform: translateY(-2px);
+  }
+  .card h4 { margin-top: 0; color: var(--ink); }
+  .card p { font-size: var(--step--1); color: var(--ink-soft); margin-bottom: 0; }
+
+  /* ---------- Figure / SVG ---------- */
+  figure {
+    margin: 1.8rem 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  figure svg { display: block; max-width: 100%; height: auto; min-width: 520px; }
+  figcaption {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--neutral);
+    margin-top: 0.7rem;
+  }
+
+  .phase-line {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0 0 1.6rem;
+    max-width: var(--measure);
+  }
+  .phase {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 1.2rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .phase:last-child { border-bottom: none; }
+  .phase .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 0.15rem;
+  }
+  .phase h4 { margin: 0 0 0.4rem; color: var(--ink); font-size: 0.95rem; text-transform: none; letter-spacing: -0.01em; font-family: "Inter Tight", sans-serif; }
+  .phase p { font-size: var(--step--1); margin: 0; color: var(--ink-soft); }
+  .phase ul { margin: 0.5rem 0 0; font-size: var(--step--1); }
+
+  hr.soft { border: none; border-top: 1px solid var(--hairline); margin: 2.5rem 0; max-width: var(--measure); }
+
+  .footer {
+    max-width: var(--measure);
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--ink);
+    font-size: var(--step--1);
+    color: var(--neutral);
+  }
+
+  /* ---------- Mobile ---------- */
+  .rail-toggle { display: none; }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .rail {
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--hairline);
+      padding: 1.4rem 1.2rem;
+    }
+    .rail nav { display: none; }
+    .rail nav.open { display: flex; }
+    .rail-toggle {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--surface-sunk);
+      border: 1px solid var(--hairline-firm);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 0.5rem 0.9rem;
+      cursor: pointer;
+    }
+    .masthead { padding-top: 3rem; }
+    .phase { grid-template-columns: 70px 1fr; gap: 0.8rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; }
+  }
+  html { scroll-behavior: smooth; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-brand">Play<span>link</span></div>
+    <div class="rail-kicker">Mobile Blueprint · v1</div>
+    <button class="rail-toggle" aria-expanded="false">Sommaire</button>
+    <nav>
+      <a href="#vision"><span class="n">00</span> Vision &amp; périmètre</a>
+      <a href="#existant"><span class="n">01</span> Ce que révèle l'audit</a>
+      <a href="#webref"><span class="n">02</span> Référence de l'app web actuelle</a>
+      <a href="#webref" class="is-sub">Monorepo &amp; packages</a>
+      <a href="#web-pages" class="is-sub">Pages &amp; composants</a>
+      <a href="#web-logic" class="is-sub">Logique de jeu</a>
+      <a href="#web-stores" class="is-sub">Stores &amp; API</a>
+      <a href="#archi"><span class="n">03</span> Architecture technique</a>
+      <a href="#archi" class="is-sub">Vue d'ensemble</a>
+      <a href="#stack" class="is-sub">Choix de stack</a>
+      <a href="#supabase" class="is-sub">Le problème Supabase</a>
+      <a href="#data"><span class="n">04</span> Modèle de données</a>
+      <a href="#data" class="is-sub">Local (SQLite)</a>
+      <a href="#data-cloud" class="is-sub">Cloud (Postgres)</a>
+      <a href="#offline"><span class="n">05</span> Offline &amp; synchronisation</a>
+      <a href="#contenu"><span class="n">06</span> Distribution du contenu</a>
+      <a href="#migration"><span class="n">07</span> Migration de la base actuelle</a>
+      <a href="#analytics"><span class="n">08</span> Analytics &amp; back-office</a>
+      <a href="#freemium"><span class="n">09</span> Freemium (préparé, non construit)</a>
+      <a href="#visuel"><span class="n">10</span> Direction visuelle « Netflix »</a>
+      <a href="#workflows"><span class="n">11</span> Workflows de l'app</a>
+      <a href="#proto"><span class="n">12</span> Plan de prototype</a>
+      <a href="#couts"><span class="n">13</span> Coûts</a>
+      <a href="#claudemd"><span class="n">14</span> CLAUDE.md du nouveau repo</a>
+      <a href="#risques"><span class="n">15</span> Risques &amp; décisions ouvertes</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="masthead">
+      <p class="eyebrow">Définition · Architecture · Prototype</p>
+      <h1>Playlink en application mobile, jouable sans réseau</h1>
+      <p class="standfirst">Porter les 8 jeux de Playlink sur iOS et Android en Flutter, 100 % offline façon Candy Crush, avec un back-office neuf et léger pour le contenu et les stats.</p>
+      <div class="meta-row">
+        <span>Flutter · iOS + Android</span>
+        <span>Next.js back-office sur Vercel</span>
+        <span>Neon Postgres + Clerk</span>
+        <span>Budget infra &lt; 20 $/mois</span>
+        <span>Cible 100–5 000 utilisateurs</span>
+      </div>
+    </header>
+
+    <!-- ============ 00 ============ -->
+    <section id="vision">
+      <div class="sec-head"><span class="num">00</span><h2>Vision &amp; périmètre de la V1</h2></div>
+
+      <p>Playlink devient une <strong>application mobile native-like en Flutter</strong>, distribuée sur l'App Store et le Google Play Store. L'app fonctionne <strong>entièrement hors-ligne</strong> : on télécharge le jeu une fois, et plus jamais besoin de réseau pour jouer. Le réseau ne sert qu'à trois choses secondaires : récupérer les mises à jour de contenu (~1×/mois), synchroniser le compte optionnel d'un joueur, et remonter des statistiques anonymes.</p>
+
+      <p>Le modèle de jeu ne change pas : <strong>pass-and-play sur un seul téléphone</strong>. Plusieurs joueurs autour d'un appareil, on se le passe, les scores se cumulent entre les parties. Pas de multi-appareils, pas de temps réel.</p>
+
+      <h3>Dans la V1</h3>
+      <ul class="plain">
+        <li>Les <strong>8 jeux du catalogue actuel</strong> portés à l'identique (Action ou Vérité, Icebreaker, Dégât Débat, Qui de nous, Mime, Thé ou café, Dilemme, Devine le mot)</li>
+        <li>Sélection catégorie → réglage d'intensité (1–5) → deck de 10 cartes tirées au poids de l'intensité → swipe → vote → résultats</li>
+        <li>Profils joueurs <strong>locaux</strong>, utilisables sans aucun compte</li>
+        <li><strong>Compte optionnel</strong> (Clerk) qui débloque : leaderboard entre les profils du compte, badges persistants, sauvegarde cloud</li>
+        <li>Statistiques joueur persistantes en local (badges, historique, progression par tag)</li>
+        <li><strong>Création de cartes personnalisées</strong> — rattachées au compte de leur auteur, privées jusqu'à publication éventuelle par toi au back-office, respectant le format d'un jeu précis</li>
+        <li><strong>Like</strong> d'une carte (nécessite un compte, remonte dans l'espace perso + au back-office)</li>
+        <li><strong>Partage</strong> d'une carte : image générée avec le branding Playlink + lien vers le store</li>
+        <li><strong>Multilingue FR + EN</strong> — interface et contenu ; cartes non traduites affichées en français</li>
+        <li>Notifications push, feedback haptique, animations soignées, mode sombre</li>
+        <li>Back-office neuf : CRUD contenu, vue des cartes personnalisées avec publication au catalogue, dashboard stats (batch horaire), export des cartes non traduites</li>
+      </ul>
+
+      <h3>Explicitement hors V1 (mais l'architecture le prévoit)</h3>
+      <ul class="plain">
+        <li>Tout paiement — l'app reste <strong>gratuite</strong> pour recueillir des retours</li>
+        <li>Le paywall freemium par abonnement (semaine / mois / année), par catégorie ou intensité</li>
+        <li>Multi-appareils, parties en réseau, classement mondial</li>
+        <li>Catalogue public de cartes communautaires</li>
+        <li>Récupération des joueurs / utilisateurs de l'app web actuelle</li>
+      </ul>
+
+      <div class="note">
+        <span class="lbl">Principe directeur</span>
+        <p>Chaque décision est prise pour <strong>minimiser le coût de maintenance</strong> : services managés à généreux free tier, pas d'infra à babysitter, logique métier dans l'app (pas de serveur de jeu), back-office qui ne fait que du CRUD et de la lecture de stats.</p>
+      </div>
+    </section>
+
+    <!-- ============ 01 ============ -->
+    <section id="existant">
+      <div class="sec-head"><span class="num">01</span><h2>Ce que révèle l'audit du code actuel</h2></div>
+
+      <p>J'ai lu le monorepo <code>playlink-v2</code>. Trois constats déterminants pour la faisabilité offline.</p>
+
+      <h3>1 — Aucune mécanique serveur en temps réel</h3>
+      <p>Le serveur ne fait qu'une chose pour le jeu : <code>GET /api/cards/export</code> renvoie tous les jeux → catégories → cartes actives en un seul JSON, avec un <code>Cache-Control: max-age=300</code>. Tout le reste est de la <strong>logique cliente pure</strong>, déjà écrite en TypeScript et directement transposable en Dart :</p>
+      <ul>
+        <li><strong>Tirage du deck</strong> — <code>shuffle()</code> (Fisher-Yates) puis <code>pickWeighted()</code> qui pondère les cartes selon l'intensité cible du jeu, coupe à 10 cartes. Aucun appel réseau.</li>
+        <li><strong>Scores &amp; votes</strong> — <code>sessionStore</code> (Zustand + <code>sessionStorage</code>) : <code>assignPoint</code>, <code>skipCard</code>, <code>nextPlayer</code>, cumul des <code>tagScores</code> par joueur. Pur état local.</li>
+        <li><strong>Types de joueur</strong> — <code>tag-mapping.ts</code> : 14 tags canoniques, une table de normalisation (<code>ami → amitié</code>…), <code>getPlayerType()</code> qui déduit un archétype (« Le Clown de service », « L'Énigmatique »…) du profil de tags. Constante, embarquable.</li>
+      </ul>
+      <div class="note ok">
+        <span class="lbl">Conclusion</span>
+        <p>Le 100 % offline est réaliste sans compromis. La seule chose à « déserveuriser » est l'attribution des badges (voir ci-dessous).</p>
+      </div>
+
+      <h3>2 — Les badges sont à moitié serveur, à rendre 100 % local</h3>
+      <p>Aujourd'hui, <code>POST /api/sessions</code> appelle <code>checkAndAwardBadges()</code> : la règle d'attribution (« <code>totalScore ≥ 20</code> → badge <em>party_legend</em> ») vit <strong>dans le code serveur</strong>, sur des agrégats Prisma. Les 5 badges actuels sont hardcodés dans la route.</p>
+      <p>En mobile, cette logique doit tourner <strong>sur l'appareil</strong> à la fin de chaque partie, sur la base SQLite locale. Le back-office ne <em>définit</em> que les métadonnées d'un badge (clé, nom, icône, description) ; la <em>règle</em> reste une fonction Dart identifiée par la clé du badge.</p>
+      <p>Nouvelle liste de badges proposée pour la V1 (extensible) :</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Clé</th><th>Nom</th><th>Règle (évaluée en local)</th></tr></thead>
+          <tbody>
+            <tr><td><code>first_win</code></td><td>Première victoire</td><td>1er point marqué, tous jeux confondus</td></tr>
+            <tr><td><code>party_legend</code></td><td>Légende de soirée</td><td>20 points cumulés au total</td></tr>
+            <tr><td><code>centurion</code></td><td>Centurion</td><td>100 points cumulés au total</td></tr>
+            <tr><td><code>social_butterfly</code></td><td>Papillon social</td><td>5 parties à 4 joueurs ou plus</td></tr>
+            <tr><td><code>truth_seeker</code></td><td>Chercheur de vérité</td><td>10 cartes taguées <code>vérité</code> gagnées</td></tr>
+            <tr><td><code>three_peat</code></td><td>Triplé</td><td>3 parties gagnées d'affilée dans une session</td></tr>
+            <tr><td><code>explorer</code></td><td>Explorateur</td><td>Au moins 1 partie dans chacun des 8 jeux</td></tr>
+            <tr><td><code>night_owl</code></td><td>Oiseau de nuit</td><td>Une partie terminée entre 2 h et 5 h</td></tr>
+            <tr><td><code>polyglot</code></td><td>Polyglotte</td><td>Jouer en FR et en EN</td></tr>
+            <tr><td><code>author</code></td><td>Auteur</td><td>Créer 5 cartes personnalisées</td></tr>
+            <tr><td><code>curator</code></td><td>Curateur</td><td>Liker 20 cartes (compte requis)</td></tr>
+            <tr><td><code>marathon</code></td><td>Marathonien</td><td>50 parties terminées</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3 — Le modèle joueur : compte → profils, tags sur les profils</h3>
+      <p>Le schéma actuel (<code>AppUser → Player[] → GameSession / GameSessionPlayer</code>) confirme ta description :</p>
+      <ul>
+        <li>Un <strong>compte</strong> gère <strong>plusieurs profils</strong> jouables (comme les joueurs d'une session)</li>
+        <li>Les <strong>badges</strong> sont rattachés <strong>au compte</strong></li>
+        <li>Les <strong>tagScores</strong> (l'archétype) sont rattachés <strong>au profil</strong></li>
+        <li>Le <strong>leaderboard</strong> est <code>where: { appUserId }</code> — un classement <strong>des profils que tu as toi-même enregistrés</strong>, pas un classement mondial</li>
+      </ul>
+      <p>En mobile : les profils vivent en local (SQLite), utilisables sans compte. À la création d'un compte, on <strong>merge le local vers le cloud</strong> (profils + historique + tagScores + badges déjà débloqués). Le leaderboard « entre potes » se recalcule alors côté serveur, et reste consultable hors-ligne car il est <strong>aussi</strong> calculable en local (toutes les données sont sur l'appareil).</p>
+
+      <h4>Détail des routes existantes analysées</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Route</th><th>Rôle</th><th>Devient</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /api/cards/export</code></td><td>Tout le contenu en un JSON</td><td>Endpoint de contenu versionné du back-office</td></tr>
+            <tr><td><code>POST /api/events</code></td><td>Tracking fire-and-forget</td><td>Remplacé par PostHog (batch offline natif)</td></tr>
+            <tr><td><code>POST /api/sessions</code></td><td>Sauve partie + attribue badges</td><td>Logique déplacée dans l'app ; endpoint de sync cloud si compte</td></tr>
+            <tr><td><code>GET /api/leaderboard</code></td><td>Classement des profils du compte</td><td>Calcul local + endpoint de sync</td></tr>
+            <tr><td><code>GET /api/app-users/badges</code></td><td>Badges du compte</td><td>Local + sync</td></tr>
+            <tr><td><code>/api/admin/*</code></td><td>CRUD back-office</td><td>Réécrit dans le nouveau back-office</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 02 ============ -->
+    <section id="webref">
+      <div class="sec-head"><span class="num">02</span><h2>Référence de l'app web actuelle</h2></div>
+
+      <p>Vue d'ensemble de <code>playlink-v2</code> — le point de départ. C'est la source à porter en Flutter en phase 2. Pour les détails d'implémentation, l'IA lira directement le repo ; cette section sert de carte.</p>
+
+      <h3 id="webref-mono">Monorepo pnpm — 3 packages</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Package</th><th>Rôle</th><th>Devenir</th></tr></thead>
+          <tbody>
+            <tr><td><code>packages/app</code></td><td>Next.js 14, port 3000. App joueur (PWA) + toutes les API routes.</td><td>Référence de portage → <code>apps/mobile</code> Flutter</td></tr>
+            <tr><td><code>packages/admin</code></td><td>Next.js 14, port 3001. Back-office (Supabase Auth admin).</td><td>Référence fonctionnelle → <code>apps/backoffice</code> réécrit</td></tr>
+            <tr><td><code>packages/shared</code></td><td>Types Zod + validators + utils partagés (compilé tsup). Constantes d'intensité (<code>INTENSITY_DEFAULT</code>, <code>INTENSITY_WEIGHT_EXPONENT</code>), <code>EventSchema</code>.</td><td>→ <code>packages/content-schema</code> (Zod + génération Dart)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Stack : Next.js 14 App Router · Tailwind v3 · <strong>Framer Motion</strong> (animations) · <strong>Zustand + persist</strong> (state) · Prisma 5 + Supabase Postgres · Supabase Auth · Zod · Lucide · déployé sur Vercel (app + admin + API même domaine, pas de serveur Express).</p>
+
+      <h3 id="web-pages">Pages joueur &amp; composants</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Page</th><th>Rôle</th></tr></thead>
+          <tbody>
+            <tr><td><code>/</code></td><td>Grille des 8 jeux (<code>GameCard</code>). Charge via <code>gameStore.fetchGames()</code>.</td></tr>
+            <tr><td><code>/game/[slug]</code></td><td>Cœur du jeu. États successifs : sélection catégorie → swipe → vote → « passe le téléphone » → résultats. ~300 lignes, orchestre tous les composants ci-dessous.</td></tr>
+            <tr><td><code>/setup</code></td><td>Composition des joueurs de la session (prénoms + avatars, ou profils enregistrés si connecté). Détection de doublons.</td></tr>
+            <tr><td><code>/classement</code></td><td>Leaderboard (onglet « Top joueurs ») + badges (onglet « Mes badges »). Verrouillé derrière un compte — sinon écran « Connecte-toi ».</td></tr>
+            <tr><td><code>/profil</code></td><td>Profil du compte, gestion des profils joueurs, déconnexion.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Composant</th><th>Ce qu'il fait — à porter en widget Flutter</th></tr></thead>
+          <tbody>
+            <tr><td><code>PlayCard</code></td><td>Carte swipeable. Framer Motion drag, stack visuelle, <code>AnimatePresence</code>. Swipe droite = carte suivante, gauche = précédente. Seuil <code>offset.x &gt; 80</code>. Face cachée jusqu'au « Révéler ».</td></tr>
+            <tr><td><code>CategoryPicker</code></td><td>Sélection de catégorie avant de jouer. Chaque catégorie affiche un aperçu d'une carte aléatoire (<code>useRandomCard</code>, stabilisé par <code>useMemo</code>).</td></tr>
+            <tr><td><code>VoteScreen</code></td><td>« Verdict du groupe » : <code>{joueur}</code> mérite-t-il un point ? Deux boutons Point / Passer. Slide-up spring.</td></tr>
+            <tr><td><code>PassDeviceScreen</code></td><td>Écran plein « passe le téléphone à {joueur} » entre deux tours quand &gt; 1 joueur. Masque la carte suivante jusqu'à confirmation.</td></tr>
+            <tr><td><code>GameResults</code></td><td>Podium de fin de partie : classement par score <em>de la session</em> (<code>score - scoreBeforeSession</code>), médailles 🥇🥈🥉, bouton « Rejouer ».</td></tr>
+            <tr><td><code>RulesModal</code></td><td>Modale de règles : slides illustrées (<code>RuleSlide[]</code>) chargées via <code>/api/games/[id]/rule-slides</code>.</td></tr>
+            <tr><td><code>CardGridModal</code></td><td>Vue grille de toutes les cartes du deck en cours.</td></tr>
+            <tr><td><code>Header</code> · <code>PlayFooter</code> · <code>BottomNav</code></td><td>Chrome : back, titre, compteur <code>{i} / {n}</code>, accès règles, nav bas d'écran.</td></tr>
+            <tr><td><code>AuthModal</code> · <code>ImportGuestPlayersModal</code> · <code>DuplicatePlayerModal</code> · <code>PlayerProfileModal</code> · <code>PlayersModal</code></td><td>Parcours compte : connexion, import des joueurs invités vers le compte après connexion, résolution de doublons, détail d'un profil.</td></tr>
+            <tr><td><code>SplashScreen</code> · <code>ThemeScript</code> · <code>LegalModal</code></td><td>Démarrage, application du thème avant hydratation, CGU / confidentialité.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="web-logic">Logique de jeu — déjà cliente, à porter en Dart</h3>
+      <ul>
+        <li><strong><code>lib/intensity-deck.ts</code></strong> — <code>intensityWeight(cardIntensity, target)</code> = <code>1 / (1 + |écart|)^k</code> avec <code>k = INTENSITY_WEIGHT_EXPONENT</code> (1.5). Aucune carte n'a un poids nul. <code>pickWeighted(cards, target, count)</code> = tirage pondéré <strong>sans remise</strong> : favorise les cartes proches de l'intensité visée sans jamais exclure les autres. Le deck n'est jamais vide.</li>
+        <li><strong><code>gameStore.startDeck()</code></strong> — <code>pickWeighted(shuffle(category.cards), intensitéDuJeu, cardsPerGame)</code>. <code>shuffle</code> = Fisher-Yates. <code>cardsPerGame</code> défaut 10.</li>
+        <li><strong>Cycle de session</strong> (<code>sessionStore</code>) — phases <code>idle → setup → playing → voting → results</code>. <code>assignPoint(playerId, tags)</code> incrémente le score + cumule les tags, passe en <code>voting</code>. <code>skipCard</code> enregistre le résultat sans point. <code>nextPlayer</code> = <code>(index + 1) % players.length</code>. Scores <strong>cumulés entre parties</strong> — <code>resetSession</code> conserve <code>players</code>, <code>scores</code>, <code>tagScoresGained</code>.</li>
+        <li><strong><code>lib/tag-mapping.ts</code></strong> — 14 tags canoniques (<code>amitié</code>, <code>humour</code>, <code>vérité</code>, <code>action</code>, <code>stratégie</code>, <code>créativité</code>, <code>courage</code>, <code>mystère</code>, <code>flirt</code>, <code>tabou</code>, <code>société</code>, <code>ambition</code>, <code>famille</code>, <code>nostalgie</code>). Table <code>TAG_MAP</code> normalise ~150 tags bruts. <code>getPlayerType(tagScores)</code> → archétype (« Le Clown de service », « L'Énigmatique », « Le Séducteur »…) selon le tag dominant du profil.</li>
+      </ul>
+      <div class="note ok">
+        <span class="lbl">Aucune de ces fonctions n'appelle le réseau</span>
+        <p>Elles sont pures et déterministes (au <code>Math.random</code> près). Le portage Dart est mécanique et testable ligne à ligne contre l'implémentation TS.</p>
+      </div>
+
+      <h3 id="web-stores">Stores Zustand → Riverpod</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Store (persist)</th><th>Contenu</th><th>Équivalent mobile</th></tr></thead>
+          <tbody>
+            <tr><td><code>gameStore</code> · <code>localStorage</code></td><td><code>games[]</code> (contenu mis en cache), <code>deck</code>, <code>currentIndex</code>, <code>intensityByGame</code>, <code>cardsPerGame</code>, <code>darkMode</code>, <code>isOffline</code>. Actions : <code>fetchGames</code>, <code>startDeck</code>, <code>next/prev</code>, <code>setIntensity</code>.</td><td>Provider Riverpod + drift (le contenu vient de SQLite, plus d'un fetch)</td></tr>
+            <tr><td><code>sessionStore</code> · <code>sessionStorage</code></td><td>Partie en cours : <code>players</code>, <code>currentPlayerIndex</code>, <code>scores</code>, <code>scoresBeforeSession</code>, <code>tagScoresGained</code>, <code>cardResults</code>, <code>phase</code>. <code>_hasHydrated</code> jamais persisté.</td><td>Provider Riverpod éphémère + persistance drift pour l'historique</td></tr>
+            <tr><td><code>authStore</code> · <code>localStorage</code></td><td><code>appUser</code>, <code>token</code> (Supabase JWT), <code>dbPlayers[]</code>. Actions : <code>signUp/signIn/signOut</code>, <code>fetchPlayers</code>, <code>createPlayer</code>.</td><td>Clerk SDK + provider de session</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>API routes actuelles → ce qu'elles deviennent</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Route(s)</th><th>Rôle</th><th>Devenir</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /api/cards/export</code>, <code>/api/games</code>, <code>/api/games/[id]/rules</code>, <code>/api/games/[id]/rule-slides</code></td><td>Tout le contenu (jeux → catégories → cartes actives) + règles + slides</td><td>Snapshot de contenu versionné (<code>ContentRelease</code>), embarqué puis OTA</td></tr>
+            <tr><td><code>POST /api/events</code> (<code>useTracking</code> : <code>game_started</code>, <code>card_viewed</code>, <code>game_finished</code>)</td><td>Tracking fire-and-forget → table <code>Event</code></td><td>Remplacé par PostHog SDK (batch offline natif)</td></tr>
+            <tr><td><code>POST /api/sessions</code></td><td>Sauve la partie + cumule <code>tagScores</code> + <code>checkAndAwardBadges</code> (5 badges hardcodés, règles serveur)</td><td>Logique déplacée dans l'app ; <code>POST /sync</code> pour les comptes</td></tr>
+            <tr><td><code>GET /api/leaderboard</code>, <code>/api/app-users/badges</code></td><td>Classement des profils du compte, badges du compte</td><td>Calcul local + sync</td></tr>
+            <tr><td><code>POST /api/players</code>, <code>/api/app-users</code></td><td>CRUD profils / compte joueur</td><td>Profils en local ; compte via Clerk + <code>Profile</code> côté cloud</td></tr>
+            <tr><td><code>/api/admin/*</code> (~35 routes : games, categories, cards, badges, rules, rule-slides, analytics/*, *-import/export, bulk-import, upload, legal, stats)</td><td>CRUD back-office complet + import/export CSV transactionnel + analytics</td><td>Réécrit dans <code>apps/backoffice</code> (schéma cloud neuf)</td></tr>
+            <tr><td><code>GET /api/legal/[key]</code></td><td>Contenu CGU / confidentialité (table <code>LegalContent</code>)</td><td>Servi par le back-office, mis en cache offline</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Schéma Prisma actuel — ce qu'on garde, ce qu'on jette</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Modèle</th><th>Décision</th></tr></thead>
+          <tbody>
+            <tr><td><code>Game</code>, <code>Category</code>, <code>Card</code></td><td><span class="pill both">migré</span> Contenu. <code>Card.intensity</code> (1–5) déjà en place, <code>difficulty</code> legacy abandonné. <code>tags[]</code> conservés + tags canoniques pré-calculés.</td></tr>
+            <tr><td><code>GameRules</code>, <code>GameRuleSlide</code></td><td><span class="pill both">migré</span> Règles markdown + slides (<code>imageUrl</code> → <code>asset://</code>)</td></tr>
+            <tr><td><code>Badge</code></td><td><span class="pill both">migré</span> Métadonnées seulement (clé, nom, icône, description). Règle = code Dart.</td></tr>
+            <tr><td><code>LegalContent</code></td><td><span class="pill both">migré</span> CGU / confidentialité</td></tr>
+            <tr><td><code>User</code> (admin), <code>AppUser</code>, <code>Player</code>, <code>GameSession</code>, <code>GameSessionPlayer</code>, <code>UserBadge</code>, <code>AuditLog</code>, <code>Event</code></td><td><span class="pill later">non migré</span> Joueurs/utilisateurs non récupérés (ta consigne). Le <em>modèle</em> <code>AppUser → Player[]</code> / tagScores-sur-profil / badges-sur-compte est repris tel quel dans le schéma cloud neuf.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Comportements notables à reproduire</h3>
+      <ul class="plain">
+        <li>Swipe droite = carte <strong>suivante</strong>, gauche = <strong>précédente</strong> (contre-intuitif mais volontaire) — seuil ±80 px</li>
+        <li><code>fetchGames</code> se relance sur <code>visibilitychange</code> (retour d'onglet = resync) → en mobile : check de contenu au retour au premier plan</li>
+        <li>Mode hors-ligne actuel : données du cache <code>persist</code> affichées avec un bandeau ambre</li>
+        <li>Fin de deck (<code>currentIndex ≥ deck.length</code>) → écran « Partie terminée 🎉 »</li>
+        <li>Guard d'hydratation : <code>if (!_hasHydrated) return</code> avant toute redirection (évite les flashs)</li>
+        <li>10 cartes max par partie, scores jamais reset automatiquement</li>
+      </ul>
+
+      <h3>Les 8 jeux — catalogue réel (export base au 2026-08-29)</h3>
+      <p>Le catalogue a été renouvelé depuis la version précédente de ce document : <strong>Roland Gamos a disparu</strong>, remplacé par une refonte de <strong>Devine le mot</strong> (mécanique « 3 indices max »), et deux jeux ont été renommés avec une nouvelle identité éditoriale (<strong>Balance Ton Pote → Qui de nous</strong>, <strong>Mime Inversé → Mime</strong>). Un jeu totalement nouveau apparaît : <strong>Thé ou café</strong>. Table reconstruite depuis l'export CSV réel des jeux/catégories/cartes.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Jeu</th><th>Slug</th><th>Couleurs</th><th>Catégories</th></tr></thead>
+          <tbody>
+            <tr><td>🎯 Action ou Vérité</td><td><code>action-ou-verite</code></td><td class="num">#7C3AED / #EC4899</td><td>Vérités légères, Vérités Flirt, Vérités Spicy, Actions Rigolote, Actions Flirt, Actions Spicy</td></tr>
+            <tr><td>🧊 Icebreaker</td><td><code>icebreaker</code></td><td class="num">#0EA5E9 / #06B6D4</td><td>Pour se découvrir, Cœur à Cœur, Deep Talk</td></tr>
+            <tr><td>💥 Dégât Débat</td><td><code>degat-debat</code></td><td class="num">#DC2626 / #F97316</td><td>Société, Perso et Relations, Éthique et Morale</td></tr>
+            <tr><td>🗳️ Qui de nous</td><td><code>qui-de-nous</code></td><td class="num">#059669 / #10B981</td><td>Personnalité, Désir et Attirance, Taquineries, Secrets et Confessions</td></tr>
+            <tr><td>🎭 Mime</td><td><code>mime</code></td><td class="num">#D97706 / #F59E0B</td><td>Objets du quotidien, Actions, Métiers</td></tr>
+            <tr><td>☕ Thé ou café</td><td><code>the-cafe</code></td><td class="num">#7C3AED / #8B5CF6</td><td>Facile, Moyen, Difficile</td></tr>
+            <tr><td>⚖️ Dilemme</td><td><code>dilemme</code></td><td class="num">#1D4ED8 / #3B82F6</td><td>Absurde et Fun, Relations et Sociétés, Identité et Valeurs</td></tr>
+            <tr><td>🕵️ Devine le mot</td><td><code>devine-mot</code></td><td class="num">#BE185D / #EC4899</td><td>Objets et Lieux, Personnages et Culture, Abstrait et Expressions</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Mécaniques à confirmer pour le portage</h4>
+      <p>Tes descriptions produit de chaque jeu (message du 5 septembre) donnent l'intention éditoriale. Deux jeux ont une mécanique qui dépasse le simple swipe de carte actuel et méritent une vérification de comportement en phase 2 :</p>
+      <ul class="plain">
+        <li><strong>Qui de nous</strong> — « le groupe désigne, la majorité tranche » : implique un vote collectif sur un joueur désigné, pas un vote binaire oui/non sur une seule personne comme le <code>VoteScreen</code> actuel. À concevoir comme un écran de désignation multi-joueurs.</li>
+        <li><strong>Thé ou café</strong> — mécanique de duel binaire itératif (« thé ou café ? » jusqu'à converger vers le mot) : différente du mime classique, se rapproche d'un jeu de 20 questions à choix binaire forcé. Nouveau composant à concevoir, pas un portage direct de <code>PlayCard</code>.</li>
+        <li><strong>Devine le mot</strong> — mécanique « 3 indices maximum » avec pénalité si un indice est mal choisi : nécessite un compteur d'indices et une logique de fin de tour anticipée, absente du flux swipe actuel.</li>
+        <li><strong>Mime</strong>, <strong>Action ou Vérité</strong>, <strong>Icebreaker</strong>, <strong>Dégât Débat</strong>, <strong>Dilemme</strong> — mécanique de swipe/carte inchangée, portage direct.</li>
+      </ul>
+
+      <div class="note warn">
+        <span class="lbl">Comptes de cartes et catégories</span>
+        <p>Les CSV réels (jeux, catégories, ~1 600+ cartes) ont été fournis mais ne sont pas dénombrés à la main dans ce document — trop volumineux pour un comptage fiable en prose. Le script <code>scripts/verify-migration.ts</code> (§07) doit produire le décompte exact par jeu/catégorie/intensité au moment de l'import, à partir de ces mêmes fichiers.</p>
+      </div>
+    </section>
+
+    <!-- ============ 03 ============ -->
+    <section id="archi">
+      <div class="sec-head"><span class="num">03</span><h2>Architecture technique</h2></div>
+
+      <p>Trois composants seulement. Aucun serveur applicatif de jeu.</p>
+
+      <figure>
+        <svg viewBox="0 0 760 420" role="img" aria-labelledby="archi-title">
+          <title id="archi-title">Schéma d'architecture : app mobile Flutter, back-office Next.js, base Neon</title>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <g font-family="'JetBrains Mono', monospace" font-size="11">
+
+            <!-- Mobile -->
+            <rect x="20" y="120" width="210" height="180" rx="12" fill="var(--accent-wash)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="125" y="112" text-anchor="middle" fill="var(--neutral)" font-size="10" letter-spacing="1">APPAREIL DU JOUEUR</text>
+            <text x="36" y="146" fill="var(--ink)" font-weight="600" font-size="12" font-family="'Inter Tight', sans-serif">App Playlink · Flutter</text>
+            <text x="36" y="170" fill="var(--ink-soft)">SQLite (drift) — contenu +</text>
+            <text x="36" y="185" fill="var(--ink-soft)">profils + parties + badges</text>
+            <text x="36" y="209" fill="var(--ink-soft)">Assets GIF embarqués</text>
+            <text x="36" y="224" fill="var(--ink-soft)">Logique jeu / deck / badges</text>
+            <text x="36" y="248" fill="var(--ink-soft)">Clerk SDK (compte optionnel)</text>
+            <text x="36" y="263" fill="var(--ink-soft)">PostHog SDK (events bufferisés)</text>
+            <text x="36" y="287" fill="var(--ink-soft)">File d'attente de sync</text>
+
+            <!-- Vercel -->
+            <rect x="330" y="40" width="240" height="150" rx="12" fill="var(--blue-wash)" stroke="var(--blue)" stroke-width="1.5"/>
+            <text x="450" y="32" text-anchor="middle" fill="var(--neutral)" font-size="10" letter-spacing="1">VERCEL</text>
+            <text x="346" y="66" fill="var(--ink)" font-weight="600" font-size="12" font-family="'Inter Tight', sans-serif">Back-office · Next.js</text>
+            <text x="346" y="90" fill="var(--ink-soft)">Dashboard stats (batch)</text>
+            <text x="346" y="105" fill="var(--ink-soft)">CRUD jeux/cartes/badges</text>
+            <text x="346" y="120" fill="var(--ink-soft)">Publication cartes utilisateur</text>
+            <text x="346" y="140" fill="var(--ink-soft)">GET /content/v{n}.json</text>
+            <text x="346" y="155" fill="var(--ink-soft)">POST /sync (compte)</text>
+            <text x="346" y="175" fill="var(--ink-soft)">Cron horaire → agrégats</text>
+
+            <!-- Neon -->
+            <rect x="330" y="250" width="240" height="90" rx="12" fill="var(--surface)" stroke="var(--hairline-firm)" stroke-width="1.5"/>
+            <text x="450" y="242" text-anchor="middle" fill="var(--neutral)" font-size="10" letter-spacing="1">NEON (via Vercel Marketplace)</text>
+            <text x="346" y="278" fill="var(--ink)" font-weight="600" font-size="12" font-family="'Inter Tight', sans-serif">Postgres (Prisma)</text>
+            <text x="346" y="300" fill="var(--ink-soft)">Contenu maître · comptes</text>
+            <text x="346" y="315" fill="var(--ink-soft)">Likes · cartes perso · agrégats</text>
+
+            <!-- External -->
+            <rect x="620" y="60" width="120" height="60" rx="10" fill="var(--surface)" stroke="var(--hairline-firm)"/>
+            <text x="680" y="86" text-anchor="middle" fill="var(--ink)">Clerk</text>
+            <text x="680" y="102" text-anchor="middle" fill="var(--ink-soft)" font-size="10">auth</text>
+
+            <rect x="620" y="150" width="120" height="60" rx="10" fill="var(--surface)" stroke="var(--hairline-firm)"/>
+            <text x="680" y="176" text-anchor="middle" fill="var(--ink)">PostHog EU</text>
+            <text x="680" y="192" text-anchor="middle" fill="var(--ink-soft)" font-size="10">analytics</text>
+
+            <!-- Arrows -->
+            <g stroke="var(--accent)" fill="none" stroke-width="1.5" color="var(--accent)">
+              <path d="M230 175 C 290 175, 290 120, 328 120" marker-end="url(#arrow)"/>
+              <path d="M230 285 C 290 285, 290 300, 328 300" marker-end="url(#arrow)"/>
+            </g>
+            <g stroke="var(--blue)" fill="none" stroke-width="1.5" color="var(--blue)">
+              <path d="M450 190 L450 248" marker-end="url(#arrow)"/>
+            </g>
+            <g stroke="var(--neutral-faint)" fill="none" stroke-width="1.3" color="var(--neutral-faint)" stroke-dasharray="4 3">
+              <path d="M230 200 C 400 210, 520 150, 618 100" marker-end="url(#arrow)"/>
+              <path d="M230 250 C 420 250, 500 200, 618 185" marker-end="url(#arrow)"/>
+            </g>
+          </g>
+        </svg>
+        <figcaption>Trait plein = requêtes de l'app · pointillé = SDK tiers · Le back-office ne parle jamais directement à l'app pendant une partie.</figcaption>
+      </figure>
+
+      <h3 id="stack">Choix de stack</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Couche</th><th>Choix</th><th>Pourquoi</th></tr></thead>
+          <tbody>
+            <tr><td>App mobile</td><td><strong>Flutter</strong> (Dart 3)</td><td>Un seul code iOS + Android, animations et haptique natives, excellent pour ce type d'UI très visuelle</td></tr>
+            <tr><td>Base locale</td><td><strong>drift</strong> (SQLite typé)</td><td>Requêtes SQL typées, migrations, réactif ; parfait pour contenu + historique offline</td></tr>
+            <tr><td>State</td><td><strong>Riverpod</strong></td><td>Équivalent Dart de Zustand, testable, pas de boilerplate</td></tr>
+            <tr><td>Navigation</td><td><strong>go_router</strong></td><td>Deep links (carte partagée → store) gérés proprement</td></tr>
+            <tr><td>i18n</td><td><code>flutter_localizations</code> + ARB</td><td>Standard, FR + EN, fallback automatique</td></tr>
+            <tr><td>Back-office</td><td><strong>Next.js 15 App Router</strong> sur Vercel</td><td>Tu connais déjà, free tier suffisant, Prisma réutilisable</td></tr>
+            <tr><td>UI back-office</td><td><strong>shadcn/ui</strong> + Tailwind</td><td>Tables, formulaires, dashboard rapides et propres</td></tr>
+            <tr><td>Base cloud</td><td><strong>Neon Postgres</strong> (Vercel Marketplace)</td><td>Voir §<a href="#supabase" class="inline">03 · problème Supabase</a></td></tr>
+            <tr><td>Auth joueurs</td><td><strong>Clerk</strong> (défaut) · Better Auth (alternative)</td><td>Email/pwd + magic link + Apple + Google inclus, 10 000 MAU gratuits</td></tr>
+            <tr><td>Analytics</td><td><strong>PostHog Cloud EU</strong></td><td>RGPD, hébergé UE, batch offline natif, 1M events/mois gratuits</td></tr>
+            <tr><td>Génération d'image de partage</td><td>Canvas Flutter → PNG</td><td>Rendu local, pas de service serveur</td></tr>
+            <tr><td>Push</td><td><strong>Firebase Cloud Messaging</strong> (gratuit, illimité)</td><td>Seul usage de Firebase ; standard iOS + Android</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note blue">
+        <span class="lbl">Better Auth — alternative documentée</span>
+        <p><strong>Better Auth</strong> est une lib open-source : les tables d'auth vivent dans ta base Neon, zéro dépendance SaaS, gratuit pour toujours. Le coût : tu écris et maintiens toi-même la vérification d'email, le reset de mot de passe, la rotation des tokens, et l'intégration Sign in with Apple / Google. À reconsidérer si Clerk devient payant à ton échelle (peu probable avant &gt; 10 000 utilisateurs actifs/mois) ou si tu veux tout rapatrier. La bascule Clerk → Better Auth touche l'écran de login de l'app et l'endpoint <code>/sync</code>, pas le reste.</p>
+      </div>
+
+      <h3 id="supabase">Le problème Supabase — et pourquoi Neon</h3>
+      <p>Tu as bien identifié le risque. Sur le plan gratuit Supabase, un projet est <strong>mis en pause après 7 jours sans activité</strong>, et le réveil prend <strong>1 à 2 minutes</strong>. Pour une app dont le premier lancement doit être instantané, c'est rédhibitoire. Et le cron-qui-ping est un antipattern : fragile, et détectable comme activité artificielle.</p>
+      <p><strong>Neon</strong> résout ça :</p>
+      <ul>
+        <li>Neon <em>scale-to-zero</em> aussi après ~5 min d'inactivité — mais le réveil est <strong>~500 ms</strong>, invisible. Pas de « mise en pause » du projet : la base reste toujours joignable.</li>
+        <li>Intégration Vercel native : <code>vercel integration add neon</code>, la <code>DATABASE_URL</code> est injectée automatiquement. Branch DB par preview deploy incluse.</li>
+        <li>Free tier : 0,5 GB de stockage (ta base utile ≈ 5 MB), largement au-dessus de 5 000 utilisateurs.</li>
+        <li>Aucun cron de <em>keep-alive</em> à maintenir.</li>
+      </ul>
+      <div class="note ok">
+        <span class="lbl">Effet de bord favorable sur ton quota</span>
+        <p>Avec Neon + Clerk, tu n'ajoutes <strong>aucune</strong> base Supabase. Tes 2 slots Supabase restent entièrement pour l'app web actuelle. Une <strong>adresse mail dédiée au projet</strong> (alias type <code>playlink@…</code>) reste recommandée pour rattacher Apple Developer, Google Play, Neon, Clerk, PostHog, GitHub — sans tout accrocher à ton compte perso. Non bloquant, mais à faire tôt.</p>
+      </div>
+    </section>
+
+    <!-- ============ 04 ============ -->
+    <section id="data">
+      <div class="sec-head"><span class="num">04</span><h2>Modèle de données</h2></div>
+
+      <p>Deux bases, deux rôles. Le <span class="pill local">local</span> est la source de vérité pour jouer. Le <span class="pill cloud">cloud</span> est la source de vérité pour le contenu et — si compte — pour la sauvegarde.</p>
+
+      <h3>Base locale — SQLite / drift (sur l'appareil)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Table</th><th>Origine</th><th>Contenu</th></tr></thead>
+          <tbody>
+            <tr><td><code>games</code></td><td><span class="pill cloud">contenu</span></td><td>id, nom, slug, description, icône, couleurs, ordre, actif — par langue</td></tr>
+            <tr><td><code>game_rules</code> · <code>game_rule_slides</code></td><td><span class="pill cloud">contenu</span></td><td>Règles markdown + slides illustrées (imageRef local)</td></tr>
+            <tr><td><code>categories</code></td><td><span class="pill cloud">contenu</span></td><td>id, gameId, nom, slug, description, icône, ordre — par langue</td></tr>
+            <tr><td><code>cards</code></td><td><span class="pill cloud">contenu</span></td><td>id, categoryId, texte, intensité (1–5), tags[], langue, actif, ordre, <code>likeCount</code></td></tr>
+            <tr><td><code>card_translations</code></td><td><span class="pill cloud">contenu</span></td><td>cardId, langue, texte — absente ⇒ fallback FR</td></tr>
+            <tr><td><code>badges</code></td><td><span class="pill cloud">contenu</span></td><td>clé, nom, description, icône — par langue (règle = code Dart)</td></tr>
+            <tr><td><code>assets</code></td><td><span class="pill both">embarqué + OTA</span></td><td>ref, type (gif/img), chemin local, hash, version</td></tr>
+            <tr><td><code>content_meta</code></td><td><span class="pill both">both</span></td><td>version de contenu installée, date de dernier check, langue active</td></tr>
+            <tr><td><code>session_players_list</code></td><td><span class="pill local">local</span></td><td>La liste persistante des joueurs de l'appareil (nom, avatar, ordre) — composée à l'onboarding/lancement (A1/A2), modifiable à tout moment depuis la home (B1). Partagée par tous les jeux.</td></tr>
+            <tr><td><code>local_players</code></td><td><span class="pill local">local</span></td><td>id (uuid), nom, avatar, tagScores (JSON), createdAt, <code>remoteId?</code> — un profil par entrée de <code>session_players_list</code></td></tr>
+            <tr><td><code>game_sessions</code></td><td><span class="pill local">local</span></td><td>id, gameId, categoryId, langue, startedAt, finishedAt, playerCount</td></tr>
+            <tr><td><code>session_players</code></td><td><span class="pill local">local</span></td><td>sessionId, playerId, score, tagScoresGained (JSON)</td></tr>
+            <tr><td><code>player_totals</code></td><td><span class="pill local">local</span></td><td>Vue matérialisée : score cumulé + nb parties par profil (pour le leaderboard offline)</td></tr>
+            <tr><td><code>earned_badges</code></td><td><span class="pill local">local</span></td><td>badgeKey, earnedAt, <code>syncedAt?</code></td></tr>
+            <tr><td><code>custom_cards</code></td><td><span class="pill local">local</span> → <span class="pill cloud">sync</span></td><td>id, accountId, gameId, categoryId, texte, active (toggle), createdAt, updatedAt, <code>syncedAt?</code>, <code>remoteId?</code> — <strong>compte requis</strong> pour exister au-delà de l'appareil ; sans compte, ne sort jamais du local et n'est jamais publiable</td></tr>
+            <tr><td><code>liked_cards</code></td><td><span class="pill local">local</span> → <span class="pill cloud">sync</span></td><td>cardId, likedAt, syncedAt? (compte requis pour synchro)</td></tr>
+            <tr><td><code>sync_queue</code></td><td><span class="pill local">local</span></td><td>Opérations en attente d'envoi (voir §05)</td></tr>
+            <tr><td><code>app_prefs</code></td><td><span class="pill local">local</span></td><td>langue UI, intensité par jeu, cartes/partie, thème, onboarding vu, consentement analytics</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="data-cloud">Base cloud — Postgres / Prisma (Neon)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Modèle</th><th>Rôle</th></tr></thead>
+          <tbody>
+            <tr><td><code>Game</code> · <code>Category</code> · <code>Card</code> · <code>CardTranslation</code></td><td>Contenu maître, édité au back-office. <code>Card.originalLocale = "fr"</code>.</td></tr>
+            <tr><td><code>GameRules</code> · <code>GameRuleSlide</code></td><td>Règles + slides, avec traductions</td></tr>
+            <tr><td><code>Badge</code> · <code>BadgeTranslation</code></td><td>Métadonnées de badge (pas la règle)</td></tr>
+            <tr><td><code>ContentRelease</code></td><td>version (int), publishedAt, snapshotUrl, changelog — <strong>une ligne par publication</strong></td></tr>
+            <tr><td><code>AdminUser</code></td><td>Éditeurs du back-office (Clerk ou table simple) — <strong>distinct des joueurs</strong></td></tr>
+            <tr><td><code>Account</code></td><td>Miroir du compte Clerk : clerkId, email, locale, createdAt</td></tr>
+            <tr><td><code>Profile</code></td><td>accountId, name, avatar, tagScores (JSON), localId (uuid d'origine) — pour la réconciliation du merge</td></tr>
+            <tr><td><code>SyncedSession</code> · <code>SyncedSessionPlayer</code></td><td>Historique de parties poussé par les comptes (dédupliqué sur un <code>clientSessionId</code>)</td></tr>
+            <tr><td><code>EarnedBadge</code></td><td>accountId, badgeKey, earnedAt</td></tr>
+            <tr><td><code>CardLike</code></td><td>accountId, cardId, createdAt — <code>@@unique([accountId, cardId])</code> anti-double-comptage</td></tr>
+            <tr><td><code>CustomCard</code></td><td>accountId, gameId, categoryId, texte, active, createdAt, updatedAt — miroir cloud de la carte perso, visible au back-office avec son auteur</td></tr>
+            <tr><td><code>Card.sourceCustomCardId</code></td><td>Sur une <code>Card</code> officielle issue d'une publication : lien de traçabilité vers la <code>CustomCard</code> d'origine (copie figée, pas de référence live — voir §05)</td></tr>
+            <tr><td><code>DailyStat</code> · <code>HourlyStat</code></td><td>Agrégats pré-calculés par le cron (voir §08) — le dashboard ne fait que les lire</td></tr>
+            <tr><td><code>AuditLog</code></td><td>Traçabilité des mutations back-office</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">Traductions manquantes</span>
+        <p>Une carte sans <code>CardTranslation</code> pour la langue demandée est servie en FR. Le back-office expose une vue <strong>« Cartes non traduites »</strong> : <code>SELECT cards LEFT JOIN card_translations WHERE locale = 'en' AND translation IS NULL</code>, exportable en CSV, avec compteur par jeu. C'est le tableau de bord de l'effort de traduction.</p>
+      </div>
+    </section>
+
+    <!-- ============ 05 ============ -->
+    <section id="offline">
+      <div class="sec-head"><span class="num">05</span><h2>Offline &amp; synchronisation</h2></div>
+
+      <p>L'app est <strong>offline-first strict</strong> : toute action réussit immédiatement en local, la synchro est un effet de bord opportuniste. On ne bloque jamais l'utilisateur sur le réseau.</p>
+
+      <h3>La file de synchronisation</h3>
+      <p>Toute opération qui doit remonter au cloud est écrite dans <code>sync_queue</code> avec un type et un payload. Un <em>worker</em> se déclenche quand : l'app passe au premier plan, la connectivité revient, ou toutes les 15 min en tâche de fond. Il envoie les items par lot à <code>POST /sync</code>, marque <code>syncedAt</code>, réessaie avec backoff.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type d'opération</th><th>Déclencheur</th><th>Nécessite un compte</th></tr></thead>
+          <tbody>
+            <tr><td><code>session.completed</code></td><td>Fin de partie</td><td>Oui (sinon reste local)</td></tr>
+            <tr><td><code>badge.earned</code></td><td>Badge débloqué</td><td>Oui</td></tr>
+            <tr><td><code>card.liked</code> / <code>card.unliked</code></td><td>Like / unlike</td><td>Oui (le like <em>exige</em> un compte)</td></tr>
+            <tr><td><code>custom_card.created</code> / <code>updated</code> / <code>deleted</code></td><td>Création, édition, activation/désactivation, suppression d'une carte perso</td><td>Oui (une carte perso sans compte reste 100 % locale, jamais synchronisée, jamais publiable)</td></tr>
+            <tr><td><code>analytics.*</code></td><td>Événements produit</td><td>Non — géré par le SDK PostHog, pas la file</td></tr>
+            <tr><td><code>account.merge</code></td><td>Création de compte après usage local</td><td>Oui — one-shot</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Le merge local → cloud (création de compte)</h3>
+      <ol>
+        <li>L'utilisateur jouait sans compte : profils, parties, badges, likes sont en SQLite avec des <code>uuid</code> locaux.</li>
+        <li>Il crée un compte via Clerk. L'app envoie <strong>un seul payload</strong> <code>account.merge</code> : liste des profils (avec leur <code>localId</code>), historique complet des sessions (chaque session porte un <code>clientSessionId</code> stable), badges débloqués, likes.</li>
+        <li>Le serveur crée les <code>Profile</code>, <code>SyncedSession</code> (dédupliqués sur <code>clientSessionId</code>), <code>EarnedBadge</code>, <code>CardLike</code> (ignorés si le couple existe déjà). Il renvoie la table de correspondance <code>localId → remoteId</code>.</li>
+        <li>L'app écrit les <code>remoteId</code> dans <code>local_players</code>. À partir de là, chaque nouvelle partie est poussée en incrémental.</li>
+      </ol>
+      <p>Le merge est <strong>idempotent</strong> : rejouer le même payload ne crée pas de doublons. Utile si l'utilisateur se reconnecte sur un autre appareil — on récupère alors le cloud vers le local (sens inverse, même logique de correspondance).</p>
+
+      <h3>Publication d'une carte personnalisée au catalogue officiel</h3>
+      <p>Une carte perso créée avec un compte (workflow C1) remonte au back-office via <code>custom_card.created</code>. Elle reste <strong>privée</strong> — invisible des autres utilisateurs dans l'app — jusqu'à ce que toi, depuis le back-office, tu bascules le toggle « Publier au catalogue » (§08).</p>
+      <ol>
+        <li>Le toggle crée une <strong>nouvelle</strong> <code>Card</code> officielle dans le jeu/catégorie/intensité d'origine, avec le texte figé au moment de la publication et un champ <code>sourceCustomCardId</code> (traçabilité vers l'auteur).</li>
+        <li>La <code>CustomCard</code> d'origine continue d'exister et de vivre indépendamment : l'auteur peut l'éditer ou la supprimer sans jamais toucher à la version publiée. Ce n'est pas une référence live, c'est une copie.</li>
+        <li>Si l'auteur modifie sa carte après publication, la <code>Card</code> officielle ne bouge pas automatiquement. Le back-office peut simplement signaler (via <code>updatedAt</code> local &gt; date de publication) que la source a changé — c'est toi qui décides de republier ou non.</li>
+        <li>La <code>Card</code> publiée entre dans le <code>ContentRelease</code> suivant comme n'importe quelle autre carte du catalogue (§06).</li>
+      </ol>
+
+      <h3>Le leaderboard hors-ligne</h3>
+      <p>Le classement « entre mes profils » se calcule <strong>toujours en local</strong> à partir de <code>player_totals</code> (score cumulé + parties, par profil). Le cloud ne sert qu'à répliquer ces données vers un second appareil. Pas de dépendance réseau à l'affichage.</p>
+
+      <div class="note warn">
+        <span class="lbl">Triche sur les scores — accepté en V1</span>
+        <p>Un score fait hors-ligne est déclaratif : l'app pourrait mentir au serveur. Comme le leaderboard est <strong>privé au compte</strong> (tu classes tes propres potes), l'enjeu est nul. Pas de validation serveur en V1. Si un classement public arrive un jour, il faudra une validation côté serveur — l'architecture ne l'empêche pas.</p>
+      </div>
+    </section>
+
+    <!-- ============ 06 ============ -->
+    <section id="contenu">
+      <div class="sec-head"><span class="num">06</span><h2>Distribution du contenu</h2></div>
+
+      <h3>Modèle retenu : hybride embarqué + OTA</h3>
+      <p>Vu tes volumes réels — <strong>~1 600 cartes = ~2 à 4 MB de JSON</strong> une fois sans le bruit SQL, et <strong>~100 GIF = 30 MB</strong> — et un rythme de changement de <strong>1×/mois</strong>, le bon compromis est :</p>
+      <ol>
+        <li><strong>Snapshot embarqué dans le binaire</strong> — un <code>content_v{n}.json</code> + tous les GIF sont livrés dans l'app. Au tout premier lancement, l'app <em>seed</em> SQLite depuis ce fichier. Zéro réseau, jeu immédiat. Poids app estimé : ~45–60 MB, comparable à n'importe quel jeu casual.</li>
+        <li><strong>Check de version au lancement</strong> (si réseau) — <code>GET /content/latest</code> renvoie <code>{ version, snapshotUrl, changelog }</code>. Si <code>version &gt; content_meta.version</code>, l'app télécharge le snapshot en tâche de fond, puis remplace le contenu SQLite d'un bloc à la prochaine ouverture. Les GIF nouveaux/modifiés sont téléchargés à la demande et mis en cache (identifiés par hash).</li>
+        <li><strong>Publication depuis le back-office</strong> — un bouton « Publier une version » fige l'état courant du contenu dans un <code>ContentRelease</code>, génère le snapshot JSON, l'upload sur Vercel Blob, incrémente <code>version</code>. Rien n'est servi aux apps tant qu'on n'a pas publié — on édite tranquillement.</li>
+      </ol>
+
+      <h4>Pourquoi ce modèle plutôt que les autres</h4>
+      <ul>
+        <li><strong>Pas « tout dans le binaire, MAJ par les stores »</strong> : une coquille dans une carte t'obligerait à une revue App Store de 1–3 jours. Inacceptable.</li>
+        <li><strong>Pas « tout téléchargé au 1er lancement »</strong> : premier lancement sans réseau = app vide. Mauvaise première impression, et tu vises justement des retours de testeurs.</li>
+        <li><strong>L'hybride</strong> : joue tout de suite, se met à jour en silence, et une correction de contenu est en ligne en minutes sans passer par Apple. À 1×/mois, le trafic de MAJ est négligeable (~4 MB par appareil par mois).</li>
+      </ul>
+
+      <figure>
+        <svg viewBox="0 0 720 260" role="img" aria-labelledby="content-title">
+          <title id="content-title">Flux de publication et de mise à jour du contenu</title>
+          <g font-family="'JetBrains Mono', monospace" font-size="10.5">
+            <rect x="10" y="40" width="150" height="70" rx="10" fill="var(--blue-wash)" stroke="var(--blue)"/>
+            <text x="85" y="70" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600" font-family="'Inter Tight',sans-serif">Back-office</text>
+            <text x="85" y="88" text-anchor="middle" fill="var(--ink-soft)">édition CRUD</text>
+
+            <rect x="210" y="40" width="150" height="70" rx="10" fill="var(--blue-wash)" stroke="var(--blue)"/>
+            <text x="285" y="66" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600" font-family="'Inter Tight',sans-serif">« Publier »</text>
+            <text x="285" y="83" text-anchor="middle" fill="var(--ink-soft)">ContentRelease</text>
+            <text x="285" y="97" text-anchor="middle" fill="var(--ink-soft)">version + 1</text>
+
+            <rect x="410" y="40" width="150" height="70" rx="10" fill="var(--surface)" stroke="var(--hairline-firm)"/>
+            <text x="485" y="66" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600" font-family="'Inter Tight',sans-serif">Vercel Blob</text>
+            <text x="485" y="83" text-anchor="middle" fill="var(--ink-soft)">content_v{n}.json</text>
+            <text x="485" y="97" text-anchor="middle" fill="var(--ink-soft)">+ GIF par hash</text>
+
+            <rect x="410" y="160" width="150" height="70" rx="10" fill="var(--accent-wash)" stroke="var(--accent)"/>
+            <text x="485" y="186" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600" font-family="'Inter Tight',sans-serif">App au lancement</text>
+            <text x="485" y="203" text-anchor="middle" fill="var(--ink-soft)">GET /content/latest</text>
+            <text x="485" y="217" text-anchor="middle" fill="var(--ink-soft)">version &gt; locale ?</text>
+
+            <rect x="600" y="160" width="110" height="70" rx="10" fill="var(--accent-wash)" stroke="var(--accent)"/>
+            <text x="655" y="190" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600" font-family="'Inter Tight',sans-serif">Swap SQLite</text>
+            <text x="655" y="207" text-anchor="middle" fill="var(--ink-soft)">au prochain</text>
+            <text x="655" y="219" text-anchor="middle" fill="var(--ink-soft)">démarrage</text>
+
+            <g stroke="var(--neutral)" fill="none" stroke-width="1.4" color="var(--neutral)">
+              <path d="M160 75 L206 75" marker-end="url(#arrow)"/>
+              <path d="M360 75 L406 75" marker-end="url(#arrow)"/>
+              <path d="M485 110 L485 156" marker-end="url(#arrow)"/>
+              <path d="M560 195 L596 195" marker-end="url(#arrow)"/>
+            </g>
+          </g>
+        </svg>
+        <figcaption>Snapshot immuable par version · l'app ne consomme jamais le contenu « live », toujours une release figée.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ 07 ============ -->
+    <section id="migration">
+      <div class="sec-head"><span class="num">07</span><h2>Migration depuis la base Playlink actuelle</h2></div>
+
+      <p>On migre <strong>uniquement le contenu</strong> : jeux, catégories, cartes, règles + slides, badges. Pas les <code>User</code>, <code>AppUser</code>, <code>Player</code>, <code>GameSession</code>, <code>Event</code>, <code>AuditLog</code>.</p>
+
+      <h3>Procédure</h3>
+      <ol>
+        <li><strong>Dump ciblé</strong> depuis la Supabase actuelle (URL de connexion directe, port 5432) :
+          <pre><code>pg_dump --data-only --table=games --table=game_rules \
+  --table=game_rule_slides --table=categories \
+  --table=cards --table=badges \
+  "$DATABASE_URL_DIRECT" &gt; playlink_content.sql</code></pre>
+        </li>
+        <li><strong>Script de transformation</strong> (Node, dans le nouveau repo, <code>scripts/migrate-content.ts</code>) : lit le dump, mappe vers le nouveau schéma Prisma. Transformations connues :
+          <ul>
+            <li><code>Card.difficulty</code> (<code>easy|medium|hard</code>, legacy) est déjà remplacé par <code>Card.intensity</code> (1–5) dans le schéma actuel — on prend <code>intensity</code> tel quel.</li>
+            <li><code>Card.tags[]</code> : on conserve les tags bruts <strong>et</strong> on pré-calcule les tags canoniques via un portage de <code>tag-mapping.ts</code>, stockés à part pour les archétypes.</li>
+            <li>Chaque <code>Card</code>, <code>Category</code>, <code>Game</code>, <code>Badge</code> reçoit <code>originalLocale = "fr"</code> et <strong>aucune</strong> <code>*Translation</code> (à produire ensuite).</li>
+            <li>Les <code>id</code> cuid actuels sont <strong>conservés</strong> — ça simplifie tout futur re-import et garde les GIF référencés.</li>
+          </ul>
+        </li>
+        <li><strong>Images (GIF)</strong> : les 100 assets sont aujourd'hui référencés par URL dans <code>GameRuleSlide.imageUrl</code> (et éventuellement dans le texte des cartes). Script <code>scripts/fetch-assets.ts</code> : télécharge chaque asset, le renomme <code>{hash}.gif</code>, remplit la table <code>assets</code>, réécrit les références en <code>asset://{ref}</code>. Les fichiers vont dans <code>apps/mobile/assets/content/</code> (embarqués) et sur Vercel Blob (OTA).</li>
+        <li><strong>Import dans Neon</strong> via <code>prisma db seed</code> pointant sur le script. <strong>Jamais</strong> <code>prisma migrate dev</code> sur une base contenant des données (même règle que le repo actuel).</li>
+        <li><strong>Vérification</strong> : script <code>scripts/verify-migration.ts</code> qui compte lignes source vs cible par table et liste les écarts — 8 jeux, 28 catégories, et le total exact de cartes actives calculé depuis l'export réel (§02), pas estimé.</li>
+        <li><strong>Première</strong> <code>ContentRelease</code> <strong>version 1</strong> générée → snapshot embarqué dans le premier build de l'app.</li>
+      </ol>
+
+      <div class="note">
+        <span class="lbl">Accès dont j'aurai besoin</span>
+        <p>Pour écrire les scripts de migration : le <code>schema.prisma</code> actuel (je l'ai déjà lu), et soit un <strong>dump de la base</strong> soit un accès lecture à la Supabase de prod (URL directe port 5432). Les GIF : soit leur URL de base, soit un dossier. Rien de tout ça n'est nécessaire pour valider ce document — c'est pour la phase d'implémentation.</p>
+      </div>
+    </section>
+
+    <!-- ============ 08 ============ -->
+    <section id="analytics">
+      <div class="sec-head"><span class="num">08</span><h2>Analytics &amp; back-office</h2></div>
+
+      <h3>Collecte — PostHog Cloud EU</h3>
+      <p>SDK PostHog Flutter. Bufferise les événements hors-ligne et les envoie par lot au retour du réseau — exactement le comportement voulu. Hébergé en UE, conforme RGPD. Free tier : 1M events/mois (à 5 000 utilisateurs actifs jouant 10 parties/mois avec ~15 events/partie ≈ 750k events — on tient).</p>
+      <p><strong>Consentement</strong> : écran d'onboarding avec opt-in analytics clair. Si refus, le SDK est initialisé en mode <em>désactivé</em>. Aucune donnée personnelle envoyée : pas d'email, pas de nom de profil, un <code>anonId</code> aléatoire régénérable.</p>
+
+      <h4>Événements suivis (V1)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Événement</th><th>Propriétés</th></tr></thead>
+          <tbody>
+            <tr><td><code>app_opened</code></td><td>locale, version contenu, jours depuis install</td></tr>
+            <tr><td><code>game_started</code></td><td>gameSlug, categorySlug, intensité, nb joueurs, locale</td></tr>
+            <tr><td><code>game_finished</code></td><td>gameSlug, categorySlug, cartes vues, durée, nb joueurs</td></tr>
+            <tr><td><code>game_abandoned</code></td><td>gameSlug, à quelle carte</td></tr>
+            <tr><td><code>card_revealed</code></td><td>gameSlug, categorySlug, intensité de la carte</td></tr>
+            <tr><td><code>badge_earned</code></td><td>badgeKey</td></tr>
+            <tr><td><code>custom_card_created</code></td><td>gameSlug, categorySlug</td></tr>
+            <tr><td><code>custom_card_published</code></td><td>gameSlug, categorySlug — déclenché côté back-office</td></tr>
+            <tr><td><code>card_liked</code> / <code>card_shared</code></td><td>gameSlug, cardId</td></tr>
+            <tr><td><code>account_created</code></td><td>méthode (apple / google / email / magic_link), nb profils mergés</td></tr>
+            <tr><td><code>content_updated</code></td><td>de version → version</td></tr>
+            <tr><td><code>language_changed</code></td><td>de → vers</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Stats propres à Playlink — cron horaire</h3>
+      <p>Certaines données ne passent pas par PostHog (likes, cartes personnalisées, comptes, parties synchronisées). Un <strong>cron Vercel toutes les heures</strong> agrège la base Neon dans <code>HourlyStat</code> / <code>DailyStat</code>. Le dashboard du back-office ne lit que ces tables pré-agrégées — jamais de requête lourde à l'affichage.</p>
+      <pre><code>// vercel.ts
+crons: [
+  { path: '/api/cron/aggregate-stats', schedule: '0 * * * *' },
+  { path: '/api/cron/aggregate-daily', schedule: '15 3 * * *' },
+]</code></pre>
+      <p>Latence de plusieurs heures acceptée — c'est un back-office de suivi, pas un monitoring temps réel.</p>
+
+      <h3>Pages du back-office</h3>
+      <div class="grid">
+        <div class="card"><h4>Dashboard</h4><p>Installs, DAU/MAU, parties/jour, top jeux &amp; catégories, rétention J1/J7/J30, répartition FR/EN — tout depuis <code>DailyStat</code>.</p></div>
+        <div class="card"><h4>Jeux · Catégories · Cartes</h4><p>CRUD complet, pagination server-side, import/export CSV transactionnel (repris de l'existant), filtre par intensité/tag/langue.</p></div>
+        <div class="card"><h4>Traductions</h4><p>Vue « non traduites » par langue, édition inline FR↔EN, export CSV du reste-à-faire, compteur de couverture par jeu.</p></div>
+        <div class="card"><h4>Règles du jeu</h4><p>Éditeur markdown + gestion des slides illustrées par jeu (repris de l'existant).</p></div>
+        <div class="card"><h4>Badges</h4><p>Métadonnées uniquement (clé, nom, icône, description, traductions). Rappel : la règle vit dans l'app.</p></div>
+        <div class="card"><h4>Cartes des utilisateurs</h4><p>Liste des <code>CustomCard</code> créées par les comptes, avec leur auteur. Toggle « Publier au catalogue » par carte : crée une <code>Card</code> officielle figée (copie, pas de référence live) dans le jeu/catégorie/intensité d'origine, en gardant un lien de traçabilité vers l'auteur. Voir §05 pour le mécanisme complet.</p></div>
+        <div class="card"><h4>Likes</h4><p>Cartes les plus/moins likées, tendance — signal éditorial pour retravailler le contenu.</p></div>
+        <div class="card"><h4>Publication</h4><p>Diff du contenu depuis la dernière release, changelog, bouton « Publier la version n+1 », historique des releases.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ 09 ============ -->
+    <section id="freemium">
+      <div class="sec-head"><span class="num">09</span><h2>Freemium — préparé, pas construit</h2></div>
+
+      <p>Rien de payant en V1. Mais on ne se ferme aucune porte. Ce qu'on prévoit dès maintenant, sans le développer :</p>
+      <ul>
+        <li><strong>Modèle : abonnement</strong> (semaine / mois / année), pas d'achat définitif. La restauration d'achat et la vérification de reçu suivront la logique <em>subscription</em> des stores.</li>
+        <li><strong>Découpage du contenu</strong> : chaque <code>Category</code> et chaque niveau d'<code>intensity</code> porte déjà un champ <code>tier</code> (<code>free</code> par défaut). Le paywall se branchera dessus sans migration.</li>
+        <li><strong>Entitlements</strong> : prévoir <strong>RevenueCat</strong> (free tier jusqu'à ~2 500 $ de revenu mensuel) — il gère iOS + Android, la restauration, les reçus, le statut d'abonnement cross-plateforme. L'app lit un booléen <code>isPremium</code> ; RevenueCat fait le sale boulot.</li>
+        <li><strong>Compte requis pour payer</strong> : l'abonnement se rattache au compte store <em>et</em> se reflète dans <code>Account.premiumUntil</code> côté Neon (via webhook RevenueCat), pour que le statut suive l'utilisateur d'un appareil à l'autre.</li>
+        <li><strong>UX</strong> : quand l'app est gratuite, aucun élément de paywall visible. Le jour venu, une catégorie <code>tier: premium</code> affiche un cadenas + une modale d'abonnement — même pattern que la modale « créer un compte » actuelle.</li>
+      </ul>
+      <div class="note">
+        <span class="lbl">Coût de la préparation aujourd'hui</span>
+        <p>Trois champs en base (<code>tier</code>, <code>premiumUntil</code>) et une abstraction <code>EntitlementService</code> dans l'app qui renvoie toujours <code>true</code> en V1. C'est tout.</p>
+      </div>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section id="visuel">
+      <div class="sec-head"><span class="num">10</span><h2>Direction visuelle — l'ambiance « Netflix »</h2></div>
+
+      <p>Pas une refonte de structure : la home reste une grille de jeux, pas des rangées éditoriales. Ce qu'on emprunte à Netflix, c'est un <strong>langage visuel</strong> — fond sombre immersif en base, les couleurs de chaque jeu comme accents vifs dessus, du mouvement qui donne du poids aux transitions. Trois principes, applicables à toute l'app.</p>
+
+      <div class="note blue">
+        <span class="lbl">Référence visuelle externe</span>
+        <p>Un wireframe de l'app a été esquissé avec Claude Design : <a href="https://claude.ai/code/artifact/2791af21-480b-4aaf-b23d-2eab73a41698" class="inline">Application mobile Playlink</a>. À utiliser comme point de départ visuel pour la phase 2 — à vérifier/aligner avec le catalogue de jeux réel (§02) et les principes ci-dessous au moment de sa reprise en Flutter, plutôt qu'à considérer comme figé.</p>
+      </div>
+
+      <h3>1 — Fond sombre en base, partout</h3>
+      <p>L'app n'a plus de mode clair par défaut : le <strong>sombre devient le socle</strong> (quasi-noir, pas gris neutre — un noir légèrement teinté vers l'indigo pour rester chaleureux). Le F2 actuel (« Clair / sombre / système ») garde un mode clair en option pour l'accessibilité, mais l'app est <em>designée</em> sombre-first, sombre par défaut au premier lancement.</p>
+      <ul>
+        <li><strong>Home</strong> — fond quasi-noir ; chaque tuile de jeu garde son <code>colorMain</code>/<code>colorSecondary</code> mais en dégradé <em>contenu à la tuile</em>, pas en fond d'écran plein — exactement comme une affiche colorée qui se détache d'un fond de catalogue sombre.</li>
+        <li><strong>Écran de jeu</strong> — <strong>ne change pas</strong> : le dégradé plein écran <code>colorMain → colorSecondary</code> reste, il est déjà l'accent immersif propre à chaque jeu (Icebreaker bleu, Action ou Vérité rose…). Le sombre encadre cette expérience sans jamais la concurrencer.</li>
+        <li><strong>Profil / réglages / classement</strong> — fond sombre uniforme, cartes en surface légèrement plus claire (élévation), textes clairs. Mêmes tokens partout, pas de re-décision écran par écran.</li>
+      </ul>
+
+      <h3>2 — Scale + glow au focus et au tap</h3>
+      <p>Toute tuile interactive (jeu, catégorie, carte du profil) répond au toucher par un <strong>scale ~1.04–1.06</strong> plus une ombre portée colorée (<em>glow</em>) reprenant la couleur du jeu — pas une simple opacité ou un aplat gris comme l'état pressé actuel. L'effet doit se sentir « premium » sans ralentir l'interaction : durée courte (~120–160 ms), easing avec un léger dépassement (spring, pas linéaire).</p>
+      <ul>
+        <li><strong>Tap</strong> — scale down léger (0.97) à l'appui, puis rebond au relâchement</li>
+        <li><strong>Sélection prolongée</strong> (ex. tuile qui reste en avant pendant un choix) — scale up (1.05) + glow qui pulse doucement, <code>prefers-reduced-motion</code> respecté (glow statique, pas de pulse)</li>
+      </ul>
+
+      <h3>3 — Transitions cinématiques entre écrans</h3>
+      <p>Le passage home → jeu ne doit plus être un simple push de route : la tuile tapée <strong>s'étend et devient l'écran suivant</strong> (shared element transition), comme ouvrir une fiche Netflix depuis son affiche. En Flutter : <code>Hero</code> widget sur la tuile de jeu, avec une animation de morph vers le header de l'écran de catégories (même couleur, même icône, qui se repositionnent en douceur).</p>
+      <ul>
+        <li><strong>Home → jeu</strong> : la tuile s'agrandit en plein écran, son dégradé de couleur devient le fond de l'écran de sélection de catégorie</li>
+        <li><strong>Retour</strong> : l'animation inverse, symétrique — jamais un aller sans un retour cohérent</li>
+        <li><strong>Portée</strong> : réservé aux transitions à fort enjeu émotionnel (entrer dans un jeu, ouvrir les résultats de fin de partie). Pas sur chaque micro-navigation — un `Hero` sur tout casserait le rythme et coûterait en fluidité sur les appareils bas de gamme.</li>
+      </ul>
+
+      <figure>
+        <svg viewBox="0 0 760 300" role="img" aria-labelledby="visuel-title">
+          <title id="visuel-title">Trois écrans illustrant fond sombre, scale+glow, et transition Hero vers l'écran de jeu</title>
+          <defs>
+            <linearGradient id="tileGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7C3AED"/>
+              <stop offset="100%" stop-color="#EC4899"/>
+            </linearGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="8" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g font-family="'JetBrains Mono', monospace" font-size="10">
+
+            <!-- Screen 1: home dark -->
+            <rect x="10" y="30" width="220" height="240" rx="16" fill="#0F0E13" stroke="var(--hairline-firm)"/>
+            <text x="120" y="20" text-anchor="middle" fill="var(--neutral)" letter-spacing="1">1 · HOME — FOND SOMBRE</text>
+            <rect x="28" y="50" width="85" height="85" rx="12" fill="url(#tileGrad)"/>
+            <rect x="123" y="50" width="85" height="85" rx="12" fill="#378ADD" opacity="0.9"/>
+            <rect x="28" y="145" width="85" height="85" rx="12" fill="#8B5CF6" opacity="0.85"/>
+            <rect x="123" y="145" width="85" height="85" rx="12" fill="#639922" opacity="0.85"/>
+            <text x="120" y="255" text-anchor="middle" fill="#6C665D">fond #0F0E13</text>
+
+            <!-- Screen 2: scale+glow -->
+            <rect x="270" y="30" width="220" height="240" rx="16" fill="#0F0E13" stroke="var(--hairline-firm)"/>
+            <text x="380" y="20" text-anchor="middle" fill="var(--neutral)" letter-spacing="1">2 · SCALE + GLOW</text>
+            <rect x="285" y="55" width="80" height="80" rx="11" fill="#378ADD" opacity="0.55"/>
+            <rect x="380" y="55" width="80" height="80" rx="11" fill="#8B5CF6" opacity="0.55"/>
+            <g filter="url(#glow)">
+              <rect x="315" y="150" width="105" height="105" rx="14" fill="url(#tileGrad)" transform="translate(-7,-7) scale(1.07)" transform-origin="367 202"/>
+            </g>
+            <text x="380" y="255" text-anchor="middle" fill="#6C665D">tuile sélectionnée : ×1.06 + glow</text>
+
+            <!-- Screen 3: hero transition -->
+            <rect x="530" y="30" width="220" height="240" rx="16" fill="url(#tileGrad)"/>
+            <text x="640" y="20" text-anchor="middle" fill="var(--neutral)" letter-spacing="1">3 · TRANSITION HERO</text>
+            <circle cx="640" cy="90" r="26" fill="#ffffff" opacity="0.15"/>
+            <text x="640" y="97" text-anchor="middle" font-size="22">🎯</text>
+            <text x="640" y="135" text-anchor="middle" fill="#ffffff" font-weight="600" font-family="'Inter Tight',sans-serif" font-size="13">Action ou Vérité</text>
+            <rect x="550" y="155" width="180" height="34" rx="10" fill="#ffffff" opacity="0.15"/>
+            <text x="640" y="176" text-anchor="middle" fill="#ffffff" opacity="0.85">Vérités légères</text>
+            <rect x="550" y="197" width="180" height="34" rx="10" fill="#ffffff" opacity="0.15"/>
+            <text x="640" y="218" text-anchor="middle" fill="#ffffff" opacity="0.85">Vérités Flirt</text>
+            <text x="640" y="255" text-anchor="middle" fill="#ffffff" opacity="0.7">la tuile devient l'écran</text>
+
+            <g stroke="var(--neutral-faint)" fill="none" stroke-width="1.3" stroke-dasharray="4 3">
+              <path d="M234 150 L266 150" marker-end="url(#arrow)"/>
+              <path d="M494 150 L526 150" marker-end="url(#arrow)"/>
+            </g>
+          </g>
+        </svg>
+        <figcaption>Le dégradé de chaque jeu (ici Action ou Vérité, #7C3AED → #EC4899) reste l'accent vif ; tout le reste bascule au sombre.</figcaption>
+      </figure>
+
+      <div class="note">
+        <span class="lbl">Ce que ça change dans le plan de prototype</span>
+        <p>La palette sombre et les tokens de couleur sont posés dès la <strong>phase 2</strong> (coquille de l'app) — c'est plus coûteux à retrofitter après coup qu'à poser dès le départ. Le <code>Hero</code> transition home→jeu et le glow sur tap s'ajoutent en même temps que les animations de carte (référence Undercover by Bluff, déjà prévue phase 2).</p>
+      </div>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section id="workflows">
+      <div class="sec-head"><span class="num">11</span><h2>Liste des workflows de l'app</h2></div>
+
+      <p>Tous jouables hors-ligne sauf mention <span class="pill cloud">réseau</span>. Chaque workflow = un parcours utilisateur complet à implémenter et à tester.</p>
+
+      <h3>A · Démarrage &amp; contenu</h3>
+      <div class="phase-line">
+        <div class="phase"><span class="tag">A1</span><div><h4>Premier lancement</h4><p>Splash animé → seed de SQLite depuis le snapshot embarqué → choix de langue (détectée, modifiable) → onboarding 3 écrans (comment on joue, le compte optionnel, consentement analytics) → <strong>ajout des joueurs de la session</strong> → home.</p></div></div>
+        <div class="phase"><span class="tag">A2</span><div><h4>Lancements suivants</h4><p>Splash court → <strong>écran des joueurs de la session</strong> (la liste persistée depuis la dernière fois, modifiable) → home. En parallèle et silencieusement : <span class="pill cloud">réseau</span> check de version de contenu, worker de sync, refresh des entitlements.</p></div></div>
+        <div class="phase"><span class="tag">A3</span><div><h4>Mise à jour de contenu</h4><p><span class="pill cloud">réseau</span> Nouvelle version détectée → download en fond → bandeau discret « nouveau contenu, redémarre pour l'appliquer » → swap au prochain démarrage → <code>content_updated</code>.</p></div></div>
+      </div>
+
+      <h3>B · Jouer une partie (cœur)</h3>
+      <div class="phase-line">
+        <div class="phase"><span class="tag">B1</span><div><h4>Choisir un jeu</h4><p>Home = grille des 8 jeux (icône, couleurs, nom) + CTA qui ouvre une modale listant les joueurs de la session (modifiable à tout moment, sans quitter la home). Tap sur un jeu → page du jeu avec ses catégories + accès aux règles (modale slides).</p></div></div>
+        <div class="phase"><span class="tag">B2</span><div><h4>Configurer la partie</h4><p>Choix de catégorie → aperçu d'une carte aléatoire → réglage d'intensité 1–5 (mémorisé par jeu) → réglage cartes/partie (défaut 10). Les joueurs ne sont <strong>pas</strong> redemandés ici — c'est la liste de session déjà en place (A1/A2/B1) qui joue.</p></div></div>
+        <div class="phase"><span class="tag">B3</span><div><h4>Joueur actif — en attente</h4><p><span style="color:var(--neutral); font-family:'JetBrains Mono',monospace; font-size:0.72rem;">« C'est à ton tour ! »</span> + avatar et nom du joueur actif + bouton « Voir la carte ». La carte du deck n'est pas encore affichée.</p></div></div>
+        <div class="phase"><span class="tag">B4</span><div><h4>Carte révélée</h4><p>Tap « Voir la carte » (haptique) → <span style="color:var(--neutral); font-family:'JetBrains Mono',monospace; font-size:0.72rem;">« C'est au tour de {joueur} »</span> + carte du deck affichée + CTA « Voter ». Le compteur <code>i / n</code> <strong>n'avance pas encore</strong> — voir la carte ne la « consomme » pas.</p></div></div>
+        <div class="phase"><span class="tag">B5</span><div><h4>Vote</h4><p>Tap « Voter » → le CTA se transforme en <span style="color:var(--neutral); font-family:'JetBrains Mono',monospace; font-size:0.72rem;">« Est-ce que {joueur} mérite un point ? »</span> + boutons Oui / Non. Le vote est <strong>obligatoire</strong> pour avancer : c'est au moment du Oui/Non que le <code>currentIndex</code> incrémente et que <code>assignPoint</code>/<code>skipCard</code> s'exécutent. Puis écran « passe le téléphone » si &gt; 1 joueur → retour à B3 pour le joueur suivant, jusqu'à la fin du deck.</p></div></div>
+        <div class="phase"><span class="tag">B6</span><div><h4>Résultats</h4><p>Deck épuisé. Si un badge est débloqué : modale animée <span style="color:var(--neutral); font-family:'JetBrains Mono',monospace; font-size:0.72rem;">« Félicitations ! Tu as débloqué le badge {x} »</span>, dismissible, avant l'écran de résultats. Puis classement de la partie + archétype de chaque joueur + CTA « Rejouer » / « Retour à l'accueil » / « Partager » (score final — <strong>sans compte requis</strong>). Écriture de <code>game_sessions</code> + <code>session_players</code> + <code>player_totals</code>. Enqueue sync si compte.</p></div></div>
+        <div class="phase"><span class="tag">B7</span><div><h4>Rejouer / changer</h4><p>« Rejouer » → écran de choix de catégorie du même jeu (B2), même liste de joueurs. « Retour à l'accueil » → home. Les scores restent cumulés entre parties (reset explicite uniquement).</p></div></div>
+      </div>
+
+      <h3>C · Cartes personnalisées</h3>
+      <div class="phase-line">
+        <div class="phase"><span class="tag">C1</span><div><h4>Créer une carte</h4><p>Depuis la page profil (compte requis) → « Mes cartes » → liste des cartes créées par l'utilisateur + CTA « Créer une carte » → formulaire (jeu, catégorie, texte, toggle « actif ») → validation → carte ajoutée à la liste + confirmation. <code>custom_card_created</code>.</p></div></div>
+        <div class="phase"><span class="tag">C2</span><div><h4>Jouer avec ses cartes</h4><p>Une carte perso avec le toggle <strong>actif</strong> entre automatiquement dans le pool de tirage de sa catégorie. Le toggle sert à activer/désactiver une carte donnée sans la supprimer — pas de réglage global à la config de partie.</p></div></div>
+        <div class="phase"><span class="tag">C3</span><div><h4>Gérer ses cartes</h4><p>Depuis « Mes cartes » : éditer le texte, activer/désactiver, supprimer. Rattachées au compte (pas au profil joueur ni à l'appareil) — nécessite une connexion. Jamais visibles par un autre utilisateur dans l'app.</p></div></div>
+        <div class="phase"><span class="tag">C4</span><div><h4>Publication au catalogue officiel</h4><p><span class="pill cloud">réseau</span> Toute carte perso créée avec un compte remonte au back-office (visible avec son auteur). Toi seul, depuis le back-office, tu bascules un toggle « Publier au catalogue ». Voir §08 pour le mécanisme (copie figée, pas de référence live).</p></div></div>
+      </div>
+
+      <h3>D · Compte, profils, progression</h3>
+      <div class="phase-line">
+        <div class="phase"><span class="tag">D1</span><div><h4>Jouer sans compte</h4><p>Tout le jeu, les cartes perso, l'historique, les badges fonctionnent en local. Un bandeau discret suggère le compte pour « sauvegarder et voir le classement ».</p></div></div>
+        <div class="phase"><span class="tag">D2</span><div><h4>Créer un compte / se connecter</h4><p><span class="pill cloud">réseau</span> Modale déclenchée par une feature verrouillée (leaderboard, like). Clerk : Apple / Google / email+mdp / magic link. À la 1re connexion → merge local → cloud (workflow §05).</p></div></div>
+        <div class="phase"><span class="tag">D3</span><div><h4>Leaderboard</h4><p>Classement des profils du compte, par score cumulé, avec nb de parties et archétype. Calculé en local, consultable hors-ligne. Tap sur un profil → détail.</p></div></div>
+        <div class="phase"><span class="tag">D4</span><div><h4>Badges</h4><p>Grille des badges gagnés + verrouillés (avec la condition). Évalués localement en fin de partie. Sync si compte.</p></div></div>
+        <div class="phase"><span class="tag">D5</span><div><h4>Multi-appareils</h4><p><span class="pill cloud">réseau</span> Connexion du même compte sur un 2e appareil → pull cloud → local. Fusion idempotente des historiques.</p></div></div>
+        <div class="phase"><span class="tag">D6</span><div><h4>Se déconnecter / supprimer le compte</h4><p>Déconnexion garde les données locales. Suppression de compte (RGPD) : efface le cloud, propose de garder ou effacer le local.</p></div></div>
+      </div>
+
+      <h3>E · Communauté (like, partage)</h3>
+      <p>Les trois actions se font <strong>depuis la carte affichée pendant la partie</strong> (écran B4), pas depuis un catalogue séparé.</p>
+      <div class="phase-line">
+        <div class="phase"><span class="tag">E1</span><div><h4>Liker une carte</h4><p>Bouton cœur sur la carte affichée. <span class="pill cloud">réseau</span> Nécessite un compte (sinon modale « créer un compte »). Like enregistré local + enqueue <code>card.liked</code>. Visible dans « mes cartes likées » au profil. <code>likeCount</code> mis à jour au prochain contenu.</p></div></div>
+        <div class="phase"><span class="tag">E2</span><div><h4>Partager une carte</h4><p>Bouton partager sur la carte affichée. <strong>Sans compte requis.</strong> Génération locale d'un PNG (carte stylée + logo Playlink + « Joue sur Playlink ») → feuille de partage native → lien vers l'App Store / Play Store selon la plateforme. <code>card_shared</code>.</p></div></div>
+      </div>
+      <div class="note">
+        <span class="lbl">Signalement retiré de la V1</span>
+        <p>Pas de bouton « signaler » ni de file de modération de signalements. À la place, le back-office donne une visibilité directe sur les cartes personnalisées créées par les comptes, avec un toggle de publication au catalogue officiel (détail au §05 et §08) — le contrôle qualité passe par la sélection éditoriale plutôt que par le signalement communautaire, cohérent avec le fait que ces cartes restent privées à leur auteur tant qu'elles ne sont pas publiées.</p>
+      </div>
+
+      <h3>F · Réglages &amp; système</h3>
+      <div class="phase-line">
+        <div class="phase"><span class="tag">F1</span><div><h4>Changer de langue</h4><p>FR ↔ EN. Recharge l'UI + bascule le contenu (fallback FR si carte non traduite). <code>language_changed</code>.</p></div></div>
+        <div class="phase"><span class="tag">F2</span><div><h4>Thème</h4><p>Clair / sombre / système.</p></div></div>
+        <div class="phase"><span class="tag">F3</span><div><h4>Notifications push</h4><p><span class="pill cloud">réseau</span> Opt-in. Usage V1 : rappel « ça fait un moment » + annonce de nouveau contenu. FCM.</p></div></div>
+        <div class="phase"><span class="tag">F4</span><div><h4>Confidentialité</h4><p>Toggle consentement analytics, lien politique de confidentialité / CGU (contenu servi par le back-office), export / suppression des données.</p></div></div>
+        <div class="phase"><span class="tag">F5</span><div><h4>Mode hors-ligne assumé</h4><p>Aucun écran d'erreur réseau bloquant. Les features réseau affichent un état « se synchronisera plus tard » au lieu d'échouer.</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ 12 ============ -->
+    <section id="proto">
+      <div class="sec-head"><span class="num">12</span><h2>Plan de prototype</h2></div>
+
+      <p>Découpé en phases livrables. Chaque phase produit quelque chose de testable sur un vrai téléphone. C'est l'IA qui code, sur tes directives — l'ordre est pensé pour ça.</p>
+
+      <h3>Phase 0 — Fondations (avant toute ligne de Flutter)</h3>
+      <ul class="plain">
+        <li>Créer le repo GitHub <code>playlink-mobile</code> (monorepo : <code>apps/mobile</code>, <code>apps/backoffice</code>, <code>packages/content-schema</code>, <code>scripts/</code>)</li>
+        <li>Créer l'adresse mail projet + comptes : Neon (via Vercel Marketplace), Clerk, PostHog EU, Vercel Blob</li>
+        <li>Ouvrir les comptes <strong>Apple Developer (99 $/an)</strong> et <strong>Google Play Console (25 $ une fois)</strong> — la validation Apple prend parfois plusieurs jours, à lancer tôt</li>
+        <li>Installer Flutter SDK, Xcode, Android Studio (commandes fournies au démarrage de la phase)</li>
+        <li>Écrire le <code>CLAUDE.md</code> du nouveau repo (§14) + copier ce document dans <code>docs/</code></li>
+      </ul>
+
+      <h3>Phase 1 — Back-office &amp; migration du contenu</h3>
+      <ul class="plain">
+        <li>Next.js + Prisma + Neon, schéma cloud complet, Clerk pour les éditeurs</li>
+        <li>Scripts de migration : dump → transform → import → verify (§07)</li>
+        <li>CRUD jeux / catégories / cartes / règles / badges + import-export CSV</li>
+        <li>Table <code>ContentRelease</code> + endpoint <code>GET /content/latest</code> + génération de snapshot sur Blob</li>
+        <li><strong>Livrable</strong> : le contenu Playlink est dans Neon, une version 1 est publiée, le snapshot JSON est téléchargeable</li>
+      </ul>
+
+      <h3>Phase 2 — Coquille de l'app + jeu offline</h3>
+      <p style="font-size:var(--step--1); color:var(--neutral); max-width:var(--measure);">Source de portage : §<a href="#webref" class="inline">02 · Référence de l'app web actuelle</a> + le code de <code>packages/app</code>.</p>
+      <ul class="plain">
+        <li>Projet Flutter, thème sombre-first (voir §10) avec option claire, navigation go_router, i18n FR/EN</li>
+        <li>drift : schéma local, seed depuis le snapshot embarqué</li>
+        <li>Portage Dart de <code>shuffle</code>, <code>pickWeighted</code>, <code>tag-mapping</code> — tests ligne à ligne contre le TS (§02)</li>
+        <li>Portage des composants : <code>PlayCard</code>, <code>CategoryPicker</code>, <code>VoteScreen</code>, <code>PassDeviceScreen</code>, <code>GameResults</code>, <code>RulesModal</code>, <code>Header</code>/<code>PlayFooter</code></li>
+        <li>Workflows <strong>B1–B6</strong> : choisir un jeu, configurer, joueurs, swipe, vote, résultats, cumul des scores</li>
+        <li>Animations de carte (référence : Undercover by Bluff) + haptique — swipe droite = suivant / gauche = précédent, seuil ±80 px</li>
+        <li><strong>Livrable</strong> : les 8 jeux jouables de bout en bout, 100 % hors-ligne, sur ton téléphone</li>
+      </ul>
+
+      <h3>Phase 3 — Progression locale</h3>
+      <ul class="plain">
+        <li>Historique de parties, <code>player_totals</code>, leaderboard local (D3)</li>
+        <li>Moteur de badges local + écran badges (D4)</li>
+        <li>Cartes personnalisées C1–C3</li>
+        <li>Réglages F1–F2</li>
+        <li><strong>Livrable</strong> : app complète sans compte, avec progression persistante</li>
+      </ul>
+
+      <h3>Phase 4 — Compte &amp; synchronisation</h3>
+      <ul class="plain">
+        <li>Clerk dans l'app (Apple / Google / email / magic link)</li>
+        <li><code>sync_queue</code> + worker + endpoint <code>POST /sync</code> côté back-office</li>
+        <li>Merge local → cloud idempotent (D2), pull cloud → local (D5)</li>
+        <li>Suppression de compte RGPD (D6)</li>
+        <li><strong>Livrable</strong> : un joueur peut sauvegarder et retrouver sa progression sur un autre appareil</li>
+      </ul>
+
+      <h3>Phase 5 — Communauté &amp; analytics</h3>
+      <ul class="plain">
+        <li>Like (E1) + génération d'image de partage et deep link store (E2)</li>
+        <li>Formulaire « Mes cartes » (C1–C3) + vue back-office des cartes utilisateur + toggle de publication (C4)</li>
+        <li>PostHog : instrumentation de tous les événements + écran de consentement</li>
+        <li>Cron horaire d'agrégation + dashboard stats + vue traductions manquantes</li>
+        <li><strong>Livrable</strong> : back-office de suivi opérationnel, boucle de feedback communautaire fermée</li>
+      </ul>
+
+      <h3>Phase 6 — Polish &amp; mise en magasin</h3>
+      <ul class="plain">
+        <li>Notifications push (F3), OTA de contenu de bout en bout (A3), états hors-ligne (F5)</li>
+        <li><code>EntitlementService</code> qui renvoie <code>true</code> + champs <code>tier</code> en base (préparation freemium, §09)</li>
+        <li>Icônes, splash, captures stores, fiches App Store / Play (FR + EN), politique de confidentialité</li>
+        <li>TestFlight + piste de test fermée Google Play</li>
+        <li><strong>Livrable</strong> : build soumis aux deux stores</li>
+      </ul>
+
+      <div class="note">
+        <span class="lbl">Pas de deadline — mais un ordre à respecter</span>
+        <p>Les phases 1 et 2 sont indépendantes et peuvent avancer en parallèle. Les phases 3→6 sont séquentielles. Chaque phase est une PR (ou un lot de PR) revue avant de passer à la suivante.</p>
+      </div>
+    </section>
+
+    <!-- ============ 13 ============ -->
+    <section id="couts">
+      <div class="sec-head"><span class="num">13</span><h2>Coûts</h2></div>
+
+      <h3>Récurrent — cible 100 à 5 000 utilisateurs</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Service</th><th>Usage V1</th><th>Free tier</th><th>Coût estimé</th></tr></thead>
+          <tbody>
+            <tr><td>Vercel (Hobby)</td><td>Back-office + endpoints contenu/sync + crons</td><td>100 GB-h, crons inclus</td><td class="num">0 $</td></tr>
+            <tr><td>Neon</td><td>~5–20 MB de données</td><td>0,5 GB, scale-to-zero</td><td class="num">0 $</td></tr>
+            <tr><td>Clerk</td><td>Auth joueurs</td><td>10 000 MAU</td><td class="num">0 $</td></tr>
+            <tr><td>PostHog Cloud EU</td><td>~750k events/mois à 5 000 users actifs</td><td>1M events/mois</td><td class="num">0 $</td></tr>
+            <tr><td>Vercel Blob</td><td>Snapshots + GIF (~40 MB × versions)</td><td>1 GB stockage, 10 GB trafic</td><td class="num">0 $</td></tr>
+            <tr><td>Firebase Cloud Messaging</td><td>Push iOS + Android</td><td>Illimité</td><td class="num">0 $</td></tr>
+            <tr><td>RevenueCat</td><td>Non activé en V1</td><td>&lt; 2 500 $/mois de revenu</td><td class="num">0 $</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Total infra récurrent V1 : 0 $/mois.</strong> Marge confortable sous ta cible de 20 $. Le premier poste à basculer en payant serait Neon (~19 $/mois) ou Vercel Pro (20 $/mois), bien au-delà de 5 000 utilisateurs.</p>
+
+      <h3>Ponctuel &amp; annuel</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Poste</th><th>Montant</th><th>Fréquence</th></tr></thead>
+          <tbody>
+            <tr><td>Apple Developer Program</td><td class="num">99 $</td><td>par an</td></tr>
+            <tr><td>Google Play Console</td><td class="num">25 $</td><td>une fois</td></tr>
+            <tr><td>Nom de domaine (landing / liens)</td><td class="num">~12 $</td><td>par an (optionnel)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">Les vrais coûts cachés d'une app mobile</span>
+        <p>Ce ne sont pas les serveurs, c'est le <strong>compte Apple à 99 $/an obligatoire</strong> (sinon pas d'App Store), le <strong>temps de review</strong> à chaque soumission, et la <strong>maintenance des SDK</strong> (Flutter, Clerk, PostHog publient des breaking changes). L'architecture ci-dessus minimise le dernier point : 4 dépendances SaaS, toutes avec des SDK stables et une voie de sortie documentée.</p>
+      </div>
+    </section>
+
+    <!-- ============ 14 ============ -->
+    <section id="claudemd">
+      <div class="sec-head"><span class="num">14</span><h2>CLAUDE.md du nouveau repo</h2></div>
+
+      <p>À placer à la racine de <code>playlink-mobile</code>. C'est le hand-off : la prochaine session Claude Code démarre à froid mais avec tout le contexte.</p>
+
+      <pre><code># Playlink Mobile — Instructions Claude
+
+## Objectif
+App mobile Flutter (iOS + Android) des 8 jeux Playlink, jouable 100% hors-ligne.
+Back-office Next.js pour le contenu et les stats. Doc de référence complète :
+`docs/playlink-mobile-blueprint.html`.
+
+## Monorepo
+- `apps/mobile`      — Flutter, Dart 3. drift (SQLite), Riverpod, go_router.
+- `apps/backoffice`  — Next.js 15 App Router, Prisma, shadcn/ui. Déployé sur Vercel.
+- `packages/content-schema` — types partagés du snapshot de contenu (Zod + génération Dart).
+- `scripts/`         — migration du contenu depuis l'ancienne base Playlink.
+
+## Règles absolues — Base de données
+- Base cloud : **Neon Postgres** via Vercel Marketplace. JAMAIS Supabase ici.
+- JAMAIS `prisma migrate dev` sur une base avec des données → utiliser `prisma migrate deploy`.
+- `prisma migrate dev --create-only` pour créer une migration sans l'appliquer.
+
+## Règles absolues — Offline-first
+- Toute action utilisateur réussit d'abord en local (SQLite). Le réseau est opportuniste.
+- Aucun écran d'erreur réseau bloquant. Features réseau → état "se synchronisera plus tard".
+- La logique de jeu (deck, scores, badges, archétypes) vit dans l'app, jamais sur le serveur.
+- Le back-office ne fait que du CRUD et de la lecture d'agrégats. Pas de serveur de jeu.
+
+## Auth
+- Joueurs : **Clerk** (Apple / Google / email+mdp / magic link). Alternative documentée : Better Auth.
+- Éditeurs back-office : distincts des joueurs (table AdminUser ou Clerk org séparée).
+- Ne jamais mélanger les deux.
+
+## Contenu
+- Source de vérité : base Neon, éditée au back-office.
+- L'app consomme un snapshot figé (`ContentRelease`), jamais le contenu live.
+- Snapshot v1 embarqué dans le binaire. MAJ via `GET /content/latest` + swap SQLite au redémarrage.
+- i18n : FR = langue originale. Carte sans `CardTranslation` → fallback FR.
+
+## Modèle joueur
+- 1 compte → N profils. Badges sur le compte. tagScores (archétype) sur le profil.
+- Leaderboard = classement des profils DU compte (privé), pas mondial.
+- Création de compte → merge local → cloud, idempotent (clientSessionId, localId).
+
+## Freemium (préparé, pas construit en V1)
+- Aucun paiement en V1. `EntitlementService` renvoie toujours true.
+- Champs `tier` (free|premium) sur Category et par intensité, déjà en base.
+- Le jour venu : abonnement via RevenueCat, webhook → `Account.premiumUntil`.
+
+## Analytics
+- PostHog Cloud EU. Opt-in explicite à l'onboarding. Aucune donnée perso.
+- Stats propres (likes, cartes perso, comptes) : cron Vercel horaire → tables DailyStat/HourlyStat.
+
+## Direction visuelle
+- Fond sombre en base partout (pas gris neutre, noir teinté indigo). Mode clair en option (F2), jamais le défaut.
+- Chaque jeu garde son dégradé `colorMain`→`colorSecondary` comme accent, contenu à sa tuile/son écran — jamais en fond d'app.
+- Tuiles interactives : scale + glow coloré au tap/focus, jamais un aplat gris plat.
+- Transition `Hero` (Flutter) réservée aux moments à fort enjeu : home→jeu, fin de partie. Pas sur chaque navigation.
+- Détail complet : `docs/playlink-mobile-blueprint.html` §10.
+
+## Conventions
+- UI et contenu en FR + EN. Code et commentaires : suivre l'existant.
+- Commentaires : seulement si le POURQUOI est non-évident.
+- Chaque phase du plan de prototype = une PR revue avant la suivante.
+- Migration : conserver les `id` cuid de l'ancienne base.</code></pre>
+    </section>
+
+    <!-- ============ 15 ============ -->
+    <section id="risques">
+      <div class="sec-head"><span class="num">15</span><h2>Risques &amp; décisions encore ouvertes</h2></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Sujet</th><th>Statut</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td>Neon scale-to-zero</td><td><span class="pill local">résolu</span></td><td>Réveil ~500 ms, invisible. Pas de keep-alive nécessaire.</td></tr>
+            <tr><td>Clerk vs Better Auth</td><td><span class="pill both">tranché</span></td><td>Clerk par défaut. Better Auth documenté (§03). Bascule = écran login + /sync.</td></tr>
+            <tr><td>Poids de l'app (~50 MB de GIF)</td><td><span class="pill later">à surveiller</span></td><td>Acceptable. Si &gt; 150 MB, passer les GIF en OTA-only (pas embarqués).</td></tr>
+            <tr><td>Traduction des 1 600 cartes</td><td><span class="pill later">ouvert</span></td><td>V1 livrée FR + fallback. Le back-office donne le reste-à-faire. Traduction auto + relecture à décider.</td></tr>
+            <tr><td>Règles de badges configurables</td><td><span class="pill local">tranché</span></td><td>Non. Règle = code Dart. Back-office = métadonnées seulement.</td></tr>
+            <tr><td>Compte Apple Developer</td><td><span class="pill later">action</span></td><td>À ouvrir en phase 0 — validation parfois longue.</td></tr>
+            <tr><td>Landing page / domaine</td><td><span class="pill later">optionnel</span></td><td>Le partage pointe directement vers les stores. Une landing sur Vercel est un plus, pas un prérequis.</td></tr>
+            <tr><td>Nom &amp; bundle ID</td><td><span class="pill local">tranché</span></td><td>« Playlink », <code>com.playlink.app</code>.</td></tr>
+            <tr><td>Publication des cartes utilisateur à l'échelle</td><td><span class="pill later">ouvert</span></td><td>Toi seul en V1, sélection manuelle carte par carte. Si le volume de cartes perso explose, prévoir un tri/filtre (par like, par jeu) dans la vue back-office.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Ce dont j'ai besoin de toi pour démarrer la phase 0</h3>
+      <ul class="plain">
+        <li>Le repo GitHub <code>playlink-mobile</code> créé (ou l'accord pour que je prépare la structure en local et que tu push)</li>
+        <li>Un dump de l'ancienne base <strong>ou</strong> un accès lecture (URL directe, port 5432) — pour les scripts de migration</li>
+        <li>L'emplacement / les URL des 100 GIF actuels</li>
+        <li>Confirmation de l'adresse mail projet à utiliser pour les comptes de services</li>
+      </ul>
+    </section>
+
+    <div class="footer">
+      <p>Playlink Mobile Blueprint · document de cadrage · à copier dans <code>playlink-mobile/docs/</code> et à tenir à jour au fil des phases. Les décisions marquées « tranché » sont fermées ; « ouvert » et « à surveiller » demandent un arbitrage en cours de route.</p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    var toggle = document.querySelector('.rail-toggle');
+    var nav = document.querySelector('.rail nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function () {
+        var open = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      nav.addEventListener('click', function (e) {
+        if (e.target.tagName === 'A' && window.matchMedia('(max-width: 900px)').matches) {
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  })();
+</script>

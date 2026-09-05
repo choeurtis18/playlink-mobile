@@ -1,0 +1,48 @@
+# Dépendances
+node_modules/
+.pnpm-store/
+
+# Env — jamais commité. Voir .env.example.
+.env
+.env.*
+!.env.example
+
+# Next.js / Vercel
+.next/
+out/
+.vercel/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Flutter / Dart
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/build/
+apps/mobile/ios/Pods/
+apps/mobile/ios/.symlinks/
+apps/mobile/ios/Flutter/Flutter.framework
+apps/mobile/ios/Flutter/Flutter.podspec
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/android/key.properties
+*.iml
+*.jks
+*.keystore
+
+# Contenu migré : dumps et assets lourds ne sont pas versionnés.
+scripts/dumps/
+scripts/assets-cache/
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Build TS
+dist/
+*.tsbuildinfo
