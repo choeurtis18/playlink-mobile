@@ -8,7 +8,8 @@
     "fetch:assets": "node --experimental-strip-types fetch-assets.ts",
     "verify": "node --experimental-strip-types verify-migration.ts",
     "build:snapshot": "node --experimental-strip-types build-snapshot.ts",
-    "publish:release": "node --experimental-strip-types publish-release.ts"
+    "publish:release": "node --experimental-strip-types publish-release.ts",
+    "seed:badges": "node --experimental-strip-types seed-badges.ts"
   },
   "dependencies": {
     "@playlink/content-schema": "workspace:*",

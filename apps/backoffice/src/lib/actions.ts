@@ -21,7 +21,17 @@ function humanize(e: unknown): string {
   const err = e as { code?: string; meta?: { target?: string[]; field_name?: string } };
   const field = err.meta?.target?.join(", ");
   switch (err.code) {
-    case "P2002": return `Cette valeur existe déjà${field ? ` (${field})` : ""} — choisis-en une autre.`;
+    case "P2002": {
+      // La contrainte composite (gameId, slug) parle d'un champ que
+      // l'éditeur ne voit pas dans le formulaire : on nomme ce qu'il a saisi.
+      if (err.meta?.target?.includes("slug")) {
+        return "Ce slug est déjà utilisé — choisis-en un autre.";
+      }
+      if (err.meta?.target?.includes("key")) {
+        return "Cette clé de badge existe déjà.";
+      }
+      return `Cette valeur existe déjà${field ? ` (${field})` : ""} — choisis-en une autre.`;
+    }
     case "P2003": return "Référence invalide : le jeu ou la catégorie visé n'existe pas.";
     case "P2025": return "Cet élément n'existe plus — il a peut-être été supprimé entre-temps.";
     case "P2000": return `Valeur trop longue${field ? ` pour ${field}` : ""}.`;
@@ -130,7 +140,7 @@ export async function saveCategory(id: string | null, form: FormData): Promise<A
       const c = await prisma.category.create({ data: { ...parsed.data, originalLocale: "fr" } });
       await logAction(adminId, "created_category", "category", c.id);
     }
-  }, ["/jeux", "/cartes", "/"]);
+  }, ["/jeux", "/categories", "/cartes", "/"]);
 }
 
 export async function deleteCategory(id: string): Promise<ActionResult> {
@@ -140,7 +150,7 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
     if (n > 0) throw new Error(`${n} cartes rattachées — vide la catégorie d'abord`);
     await prisma.category.delete({ where: { id } });
     await logAction(adminId, "deleted_category", "category", id);
-  }, ["/jeux", "/cartes", "/"]);
+  }, ["/jeux", "/categories", "/cartes", "/"]);
 }
 
 // ── Jeux ──────────────────────────────────────────────────────────────
@@ -162,7 +172,7 @@ export async function saveGame(id: string | null, form: FormData): Promise<Actio
       const g = await prisma.game.create({ data: { ...parsed.data, originalLocale: "fr" } });
       await logAction(adminId, "created_game", "game", g.id);
     }
-  }, ["/jeux", "/", "/publication"]);
+  }, ["/jeux", "/categories", "/", "/publication"]);
 }
 
 // ── Badges ────────────────────────────────────────────────────────────

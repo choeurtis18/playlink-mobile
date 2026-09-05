@@ -25,7 +25,13 @@ async function main() {
   check('categories', src('categories'), await prisma.category.count());
   check('cards', src('cards'), await prisma.card.count());
   check('rule slides', src('game_rule_slides'), await prisma.gameRuleSlide.count());
-  check('badges', src('badges'), await prisma.badge.count());
+  // Les badges ne sont plus comparés au dump : les 7 badges du §01 absents
+  // de l'ancienne base ont été créés depuis (scripts/seed-badges.ts). On
+  // vérifie plutôt qu'aucun badge du dump n'a été perdu.
+  const badgeKeys = new Set((t.get('badges') ?? []).map((b) => b.key));
+  const dbKeys = new Set((await prisma.badge.findMany({ select: { key: true } })).map((b) => b.key));
+  check('badges du dump', badgeKeys.size, [...badgeKeys].filter((k) => dbKeys.has(k!)).length);
+  console.log(`  · ${dbKeys.size} badges au total (dont ${dbKeys.size - badgeKeys.size} ajoutés au back-office)`);
   check('legal contents', src('legal_contents'), await prisma.legalContent.count());
 
   console.log('\nINTÉGRITÉ\n');
