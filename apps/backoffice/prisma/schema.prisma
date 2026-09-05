@@ -1,0 +1,455 @@
+// Playlink Mobile — schéma cloud (Neon Postgres).
+// Référence : docs/playlink-mobile-blueprint.html §04.
+//
+// Ce schéma porte le CONTENU maître et la sauvegarde des comptes.
+// Il ne porte AUCUNE logique de jeu : deck, scores, badges et archétypes
+// sont calculés dans l'app Flutter, sur SQLite. Voir CLAUDE.md.
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONTENU — édité au back-office, publié par snapshot figé
+// ─────────────────────────────────────────────────────────────
+
+// `tier` prépare le freemium (§09) sans le construire : tout est `free` en V1
+// et l'EntitlementService de l'app renvoie toujours true.
+enum Tier {
+  free
+  premium
+}
+
+model Game {
+  id             String  @id @default(cuid()) // cuid de l'ancienne base, conservé
+  name           String  @unique
+  slug           String  @unique
+  description    String?
+  icon           String?
+  colorMain      String
+  colorSecondary String
+  active         Boolean @default(true)
+  order          Int     @default(0)
+
+  originalLocale String @default("fr")
+
+  categories   Category[]
+  rules        GameRules?
+  ruleSlides   GameRuleSlide[]
+  translations GameTranslation[]
+  customCards  CustomCard[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("games")
+}
+
+model GameTranslation {
+  id          String  @id @default(cuid())
+  gameId      String
+  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  locale      String
+  name        String
+  description String?
+
+  @@unique([gameId, locale])
+  @@map("game_translations")
+}
+
+model GameRules {
+  id     String @id @default(cuid())
+  gameId String @unique
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  rules  String // markdown
+
+  translations GameRulesTranslation[]
+
+  updatedAt DateTime @updatedAt
+
+  @@map("game_rules")
+}
+
+model GameRulesTranslation {
+  id        String    @id @default(cuid())
+  rulesId   String
+  gameRules GameRules @relation(fields: [rulesId], references: [id], onDelete: Cascade)
+  locale    String
+  rules     String
+
+  @@unique([rulesId, locale])
+  @@map("game_rules_translations")
+}
+
+model GameRuleSlide {
+  id       String  @id @default(cuid())
+  gameId   String
+  game     Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  order    Int     @default(0)
+  title    String
+  content  String
+  // Réécrit en `asset://{ref}` par scripts/fetch-assets.ts — l'app résout
+  // la référence contre sa table `assets` locale, jamais une URL réseau.
+  imageRef String?
+
+  translations GameRuleSlideTranslation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("game_rule_slides")
+}
+
+model GameRuleSlideTranslation {
+  id      String        @id @default(cuid())
+  slideId String
+  slide   GameRuleSlide @relation(fields: [slideId], references: [id], onDelete: Cascade)
+  locale  String
+  title   String
+  content String
+
+  @@unique([slideId, locale])
+  @@map("game_rule_slide_translations")
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  gameId      String
+  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String
+  description String?
+  icon        String?
+  order       Int     @default(0)
+  tier        Tier    @default(free)
+
+  originalLocale String @default("fr")
+
+  cards        Card[]
+  translations CategoryTranslation[]
+  customCards  CustomCard[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gameId, slug])
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  locale      String
+  name        String
+  description String?
+
+  @@unique([categoryId, locale])
+  @@map("category_translations")
+}
+
+model Card {
+  id            String   @id @default(cuid())
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  text          String
+  intensity     Int      @default(3) // 1 (soft) .. 5 (trash)
+  // Tags bruts de l'ancienne base, conservés tels quels.
+  tags          String[]
+  // Tags canoniques pré-calculés via le portage de tag-mapping.ts (14 tags).
+  // Pré-calculés ici pour que l'app n'ait pas à normaliser au runtime.
+  canonicalTags String[]
+  active        Boolean  @default(true)
+  order         Int      @default(0)
+  tier          Tier     @default(free)
+
+  originalLocale String @default("fr")
+
+  // Renseigné quand la carte naît de la publication d'une CustomCard :
+  // copie figée, pas une référence live (§05). L'auteur peut éditer ou
+  // supprimer son original sans que cette carte officielle ne bouge.
+  sourceCustomCardId String?     @unique
+  sourceCustomCard   CustomCard? @relation(fields: [sourceCustomCardId], references: [id], onDelete: SetNull)
+
+  translations CardTranslation[]
+  likes        CardLike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId, active])
+  @@index([intensity])
+  @@map("cards")
+}
+
+model CardTranslation {
+  id     String @id @default(cuid())
+  cardId String
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  locale String
+  text   String
+
+  @@unique([cardId, locale])
+  @@map("card_translations")
+}
+
+// Métadonnées seulement. La RÈGLE d'attribution est une fonction Dart
+// identifiée par `key`, elle ne vit jamais en base (§01, décision tranchée).
+model Badge {
+  id          String @id @default(cuid())
+  key         String @unique
+  name        String
+  description String
+  icon        String
+  order       Int    @default(0)
+
+  translations BadgeTranslation[]
+  earned       EarnedBadge[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("badges")
+}
+
+model BadgeTranslation {
+  id          String @id @default(cuid())
+  badgeId     String
+  badge       Badge  @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  locale      String
+  name        String
+  description String
+
+  @@unique([badgeId, locale])
+  @@map("badge_translations")
+}
+
+model LegalContent {
+  id      String @id @default(cuid())
+  key     String // privacy | terms
+  locale  String @default("fr")
+  title   String
+  content String
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, locale])
+  @@map("legal_contents")
+}
+
+// ─────────────────────────────────────────────────────────────
+// PUBLICATION — l'app ne consomme jamais le contenu live
+// ─────────────────────────────────────────────────────────────
+
+model ContentRelease {
+  id          Int      @id @default(autoincrement())
+  version     Int      @unique
+  snapshotUrl String // Vercel Blob
+  changelog   String?
+  publishedAt DateTime @default(now())
+
+  @@map("content_releases")
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPTES JOUEURS — miroir Clerk. Distincts des éditeurs.
+// ─────────────────────────────────────────────────────────────
+
+model Account {
+  id      String @id @default(cuid())
+  clerkId String @unique
+  email   String @unique
+  locale  String @default("fr")
+
+  // Préparation freemium (§09) : alimenté par un webhook RevenueCat le jour
+  // venu. Toujours null en V1.
+  premiumUntil DateTime?
+
+  profiles    Profile[]
+  sessions    SyncedSession[]
+  badges      EarnedBadge[]
+  likes       CardLike[]
+  customCards CustomCard[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("accounts")
+}
+
+// 1 compte → N profils. Les tagScores (archétype) vivent sur le PROFIL,
+// les badges sur le COMPTE (§01).
+model Profile {
+  id        String  @id @default(cuid())
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String
+  avatar    String?
+  tagScores Json    @default("{}")
+
+  // uuid local d'origine — clé de réconciliation du merge local → cloud (§05).
+  localId String
+
+  sessions SyncedSessionPlayer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([accountId, localId])
+  @@map("profiles")
+}
+
+model SyncedSession {
+  id        String  @id @default(cuid())
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  // Stable côté client : rend le merge idempotent, rejouer le même payload
+  // ne crée pas de doublon (§05).
+  clientSessionId String
+
+  gameId      String
+  categoryId  String
+  locale      String   @default("fr")
+  playerCount Int
+  startedAt   DateTime
+  finishedAt  DateTime
+
+  players SyncedSessionPlayer[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([accountId, clientSessionId])
+  @@index([accountId, finishedAt])
+  @@map("synced_sessions")
+}
+
+model SyncedSessionPlayer {
+  id        String        @id @default(cuid())
+  sessionId String
+  session   SyncedSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  profileId String
+  profile   Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  score           Int  @default(0)
+  tagScoresGained Json @default("{}")
+
+  @@unique([sessionId, profileId])
+  @@map("synced_session_players")
+}
+
+model EarnedBadge {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  badgeKey  String
+  badge     Badge    @relation(fields: [badgeKey], references: [key], onDelete: Cascade)
+  earnedAt  DateTime
+
+  @@unique([accountId, badgeKey])
+  @@map("earned_badges")
+}
+
+model CardLike {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  // Anti-double-comptage : un compte ne like une carte qu'une fois.
+  @@unique([accountId, cardId])
+  @@index([cardId])
+  @@map("card_likes")
+}
+
+// Carte créée par un joueur. Reste PRIVÉE à son auteur jusqu'à publication
+// manuelle au back-office (§05, §08). Sans compte, elle ne quitte jamais
+// l'appareil et n'existe pas ici.
+model CustomCard {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  gameId     String
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  text       String
+  intensity  Int      @default(3)
+  active     Boolean  @default(true)
+
+  // Carte officielle née de sa publication, s'il y en a une. Permet au
+  // back-office de signaler `updatedAt > publishedCard.createdAt` : la source
+  // a changé depuis la publication, à toi de décider de republier ou non.
+  publishedCard Card?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId])
+  @@map("custom_cards")
+}
+
+// ─────────────────────────────────────────────────────────────
+// BACK-OFFICE — éditeurs, agrégats, traçabilité
+// ─────────────────────────────────────────────────────────────
+
+// Éditeurs du back-office. JAMAIS mélangés aux comptes joueurs (CLAUDE.md).
+model AdminUser {
+  id      String @id @default(cuid())
+  clerkId String @unique
+  email   String @unique
+  role    String @default("editor") // editor | admin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+// Agrégats pré-calculés par le cron horaire (§08). Le dashboard ne fait que
+// les LIRE — jamais de requête lourde à l'affichage.
+model HourlyStat {
+  id     String   @id @default(cuid())
+  bucket DateTime // début de l'heure
+  metric String
+  value  Int
+  dims   Json? // { gameSlug, categorySlug, locale… }
+
+  @@unique([bucket, metric])
+  @@index([metric, bucket])
+  @@map("hourly_stats")
+}
+
+model DailyStat {
+  id     String   @id @default(cuid())
+  day    DateTime @db.Date
+  metric String
+  value  Int
+  dims   Json?
+
+  @@unique([day, metric])
+  @@index([metric, day])
+  @@map("daily_stats")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  action    String // created_card | published_release | published_custom_card…
+  entity    String // card | category | game | release
+  entityId  String
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

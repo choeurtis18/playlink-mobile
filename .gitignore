@@ -46,3 +46,6 @@ Thumbs.db
 # Build TS
 dist/
 *.tsbuildinfo
+
+# Généré par Next.js
+next-env.d.ts
