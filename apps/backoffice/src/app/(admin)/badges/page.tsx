@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { DeleteBadgeButton, EditBadgeButton, NewBadgeButton } from "./BadgeEditor";
 
 export const dynamic = "force-dynamic";
 
-// Rappel : le back-office ne gère QUE les métadonnées. La règle d'attribution
-// est une fonction Dart identifiée par la clé du badge, évaluée sur l'appareil
-// en fin de partie (§01, décision tranchée).
+// La règle d'attribution est une fonction Dart identifiée par la clé du badge,
+// évaluée sur l'appareil en fin de partie (§01, décision tranchée). Le
+// back-office ne gère que les métadonnées — d'où ce rappel des règles prévues.
 const RULES: Record<string, string> = {
   first_win: "1er point marqué, tous jeux confondus",
   party_legend: "20 points cumulés au total",
@@ -26,10 +27,13 @@ export default async function Badges() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-semibold">Badges</h1>
+      <div className="mb-2 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Badges</h1>
+        <NewBadgeButton />
+      </div>
       <p className="mb-6 max-w-prose text-sm text-neutral-faint">
         Métadonnées uniquement. La règle d&apos;attribution vit dans le code de
-        l&apos;app et s&apos;évalue localement en fin de partie.
+        l&apos;app et s&apos;évalue localement en fin de partie — la clé fait le lien.
       </p>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -37,11 +41,17 @@ export default async function Badges() {
           <div key={b.id} className="rounded-lg border border-hairline bg-surface p-4">
             <div className="flex items-start gap-3">
               <span className="text-2xl">{b.icon}</span>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="font-medium">{b.name}</div>
                 <div className="text-sm text-ink-soft">{b.description}</div>
                 <code className="mt-1 block text-xs text-neutral-faint">{b.key}</code>
-                {RULES[b.key] && <div className="mt-2 text-xs text-neutral-faint">Règle : {RULES[b.key]}</div>}
+                {RULES[b.key]
+                  ? <div className="mt-2 text-xs text-neutral-faint">Règle : {RULES[b.key]}</div>
+                  : <div className="mt-2 text-xs text-amber-500">Aucune règle Dart connue pour cette clé</div>}
+              </div>
+              <div className="flex shrink-0 flex-col gap-1">
+                <EditBadgeButton badge={b} />
+                <DeleteBadgeButton id={b.id} name={b.name} />
               </div>
             </div>
           </div>
@@ -50,13 +60,15 @@ export default async function Badges() {
 
       {missing.length > 0 && (
         <div className="mt-6 rounded-lg border border-hairline bg-surface p-4">
-          <div className="mb-2 text-sm font-medium">
-            {missing.length} badges proposés au blueprint, absents de la base
+          <div className="mb-3 text-sm font-medium">
+            {missing.length} badges prévus au blueprint, absents de la base
           </div>
           <div className="flex flex-wrap gap-2">
             {missing.map((k) => (
-              <span key={k} className="rounded border border-hairline bg-raised px-2 py-1 text-xs">
-                <code>{k}</code> <span className="text-neutral-faint">— {RULES[k]}</span>
+              <span key={k} className="inline-flex items-center gap-2 rounded border border-hairline bg-raised px-2 py-1 text-xs">
+                <code>{k}</code>
+                <span className="text-neutral-faint">{RULES[k]}</span>
+                <NewBadgeButton presetKey={k} label="+ créer" />
               </span>
             ))}
           </div>

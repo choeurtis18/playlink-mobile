@@ -13,9 +13,15 @@ importers:
       '@clerk/nextjs':
         specifier: ^7.9.1
         version: 7.9.1(next@15.5.25(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@playlink/content-schema':
+        specifier: workspace:*
+        version: link:../../packages/content-schema
       '@prisma/client':
         specifier: ^6.3.1
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@vercel/blob':
+        specifier: ^2.8.0
+        version: 2.8.0
       next:
         specifier: ^15.1.6
         version: 15.5.25(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)

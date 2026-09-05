@@ -252,7 +252,7 @@ pointe dessus.
 | `GET /content/latest` | ✅ testé en HTTP réel |
 | Snapshot sur Blob public | ✅ https://9jift8umwaqz1iep.public.blob.vercel-storage.com/content/content_v1.json |
 | Auth éditeurs (Clerk) | ✅ redirection vérifiée |
-| Back-office (6 pages) | ✅ lecture seule |
+| Back-office (7 pages) | ✅ CRUD complet |
 
 ## Chiffres réels (mesurés, pas estimés)
 

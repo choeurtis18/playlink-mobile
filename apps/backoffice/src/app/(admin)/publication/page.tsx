@@ -1,41 +1,47 @@
 import { prisma } from "@/lib/prisma";
+import { ImportForm, PublishButton } from "./PublishForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function Publication() {
-  const [releases, cards, updatedSince] = await Promise.all([
+  const latest = await prisma.contentRelease.findFirst({ orderBy: { version: "desc" } });
+  const since = latest?.publishedAt;
+
+  const [releases, cards, changedCards, changedSlides, recentLogs] = await Promise.all([
     prisma.contentRelease.findMany({ orderBy: { version: "desc" }, take: 20 }),
     prisma.card.count({ where: { active: true } }),
-    prisma.contentRelease.findFirst({ orderBy: { version: "desc" } }).then((r) =>
-      r ? prisma.card.count({ where: { updatedAt: { gt: r.publishedAt } } }) : 0,
-    ),
+    since ? prisma.card.count({ where: { updatedAt: { gt: since } } }) : 0,
+    since ? prisma.gameRuleSlide.count({ where: { updatedAt: { gt: since } } }) : 0,
+    prisma.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 10 }),
   ]);
-  const latest = releases[0];
+  const changes = changedCards + changedSlides;
 
   return (
     <>
       <h1 className="mb-2 text-2xl font-semibold">Publication</h1>
       <p className="mb-6 max-w-prose text-sm text-neutral-faint">
-        L&apos;app ne consomme jamais le contenu live : elle télécharge une
-        release figée. Rien n&apos;est servi tant qu&apos;une version n&apos;est
-        pas publiée — on édite tranquillement.
+        L&apos;app ne consomme jamais le contenu live : elle télécharge une release
+        figée. Rien n&apos;est servi tant qu&apos;une version n&apos;est pas publiée.
       </p>
 
       <div className="mb-6 rounded-lg border border-hairline bg-surface p-4">
-        <div className="text-sm text-ink-soft">
+        <div className="mb-4 text-sm text-ink-soft">
           Version courante : <strong className="text-ink">{latest ? `v${latest.version}` : "aucune"}</strong>
           {" · "}{cards} cartes actives
-          {updatedSince > 0 && (
-            <> · <span className="text-accent">{updatedSince} cartes modifiées depuis</span></>
-          )}
+          {changes > 0
+            ? <> · <span className="text-accent">{changedCards} cartes et {changedSlides} slides modifiées depuis</span></>
+            : latest && <> · <span className="text-neutral-faint">aucune modification depuis</span></>}
         </div>
-        <div className="mt-3 text-xs text-neutral-faint">
-          Publication via <code>pnpm --filter @playlink/scripts build:snapshot</code> puis{" "}
-          <code>publish:release</code>. Le bouton « Publier » arrive en phase 5.
-        </div>
+        <PublishButton changes={changes} />
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-hairline">
+      <div className="mb-6 rounded-lg border border-hairline bg-surface p-4">
+        <h2 className="mb-3 font-medium">Import CSV</h2>
+        <ImportForm />
+      </div>
+
+      <h2 className="mb-3 font-medium">Historique des versions</h2>
+      <div className="mb-6 overflow-hidden rounded-lg border border-hairline">
         <table className="w-full text-sm">
           <thead className="bg-raised text-left text-xs text-neutral-faint">
             <tr><th className="p-3">Version</th><th className="p-3">Publiée le</th><th className="p-3">Changelog</th></tr>
@@ -44,16 +50,33 @@ export default async function Publication() {
             {releases.map((r) => (
               <tr key={r.id} className="border-t border-hairline">
                 <td className="p-3 font-medium">v{r.version}</td>
-                <td className="p-3 text-ink-soft">{r.publishedAt.toLocaleString("fr-FR")}</td>
+                <td className="whitespace-nowrap p-3 text-ink-soft">{r.publishedAt.toLocaleString("fr-FR")}</td>
                 <td className="p-3 text-ink-soft">{r.changelog}</td>
               </tr>
             ))}
-            {!releases.length && (
-              <tr><td colSpan={3} className="p-3 text-neutral-faint">Aucune release publiée</td></tr>
-            )}
+            {!releases.length && <tr><td colSpan={3} className="p-3 text-neutral-faint">Aucune release</td></tr>}
           </tbody>
         </table>
       </div>
+
+      {recentLogs.length > 0 && (
+        <>
+          <h2 className="mb-3 font-medium">Activité récente</h2>
+          <div className="overflow-hidden rounded-lg border border-hairline">
+            <table className="w-full text-sm">
+              <tbody>
+                {recentLogs.map((l) => (
+                  <tr key={l.id} className="border-t border-hairline first:border-t-0">
+                    <td className="whitespace-nowrap p-2 text-xs text-neutral-faint">{l.createdAt.toLocaleString("fr-FR")}</td>
+                    <td className="p-2"><code className="text-xs">{l.action}</code></td>
+                    <td className="p-2 text-xs text-ink-soft">{l.entity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </>
   );
 }
