@@ -4,11 +4,19 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./tag-mapping.ts": "./src/tag-mapping.ts"
+  },
   "scripts": {
     "test": "node --experimental-strip-types --test src/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": { "zod": "^3.24.1" },
-  "devDependencies": { "@types/node": "^22.10.7", "typescript": "^5.7.3" }
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3"
+  }
 }

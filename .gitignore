@@ -49,3 +49,9 @@ dist/
 
 # Généré par Next.js
 next-env.d.ts
+
+# Assets de contenu : régénérés par `scripts/fetch-assets.ts`, 13 Mo.
+# Le manifeste est versionné, les binaires non.
+apps/mobile/assets/content/*.gif
+apps/mobile/assets/content/*.png
+apps/mobile/assets/content/*.jpg

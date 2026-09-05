@@ -1,0 +1,16 @@
+{
+  "name": "@playlink/scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate:content": "node --experimental-strip-types migrate-content.ts",
+    "fetch:assets": "node --experimental-strip-types fetch-assets.ts",
+    "verify": "node --experimental-strip-types verify-migration.ts"
+  },
+  "dependencies": {
+    "@playlink/content-schema": "workspace:*",
+    "@prisma/client": "^6.3.1"
+  },
+  "devDependencies": { "@types/node": "^22.10.7", "typescript": "^5.7.3" }
+}
