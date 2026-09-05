@@ -54,6 +54,12 @@ Back-office Next.js pour le contenu et les stats. Doc de référence complète :
 - Transition `Hero` (Flutter) réservée aux moments à fort enjeu : home→jeu, fin de partie. Pas sur chaque navigation.
 - Détail complet : `docs/playlink-mobile-blueprint.html` §10.
 
+## Environnement de dev — piège connu
+- `flutter doctor` signale à tort `Android license status unknown` : la nouvelle
+  CLI Android de Google n'expose plus de commande de licences. Faux négatif,
+  à ignorer — les builds Android et iOS passent. Détail : `docs/phase-0-etat.md`.
+- CocoaPods s'installe via `brew install cocoapods` (le Ruby système est trop vieux).
+
 ## Conventions
 - UI et contenu en FR + EN. Code et commentaires : suivre l'existant.
 - Commentaires : seulement si le POURQUOI est non-évident.

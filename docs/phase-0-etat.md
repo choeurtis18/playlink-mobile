@@ -21,37 +21,53 @@ les **écarts par rapport au blueprint** à arbitrer.
 
 Repo GitHub : `github.com/choeurtis18/playlink-mobile` (compte perso).
 
-## 2. Outillage local
+## 2. Outillage local — ✅ validé par un build réel
 
 | Outil | État | Note |
 |-------|------|------|
 | Flutter 3.47.2 / Dart 3.13.2 | ✅ | via Homebrew |
-| Android Studio + SDK 35 | ⚠️ | `cmdline-tools` manquant, licences non acceptées |
-| Xcode.app | ⚠️ | `xcode-select` pointe encore sur les Command Line Tools |
-| CocoaPods | ❌ | absent — requis pour les plugins Flutter iOS |
+| Android SDK 36 + build-tools 36.0.0 | ✅ | plateformes 33 à 36 |
+| Xcode 26.6 + runtime iOS 26.5 | ✅ | simulateur disponible |
+| CocoaPods 1.17.0 | ✅ | installé via `brew install cocoapods` |
 | Node 23.9 / pnpm 10.14 | ✅ | |
 | Vercel CLI | ✅ | |
 | GitHub CLI (`gh`) | ❌ | absent — pas bloquant |
 
-**Trois commandes restent à lancer** (demandent `sudo` ou une interaction, donc
-non exécutées automatiquement) :
+**Validation** : un projet Flutter jetable a été construit pour les deux
+plateformes, hors du repo.
 
-    sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
-    sudo xcodebuild -runFirstLaunch
-    sudo gem install cocoapods
+    flutter build apk --debug          → ✓ app-debug.apk
+    flutter build ios --simulator      → ✓ Runner.app
 
-Puis, côté Android (accepte les licences SDK de façon interactive) :
+Gradle a téléchargé et accepté le NDK r28c pendant le build Android, ce qui
+confirme que les licences SDK sont opérationnelles.
 
-    flutter doctor --android-licenses
+### Faux négatif connu de `flutter doctor`
 
-Le composant `cmdline-tools` s'installe depuis Android Studio :
-*Settings → Languages & Frameworks → Android SDK → SDK Tools →
-Android SDK Command-line Tools*.
+`flutter doctor` affiche en permanence :
 
-Vérifier ensuite avec `flutter doctor`.
+    [!] Android toolchain
+        ✗ Android license status unknown.
+        Run `flutter doctor --android-licenses`
 
-> Ni Xcode ni Android Studio ne sont nécessaires avant la **phase 2**. La phase 1
-> (back-office) ne demande que Node + pnpm.
+**C'est un faux négatif, à ignorer.** Google a remplacé `sdkmanager` par une
+nouvelle CLI (`android sdk`) qui n'expose plus aucune commande de licences —
+l'acceptation se fait désormais à l'installation des paquets. `sdkmanager`
+survit comme alias mais refuse `--licenses`. Flutter n'a pas encore adapté sa
+vérification ; il n'existe donc aucune commande capable de la satisfaire.
+
+Les fichiers de licence sont bien présents dans
+`~/Library/Android/sdk/licenses/`, et surtout : **le build Android passe**.
+C'est le seul test qui compte. Ne pas perdre de temps à « corriger » cet
+avertissement, il disparaîtra avec une future version de Flutter.
+
+**Notes d'installation, si à refaire sur une autre machine :**
+
+- CocoaPods : `brew install cocoapods`, **pas** `sudo gem install`. macOS
+  embarque Ruby 2.6, alors que la dépendance `ffi` exige Ruby ≥ 3.0.
+- Runtime du simulateur iOS : `xcodebuild -downloadPlatform iOS` (~7 Go).
+- Plateforme Android 36 et cmdline-tools : via Android Studio,
+  *Settings → Languages & Frameworks → Android SDK*.
 
 ## 3. Comptes de services
 
