@@ -237,8 +237,9 @@ d'un `vercel env pull`.
 > « Le contenu Playlink est dans Neon, une version 1 est publiée, le snapshot
 > JSON est téléchargeable »
 
-Atteint, à une réserve près : le snapshot n'est pas encore *téléchargeable*
-(voir « reste à faire » plus bas). Il est généré, validé et embarquable.
+**Atteint sans réserve.** Le snapshot est en ligne sur Vercel Blob public,
+téléchargeable sans authentification en ~0,16 s, et `GET /content/latest`
+pointe dessus.
 
 ## Ce qui existe
 
@@ -249,6 +250,7 @@ Atteint, à une réserve près : le snapshot n'est pas encore *téléchargeable*
 | Assets | ✅ 55 fichiers, 13 Mo |
 | Snapshot v1 | ✅ 0,32 Mo, validé par Zod |
 | `GET /content/latest` | ✅ testé en HTTP réel |
+| Snapshot sur Blob public | ✅ https://9jift8umwaqz1iep.public.blob.vercel-storage.com/content/content_v1.json |
 | Auth éditeurs (Clerk) | ✅ redirection vérifiée |
 | Back-office (6 pages) | ✅ lecture seule |
 
@@ -276,9 +278,6 @@ L'app pèsera donc ~15 Mo, loin des 45-60 Mo annoncés au §06.
 
 ## Reste à faire avant la phase 5
 
-- **Store Vercel Blob public** à créer (l'actuel est privé, et l'accès n'est
-  pas modifiable après création). Sans lui, pas d'OTA — mais la v1 étant
-  embarquée dans le binaire, ce n'est pas bloquant avant la phase 6.
 - Le back-office est en **lecture seule** : l'édition, l'import/export CSV et
   le bouton « Publier » sont prévus phase 5 (§12). La publication se fait
   aujourd'hui en ligne de commande.
