@@ -1,4 +1,4 @@
-package com.playlink.playlink
+package com.playlink.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -25,9 +25,12 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.34.6
   build_runner: ^2.16.1
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
+  generate: true
 
   # Snapshot de contenu v1 + GIF des règles, embarqués dans le binaire (§06).
   # Régénérés par scripts/build-snapshot.ts et scripts/fetch-assets.ts.

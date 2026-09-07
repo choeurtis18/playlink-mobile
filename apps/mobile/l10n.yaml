@@ -1,0 +1,8 @@
+arb-dir: lib/l10n
+template-arb-file: app_fr.arb
+output-localization-file: app_localizations.dart
+nullable-getter: false
+# Sortie explicite dans lib/l10n : sans ça, `flutter test`/build génèrent en
+# package synthétique et effacent lib/l10n/*.dart, cassant les imports.
+synthetic-package: false
+output-dir: lib/l10n
