@@ -56,3 +56,6 @@ apps/mobile/assets/content/*.gif
 apps/mobile/assets/content/*.png
 apps/mobile/assets/content/*.jpg
 apps/mobile/assets/content/content_v*.json
+.vercel
+
+assets/
