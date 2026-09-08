@@ -30,17 +30,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Everything works offline. An account, later, only saves your progress.';
 
   @override
-  String get onboardingAnalyticsTitle => 'Help us improve Playlink';
+  String get onboardingAnalyticsTitle => 'Stats, not data';
 
   @override
   String get onboardingAnalyticsBody =>
-      'Anonymous stats, no name or e-mail. You can say no, nothing changes.';
+      'We measure what\'s played to improve the content. Never an email, never a name, never the text of your answers.';
 
   @override
-  String get onboardingAnalyticsAccept => 'I\'m in';
+  String get onboardingAnalyticsToggleTitle => 'Share anonymous stats';
 
   @override
-  String get onboardingAnalyticsDecline => 'No thanks';
+  String get onboardingAnalyticsToggleBody => 'No email, no name, no card text';
+
+  @override
+  String get onboardingStart => 'Start';
+
+  @override
+  String get skip => 'Skip';
 
   @override
   String get next => 'Next';
@@ -160,6 +166,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get no => 'No';
 
   @override
+  String get voteIsMandatory =>
+      'The vote is mandatory — it\'s what advances the count.';
+
+  @override
   String passPhoneTo(String name) {
     return 'Pass the phone to $name';
   }
@@ -194,7 +204,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get replay => 'Play again';
 
   @override
-  String get goHome => 'Back to home';
+  String get goHome => 'Home';
+
+  @override
+  String get shareScore => 'Share the score';
 
   @override
   String cardOf(int current, int total) {
@@ -212,4 +225,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadingContent => 'Getting the cards ready…';
+
+  @override
+  String get navPlay => 'Play';
+
+  @override
+  String get navLeaderboard => 'Leaderboard';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
+  String get leaderboardTitle => 'Leaderboard';
+
+  @override
+  String get leaderboardSubtitle => 'Across your profiles · calculated locally';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileLocalMode => 'Local mode — no account';
+
+  @override
+  String get profileLocalCardTitle => 'Everything works without an account';
+
+  @override
+  String get profileLocalCardBody =>
+      'Games, badges and history live on this device. An account is for saving progress, creating cards and liking.';
+
+  @override
+  String get createAccount => 'Create an account';
+
+  @override
+  String get myCards => 'My cards';
+
+  @override
+  String get likedCards => 'Liked cards';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get settingsSubtitle => 'Language, theme, privacy';
+
+  @override
+  String get noPlayersYet => 'Add players to see the leaderboard';
+
+  @override
+  String get offlineReady => 'Offline ready';
+
+  @override
+  String get playersEdit => 'Edit';
+
+  @override
+  String gamesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count games',
+      one: '1 game',
+      zero: '0 games',
+    );
+    return '$_temp0';
+  }
 }

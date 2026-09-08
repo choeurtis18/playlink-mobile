@@ -20,8 +20,9 @@ final categoriesProvider = FutureProvider.family<List<CategoryVm>, String>((ref,
   return ref.watch(contentRepositoryProvider).categories(gameId, locale);
 });
 
-/// B1 · page du jeu : la tuile s'est étendue en écran (Hero), ses catégories
-/// et l'accès aux règles.
+/// B1 · page du jeu : bandeau dégradé compact (icône, nom, sous-titre),
+/// puis la liste des catégories sur fond sombre — la tuile s'étend en Hero
+/// jusqu'à ce bandeau, il ne couvre pas tout l'écran (réf. visuelle).
 class GameScreen extends ConsumerWidget {
   const GameScreen({super.key, required this.slug});
   final String slug;
@@ -31,22 +32,28 @@ class GameScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final game = ref.watch(gameBySlugProvider(slug)).value;
     if (game == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(backgroundColor: PlColors.ground, body: Center(child: CircularProgressIndicator()));
     }
     final cats = ref.watch(categoriesProvider(game.id));
+    final players = ref.watch(playersProvider).where((p) => p.inSession).length;
 
     return GameScaffold(
       colorMain: game.colorMain,
       colorSecondary: game.colorSecondary,
       heroTag: 'game-${game.slug}',
+      headerHeight: 168,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         leading: const BackButton(),
         actions: [
-          IconButton(
-            tooltip: t.rules,
-            icon: const Icon(Icons.menu_book_rounded),
-            onPressed: () => showRulesSheet(context, game),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _PillButton(
+              icon: Icons.menu_book_rounded,
+              label: t.rules,
+              onTap: () => showRulesSheet(context, game),
+            ),
           ),
         ],
       ),
@@ -54,32 +61,31 @@ class GameScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 56, 24, 8),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(game.icon ?? '', style: const TextStyle(fontSize: 52)),
-                const SizedBox(height: 8),
+                Text(game.icon ?? '', style: const TextStyle(fontSize: 34)),
+                const SizedBox(height: 6),
                 Text(game.name,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
-                if (game.description != null) ...[
-                  const SizedBox(height: 8),
-                  Text(game.description!,
-                      maxLines: 4, overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.85), height: 1.4)),
-                ],
+                    style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
+                const SizedBox(height: 4),
+                Text(
+                  '${game.categoryCount} ${t.categoriesTitle.toLowerCase()} · ${t.cardsCount(game.cardCount)} · $players 👥',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
+                ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: Text(t.chooseCategory.toUpperCase(),
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
+                style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
           ),
           Expanded(
             child: cats.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
-              error: (e, _) => Center(child: Text('$e', style: const TextStyle(color: Colors.white))),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('$e')),
               data: (list) => ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                 itemCount: list.length,
@@ -90,26 +96,35 @@ class GameScreen extends ConsumerWidget {
                     onTap: () => context.push('/game/${game.slug}/config/${c.id}'),
                     borderRadius: PlRadius.tile,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.16),
+                        color: PlColors.surface,
                         borderRadius: BorderRadius.circular(PlRadius.tile),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
                       ),
                       child: Row(
                         children: [
-                          Text(c.icon ?? '🃏', style: const TextStyle(fontSize: 24)),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: PlColors.raisedHigh,
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: Text(c.icon ?? '🃏', style: const TextStyle(fontSize: 18)),
+                          ),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(c.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
-                                Text(t.cardsCount(c.cardCount), style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12.5)),
+                                Text(c.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                                Text('${t.cardsCount(c.cardCount)} · ${t.intensity.toLowerCase()} 1–5',
+                                    style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12.5)),
                               ],
                             ),
                           ),
-                          Icon(Icons.chevron_right, color: Colors.white.withValues(alpha: 0.7)),
+                          const Icon(Icons.chevron_right, color: PlColors.neutralFaint),
                         ],
                       ),
                     ),
@@ -119,6 +134,36 @@ class GameScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PillButton extends StatelessWidget {
+  const _PillButton({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.18),
+      shape: const StadiumBorder(),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: Colors.white),
+              const SizedBox(width: 6),
+              Text(label, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
       ),
     );
   }

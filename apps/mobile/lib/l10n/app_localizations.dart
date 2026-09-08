@@ -137,26 +137,38 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAnalyticsTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Nous aider à améliorer Playlink'**
+  /// **'Des stats, pas des données'**
   String get onboardingAnalyticsTitle;
 
   /// No description provided for @onboardingAnalyticsBody.
   ///
   /// In fr, this message translates to:
-  /// **'Des statistiques anonymes, sans nom ni e-mail. Tu peux refuser, rien ne change.'**
+  /// **'On mesure ce qui est joué pour améliorer le contenu. Jamais d\'email, jamais de nom, jamais le texte de tes réponses.'**
   String get onboardingAnalyticsBody;
 
-  /// No description provided for @onboardingAnalyticsAccept.
+  /// No description provided for @onboardingAnalyticsToggleTitle.
   ///
   /// In fr, this message translates to:
-  /// **'J\'accepte'**
-  String get onboardingAnalyticsAccept;
+  /// **'Partager des stats anonymes'**
+  String get onboardingAnalyticsToggleTitle;
 
-  /// No description provided for @onboardingAnalyticsDecline.
+  /// No description provided for @onboardingAnalyticsToggleBody.
   ///
   /// In fr, this message translates to:
-  /// **'Sans moi'**
-  String get onboardingAnalyticsDecline;
+  /// **'Aucun email, aucun nom, aucun texte de carte'**
+  String get onboardingAnalyticsToggleBody;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commencer'**
+  String get onboardingStart;
+
+  /// No description provided for @skip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer'**
+  String get skip;
 
   /// No description provided for @next.
   ///
@@ -344,6 +356,12 @@ abstract class AppLocalizations {
   /// **'Non'**
   String get no;
 
+  /// No description provided for @voteIsMandatory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le vote est obligatoire — c\'est lui qui fait avancer le compteur.'**
+  String get voteIsMandatory;
+
   /// No description provided for @passPhoneTo.
   ///
   /// In fr, this message translates to:
@@ -389,8 +407,14 @@ abstract class AppLocalizations {
   /// No description provided for @goHome.
   ///
   /// In fr, this message translates to:
-  /// **'Retour à l\'accueil'**
+  /// **'Accueil'**
   String get goHome;
+
+  /// No description provided for @shareScore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partager le score'**
+  String get shareScore;
 
   /// No description provided for @cardOf.
   ///
@@ -421,6 +445,114 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Préparation des cartes…'**
   String get loadingContent;
+
+  /// No description provided for @navPlay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jouer'**
+  String get navPlay;
+
+  /// No description provided for @navLeaderboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Classement'**
+  String get navLeaderboard;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil'**
+  String get navProfile;
+
+  /// No description provided for @leaderboardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Classement'**
+  String get leaderboardTitle;
+
+  /// No description provided for @leaderboardSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entre tes profils · calculé en local'**
+  String get leaderboardSubtitle;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil'**
+  String get profileTitle;
+
+  /// No description provided for @profileLocalMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode local — aucun compte'**
+  String get profileLocalMode;
+
+  /// No description provided for @profileLocalCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout marche sans compte'**
+  String get profileLocalCardTitle;
+
+  /// No description provided for @profileLocalCardBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parties, badges et historique vivent sur cet appareil. Un compte sert à sauvegarder, créer des cartes et liker.'**
+  String get profileLocalCardBody;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un compte'**
+  String get createAccount;
+
+  /// No description provided for @myCards.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes cartes'**
+  String get myCards;
+
+  /// No description provided for @likedCards.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cartes likées'**
+  String get likedCards;
+
+  /// No description provided for @settings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réglages'**
+  String get settings;
+
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langue, thème, confidentialité'**
+  String get settingsSubtitle;
+
+  /// No description provided for @noPlayersYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute des joueurs pour voir le classement'**
+  String get noPlayersYet;
+
+  /// No description provided for @offlineReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hors-ligne prêt'**
+  String get offlineReady;
+
+  /// No description provided for @playersEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get playersEdit;
+
+  /// No description provided for @gamesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{0 partie} =1{1 partie} other{{count} parties}}'**
+  String gamesCount(int count);
 }
 
 class _AppLocalizationsDelegate

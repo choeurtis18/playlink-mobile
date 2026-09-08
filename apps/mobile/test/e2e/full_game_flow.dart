@@ -86,7 +86,7 @@ Future<void> playFullGame(
   await tapText(tester, 'Suivant');
   await tapText(tester, 'Suivant');
   await snap('02-onboarding-analytics');
-  await tapText(tester, "J'accepte");
+  await tapText(tester, 'Commencer');
 
   // A1 — joueurs de la session.
   expect(find.text('Qui joue ce soir ?'), findsOneWidget);
@@ -137,8 +137,10 @@ Future<void> playFullGame(
     } else if (find.text('Voter').evaluate().isNotEmpty) {
       await tapText(tester, 'Voter');
       if (votes == 0) await snap('09-vote');
-    } else if (find.textContaining('Oui').evaluate().isNotEmpty) {
-      await tapText(tester, votes.isEven ? '👍  Oui' : '👎  Non');
+    } else if (find.text('Oui').evaluate().isNotEmpty) {
+      // Le bouton empile emoji et libellé (réf. visuelle) : on tape sur le
+      // libellé seul plutôt que sur un texte combiné qui n'existe plus.
+      await tapText(tester, votes.isEven ? 'Oui' : 'Non');
       votes++;
     } else if (find.text('Je suis prêt').evaluate().isNotEmpty) {
       if (votes == 1) await snap('10-pass');

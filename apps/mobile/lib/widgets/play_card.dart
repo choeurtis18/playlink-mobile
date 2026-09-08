@@ -3,9 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../theme/theme.dart';
-
-/// PlayCard : pile de cartes swipeable (variante « Pile de cartes »).
+/// PlayCard : pile de cartes swipeable, dégradée aux couleurs du jeu
+/// (réf. visuelle — plus une carte blanche).
 ///
 /// Sur mobile le vote est obligatoire pour avancer (B5) : un swipe vers la
 /// droite au-delà du seuil (±80 px, comme le web) n'avance donc pas la carte,
@@ -16,12 +15,16 @@ class PlayCard extends StatefulWidget {
     super.key,
     required this.text,
     required this.intensityLabel,
+    required this.gradient,
     required this.behind,
     required this.onSwipeToVote,
+    this.categoryLabel,
   });
 
   final String text;
   final String intensityLabel;
+  final Gradient gradient;
+  final String? categoryLabel;
   /// Nombre de cartes restantes derrière (0–2 fantômes affichés).
   final int behind;
   final VoidCallback onSwipeToVote;
@@ -74,7 +77,7 @@ class _PlayCardState extends State<PlayCard> with SingleTickerProviderStateMixin
               angle: i == 1 ? 0.04 : -0.03,
               child: Transform.scale(
                 scale: 1 - 0.07 * i,
-                child: _Face(opacity: i == 1 ? 0.5 : 0.3, child: const SizedBox.expand()),
+                child: _Face(gradient: widget.gradient, opacity: i == 1 ? 0.5 : 0.3, child: const SizedBox.expand()),
               ),
             ),
           ),
@@ -87,40 +90,46 @@ class _PlayCardState extends State<PlayCard> with SingleTickerProviderStateMixin
             child: Transform.rotate(
               angle: angle,
               child: _Face(
+                gradient: widget.gradient,
                 opacity: 1,
                 child: Padding(
-                  padding: const EdgeInsets.all(26),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1EEF7),
-                              borderRadius: BorderRadius.circular(99),
-                            ),
-                            child: Text(widget.intensityLabel,
-                                style: const TextStyle(color: PlColors.neutral, fontSize: 12, fontWeight: FontWeight.w600)),
+                      if (widget.categoryLabel != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.22),
+                            borderRadius: BorderRadius.circular(99),
                           ),
-                          const Spacer(),
-                          AnimatedOpacity(
-                            duration: const Duration(milliseconds: 120),
-                            opacity: (_dx / threshold).clamp(0, 1),
-                            child: const Icon(Icons.how_to_vote_rounded, color: PlColors.accent),
-                          ),
-                        ],
-                      ),
+                          child: Text(widget.categoryLabel!.toUpperCase(),
+                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.6)),
+                        ),
                       const Spacer(),
                       Text(
                         widget.text,
                         style: const TextStyle(
-                          color: Color(0xFF15131F), fontSize: 24, fontWeight: FontWeight.w700,
+                          color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700,
                           height: 1.3, letterSpacing: -0.3,
                         ),
                       ),
                       const Spacer(flex: 2),
+                      Row(
+                        children: [
+                          _RoundIcon(icon: Icons.favorite_border_rounded),
+                          const SizedBox(width: 10),
+                          const _RoundIcon(icon: Icons.ios_share_rounded),
+                          const Spacer(),
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 120),
+                            opacity: 1 - (_dx / threshold).clamp(0, 1),
+                            child: Text('${widget.intensityLabel} · swipe pour voter',
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 11.5)),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -133,10 +142,30 @@ class _PlayCardState extends State<PlayCard> with SingleTickerProviderStateMixin
   }
 }
 
+class _RoundIcon extends StatelessWidget {
+  const _RoundIcon({required this.icon});
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: Colors.white, size: 18),
+    );
+  }
+}
+
 class _Face extends StatelessWidget {
-  const _Face({required this.child, required this.opacity});
+  const _Face({required this.child, required this.opacity, required this.gradient});
   final Widget child;
   final double opacity;
+  final Gradient gradient;
 
   @override
   Widget build(BuildContext context) {
@@ -146,9 +175,9 @@ class _Face extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: gradient,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 30, offset: Offset(0, 14))],
+          boxShadow: const [BoxShadow(color: Color(0x50000000), blurRadius: 30, offset: Offset(0, 14))],
         ),
         child: child,
       ),

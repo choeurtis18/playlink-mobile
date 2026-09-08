@@ -7,8 +7,12 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('partie complète sur appareil, avec captures', (tester) async {
-    await playFullGame(tester, shot: (name) async {
-      await binding.takeScreenshot(name);
-    });
+    await playFullGame(
+      tester,
+      useRealAssetBundle: true,
+      shot: (name) async {
+        await binding.takeScreenshot(name);
+      },
+    );
   }, timeout: const Timeout(Duration(minutes: 5)));
 }

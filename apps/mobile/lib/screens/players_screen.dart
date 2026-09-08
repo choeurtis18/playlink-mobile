@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../data/providers.dart';
 import '../theme/theme.dart';
+import '../widgets/game_scaffold.dart';
 import '../widgets/player_avatar.dart';
 
 /// A1/A2 : la liste des joueurs de la session, composée avant la home.
@@ -15,6 +16,7 @@ class PlayersScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     return Scaffold(
+      backgroundColor: PlColors.ground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
@@ -27,11 +29,11 @@ class PlayersScreen extends ConsumerWidget {
               const SizedBox(height: 20),
               const Expanded(child: PlayersEditor()),
               const SizedBox(height: 12),
-              FilledButton(
+              AccentButton(
+                label: t.letsPlay,
                 onPressed: ref.watch(playersProvider).any((p) => p.inSession)
                     ? () => context.go('/')
                     : null,
-                child: Text(t.letsPlay),
               ),
             ],
           ),

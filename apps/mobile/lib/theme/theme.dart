@@ -47,6 +47,14 @@ LinearGradient gameGradient(String colorMain, String colorSecondary) {
   );
 }
 
+/// Dégradé d'accent (violet → rose) des CTA hors contexte d'un jeu précis :
+/// onboarding, ajout de joueurs — jamais un bouton blanc plein.
+const accentGradient = LinearGradient(
+  begin: Alignment.centerLeft,
+  end: Alignment.centerRight,
+  colors: [Color(0xFF8B3CF2), PlColors.accent],
+);
+
 ThemeData buildDarkTheme() {
   const scheme = ColorScheme.dark(
     primary: PlColors.accent,

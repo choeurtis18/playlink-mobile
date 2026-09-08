@@ -15,6 +15,8 @@ import '../widgets/player_avatar.dart';
 import 'rules_sheet.dart';
 
 /// B3 → B6 : un seul écran, l'étape est dérivée de l'état du contrôleur.
+/// Fond sombre uni partout (réf. visuelle) : seule la carte du deck et les
+/// CTA reprennent le dégradé du jeu.
 class PlayScreen extends ConsumerWidget {
   const PlayScreen({super.key});
 
@@ -45,7 +47,7 @@ class PlayScreen extends ConsumerWidget {
       // l'état (ctrl.leave() en dernier), donc ce cas n'a besoin que d'un
       // filet simple — pas d'un redirect qui, exécuté un frame plus tard,
       // pourrait écraser une navigation entre-temps décidée ailleurs.
-      return const Scaffold(body: SizedBox.shrink());
+      return const Scaffold(backgroundColor: PlColors.ground, body: SizedBox.shrink());
     }
     final ctrl = ref.read(gameControllerProvider.notifier);
     final inGame = s.stage != GameStage.results;
@@ -62,8 +64,10 @@ class PlayScreen extends ConsumerWidget {
       child: GameScaffold(
         colorMain: s.game.colorMain,
         colorSecondary: s.game.colorSecondary,
+        headerHeight: 0,
         appBar: AppBar(
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
+          foregroundColor: PlColors.ink,
           leading: inGame
               ? IconButton(
                   icon: const Icon(Icons.close),
@@ -122,13 +126,19 @@ class _Turn extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(),
-          PlayerAvatar(emoji: p.avatar, size: 96, onDark: true),
+          Text(t.yourTurn.toUpperCase(),
+              style: const TextStyle(color: PlColors.neutral, fontSize: 12.5, letterSpacing: 1.5, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 28),
+          PlayerAvatar(emoji: p.avatar, size: 96, gradient: gameGradient(s.game.colorMain, s.game.colorSecondary)),
           const SizedBox(height: 18),
-          Text(p.name, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-          const SizedBox(height: 6),
-          Text(t.yourTurn, style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 17)),
+          Text(p.name, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+          const SizedBox(height: 8),
+          Text(t.passPhoneHint, textAlign: TextAlign.center, style: const TextStyle(color: PlColors.neutralFaint)),
           const Spacer(),
-          OnGradientButton(label: t.seeCard, icon: Icons.visibility_rounded, onPressed: onReveal),
+          OnGradientButton(
+            label: t.seeCard, icon: Icons.visibility_rounded, onPressed: onReveal,
+            colorMain: s.game.colorMain, colorSecondary: s.game.colorSecondary,
+          ),
         ],
       ),
     );
@@ -151,12 +161,14 @@ class _Card extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 16),
       child: Column(
         children: [
-          Text(t.turnOf(s.currentPlayer.name), style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 15)),
+          Text(t.turnOf(s.currentPlayer.name), style: const TextStyle(color: PlColors.neutralFaint, fontSize: 14)),
           const SizedBox(height: 14),
           Expanded(
             child: PlayCard(
               text: card.text,
               intensityLabel: intensityLabels[card.intensity] ?? '',
+              categoryLabel: s.category.name,
+              gradient: gameGradient(s.game.colorMain, s.game.colorSecondary),
               behind: s.deck.length - s.index - 1,
               onSwipeToVote: ctrl.openVote,
             ),
@@ -169,7 +181,10 @@ class _Card extends StatelessWidget {
             } : null),
           ],
           const SizedBox(height: 18),
-          OnGradientButton(label: t.vote, icon: Icons.how_to_vote_rounded, onPressed: ctrl.openVote),
+          OnGradientButton(
+            label: t.vote, icon: Icons.how_to_vote_rounded, onPressed: ctrl.openVote,
+            colorMain: s.game.colorMain, colorSecondary: s.game.colorSecondary,
+          ),
         ],
       ),
     );
@@ -195,11 +210,11 @@ class _Hints extends StatelessWidget {
             width: 14, height: 14,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: i < left ? Colors.white : Colors.white.withValues(alpha: 0.25),
+              color: i < left ? PlColors.ink : PlColors.hairlineFirm,
             ),
           ),
         const SizedBox(width: 6),
-        Expanded(child: Text(t.hintsLeft(left), style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w600))),
+        Expanded(child: Text(t.hintsLeft(left), style: const TextStyle(color: PlColors.inkSoft, fontWeight: FontWeight.w600))),
         GhostButton(label: t.useHint, onPressed: onUse),
       ],
     );
@@ -217,16 +232,37 @@ class _Vote extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Spacer(),
-          PlayerAvatar(emoji: s.currentPlayer.avatar, size: 72, onDark: true),
-          const SizedBox(height: 20),
-          Text(t.deservesPoint(s.currentPlayer.name),
+          // Rappel compact de la carte (réf. visuelle : la carte réduite
+          // reste visible en haut de l'écran de vote).
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: gameGradient(s.game.colorMain, s.game.colorSecondary),
+              borderRadius: BorderRadius.circular(PlRadius.card),
+            ),
+            child: Text(
+              s.card?.text ?? '',
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700, height: 1.3),
+            ),
+          ),
+          const Spacer(flex: 2),
+          Text(t.vote.toUpperCase(),
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.4)),
-          const Spacer(),
+              style: const TextStyle(color: PlColors.neutral, fontSize: 12.5, letterSpacing: 1.5, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 10),
+          Text(
+            t.deservesPoint(s.currentPlayer.name),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, height: 1.25, letterSpacing: -0.3),
+          ),
+          const Spacer(flex: 3),
           Row(
             children: [
               Expanded(
@@ -235,13 +271,20 @@ class _Vote extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () { HapticFeedback.lightImpact(); ctrl.vote(point: false); },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.white.withValues(alpha: 0.14),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                      foregroundColor: PlColors.ink,
+                      backgroundColor: PlColors.surface,
+                      side: const BorderSide(color: PlColors.hairlineFirm),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.card)),
-                      textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                      textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
                     ),
-                    child: Text('👎  ${t.no}'),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('👎', style: TextStyle(fontSize: 24)),
+                        const SizedBox(height: 4),
+                        Text(t.no),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -249,20 +292,35 @@ class _Vote extends StatelessWidget {
               Expanded(
                 child: SizedBox(
                   height: 92,
-                  child: FilledButton(
-                    onPressed: () { HapticFeedback.heavyImpact(); ctrl.vote(point: true); },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF15131F),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.card)),
-                      textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: gameGradient(s.game.colorMain, s.game.colorSecondary),
+                      borderRadius: BorderRadius.circular(PlRadius.card),
                     ),
-                    child: Text('👍  ${t.yes}'),
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(PlRadius.card),
+                        onTap: () { HapticFeedback.heavyImpact(); ctrl.vote(point: true); },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('👍', style: TextStyle(fontSize: 24)),
+                            const SizedBox(height: 4),
+                            Text(t.yes, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          Text(t.voteIsMandatory,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: PlColors.neutralFaint, fontSize: 11.5)),
         ],
       ),
     );
@@ -280,23 +338,27 @@ class _Pass extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final p = s.currentPlayer;
-    return Container(
-      color: const Color(0xCC0D0C16),
+    return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       child: Column(
         children: [
           const Spacer(),
           const Text('📱', style: TextStyle(fontSize: 56)),
           const SizedBox(height: 20),
-          Text(t.passPhoneTo(p.name),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.4)),
-          const SizedBox(height: 14),
-          PlayerAvatar(emoji: p.avatar, size: 64, onDark: true),
-          const SizedBox(height: 14),
-          Text(t.passPhoneHint, textAlign: TextAlign.center, style: const TextStyle(color: PlColors.neutral)),
+          Text(
+            t.passPhoneTo(p.name),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.3),
+          ),
+          const SizedBox(height: 16),
+          PlayerAvatar(emoji: p.avatar, size: 64, gradient: gameGradient(s.game.colorMain, s.game.colorSecondary)),
+          const SizedBox(height: 16),
+          Text(t.passPhoneHint, textAlign: TextAlign.center, style: const TextStyle(color: PlColors.neutralFaint)),
           const Spacer(),
-          OnGradientButton(label: t.imReady, icon: Icons.check_rounded, onPressed: onReady),
+          OnGradientButton(
+            label: t.imReady, icon: Icons.check_rounded, onPressed: onReady,
+            colorMain: s.game.colorMain, colorSecondary: s.game.colorSecondary,
+          ),
         ],
       ),
     );
@@ -321,58 +383,71 @@ class _Results extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 16),
       child: Column(
         children: [
-          Text(t.gameOver, style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-          const SizedBox(height: 6),
-          Text('${s.game.icon} ${s.game.name} · ${s.category.name}', style: TextStyle(color: Colors.white.withValues(alpha: 0.8))),
-          const SizedBox(height: 20),
+          const Text('🏆', style: TextStyle(fontSize: 48)),
+          const SizedBox(height: 14),
+          Text(t.gameOver, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
+          const SizedBox(height: 4),
+          Text('${s.category.name} · ${t.cardsCount(s.deck.length)} · ${t.intensity.toLowerCase()} ${s.intensity}',
+              style: const TextStyle(color: PlColors.neutralFaint, fontSize: 13)),
+          const SizedBox(height: 24),
           Expanded(
-            child: ListView.separated(
-              itemCount: ranked.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (_, i) {
-                final p = ranked[i];
-                final archetype = getPlayerType(s.session.tagScoresGained[p.id] ?? const {});
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: i == 0 ? 0.95 : 0.16),
-                    borderRadius: BorderRadius.circular(PlRadius.tile),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(i < 3 ? medals[i] : '${i + 1}', style: const TextStyle(fontSize: 22)),
-                      const SizedBox(width: 10),
-                      PlayerAvatar(emoji: p.avatar, size: 40, onDark: i != 0),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  for (var i = 0; i < ranked.length; i++) ...[
+                    if (i > 0) const SizedBox(height: 10),
+                    Builder(builder: (_) {
+                      final p = ranked[i];
+                      final archetype = getPlayerType(s.session.tagScoresGained[p.id] ?? const {});
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: PlColors.surface,
+                          borderRadius: BorderRadius.circular(PlRadius.tile),
+                        ),
+                        child: Row(
                           children: [
-                            Text(p.name, style: TextStyle(color: i == 0 ? const Color(0xFF15131F) : Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
-                            Text(archetype, style: TextStyle(color: i == 0 ? PlColors.neutral : Colors.white70, fontSize: 12.5)),
+                            SizedBox(
+                              width: 24,
+                              child: Text(i < 3 ? medals[i] : '${i + 1}',
+                                  textAlign: TextAlign.center, style: const TextStyle(fontSize: 18)),
+                            ),
+                            const SizedBox(width: 10),
+                            PlayerAvatar(emoji: p.avatar, size: 40, gradient: gameGradient(s.game.colorMain, s.game.colorSecondary)),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                                  Text(archetype, style: TextStyle(color: hexColor(s.game.colorMain), fontSize: 12.5)),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(t.sessionScore(s.session.sessionScore(p.id)),
+                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                                Text(t.totalScore(s.session.scores[p.id] ?? 0),
+                                    style: const TextStyle(color: PlColors.neutralFaint, fontSize: 11.5)),
+                              ],
+                            ),
                           ],
                         ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(t.sessionScore(s.session.sessionScore(p.id)),
-                              style: TextStyle(color: i == 0 ? const Color(0xFF15131F) : Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
-                          Text(t.totalScore(s.session.scores[p.id] ?? 0),
-                              style: TextStyle(color: i == 0 ? PlColors.neutral : Colors.white70, fontSize: 11.5)),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
+                      );
+                    }),
+                  ],
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           OnGradientButton(
             label: t.replay,
             icon: Icons.replay_rounded,
+            colorMain: s.game.colorMain,
+            colorSecondary: s.game.colorSecondary,
             onPressed: () {
               // Naviguer AVANT de vider l'état : sinon PlayScreen se
               // reconstruit un instant avec s == null pendant la transition
@@ -384,7 +459,16 @@ class _Results extends StatelessWidget {
             },
           ),
           const SizedBox(height: 10),
-          GhostButton(label: t.goHome, onPressed: () { context.go('/'); ctrl.leave(); }),
+          Row(
+            children: [
+              // Le partage (E2) est une fonctionnalité de phase 5 — le bouton
+              // existe visuellement (réf.) mais reste désactivé tant qu'elle
+              // n'est pas construite, plutôt que de simuler une action.
+              Expanded(child: GhostButton(label: t.shareScore, onPressed: null)),
+              const SizedBox(width: 10),
+              Expanded(child: GhostButton(label: t.goHome, onPressed: () { context.go('/'); ctrl.leave(); })),
+            ],
+          ),
         ],
       ),
     );

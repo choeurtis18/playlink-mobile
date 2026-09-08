@@ -30,17 +30,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Tout marche hors-ligne. Un compte, plus tard, servira seulement à sauvegarder ta progression.';
 
   @override
-  String get onboardingAnalyticsTitle => 'Nous aider à améliorer Playlink';
+  String get onboardingAnalyticsTitle => 'Des stats, pas des données';
 
   @override
   String get onboardingAnalyticsBody =>
-      'Des statistiques anonymes, sans nom ni e-mail. Tu peux refuser, rien ne change.';
+      'On mesure ce qui est joué pour améliorer le contenu. Jamais d\'email, jamais de nom, jamais le texte de tes réponses.';
 
   @override
-  String get onboardingAnalyticsAccept => 'J\'accepte';
+  String get onboardingAnalyticsToggleTitle => 'Partager des stats anonymes';
 
   @override
-  String get onboardingAnalyticsDecline => 'Sans moi';
+  String get onboardingAnalyticsToggleBody =>
+      'Aucun email, aucun nom, aucun texte de carte';
+
+  @override
+  String get onboardingStart => 'Commencer';
+
+  @override
+  String get skip => 'Passer';
 
   @override
   String get next => 'Suivant';
@@ -160,6 +167,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get no => 'Non';
 
   @override
+  String get voteIsMandatory =>
+      'Le vote est obligatoire — c\'est lui qui fait avancer le compteur.';
+
+  @override
   String passPhoneTo(String name) {
     return 'Passe le téléphone à $name';
   }
@@ -195,7 +206,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get replay => 'Rejouer';
 
   @override
-  String get goHome => 'Retour à l\'accueil';
+  String get goHome => 'Accueil';
+
+  @override
+  String get shareScore => 'Partager le score';
 
   @override
   String cardOf(int current, int total) {
@@ -213,4 +227,68 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loadingContent => 'Préparation des cartes…';
+
+  @override
+  String get navPlay => 'Jouer';
+
+  @override
+  String get navLeaderboard => 'Classement';
+
+  @override
+  String get navProfile => 'Profil';
+
+  @override
+  String get leaderboardTitle => 'Classement';
+
+  @override
+  String get leaderboardSubtitle => 'Entre tes profils · calculé en local';
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileLocalMode => 'Mode local — aucun compte';
+
+  @override
+  String get profileLocalCardTitle => 'Tout marche sans compte';
+
+  @override
+  String get profileLocalCardBody =>
+      'Parties, badges et historique vivent sur cet appareil. Un compte sert à sauvegarder, créer des cartes et liker.';
+
+  @override
+  String get createAccount => 'Créer un compte';
+
+  @override
+  String get myCards => 'Mes cartes';
+
+  @override
+  String get likedCards => 'Cartes likées';
+
+  @override
+  String get settings => 'Réglages';
+
+  @override
+  String get settingsSubtitle => 'Langue, thème, confidentialité';
+
+  @override
+  String get noPlayersYet => 'Ajoute des joueurs pour voir le classement';
+
+  @override
+  String get offlineReady => 'Hors-ligne prêt';
+
+  @override
+  String get playersEdit => 'Modifier';
+
+  @override
+  String gamesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parties',
+      one: '1 partie',
+      zero: '0 partie',
+    );
+    return '$_temp0';
+  }
 }
