@@ -23,7 +23,7 @@ class PlayersScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.playersTitle, style: Theme.of(context).textTheme.headlineMedium),
+              _PlayersTitle(start: t.playersTitleStart, highlight: t.playersTitleHighlight),
               const SizedBox(height: 8),
               Text(t.playersSubtitle, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 20),
@@ -39,6 +39,33 @@ class PlayersScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Titre en deux temps (réf. visuelle) : texte fixe, puis les derniers mots
+/// sur une pilule au dégradé accent.
+class _PlayersTitle extends StatelessWidget {
+  const _PlayersTitle({required this.start, required this.highlight});
+  final String start, highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 10,
+      runSpacing: 8,
+      children: [
+        Text(start, style: Theme.of(context).textTheme.headlineMedium),
+        DecoratedBox(
+          decoration: BoxDecoration(gradient: accentGradient, borderRadius: BorderRadius.circular(PlRadius.tile)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: Text(highlight,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),
+          ),
+        ),
+      ],
     );
   }
 }

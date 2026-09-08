@@ -194,16 +194,22 @@ abstract class AppLocalizations {
   /// **'OK'**
   String get ok;
 
-  /// No description provided for @playersTitle.
+  /// No description provided for @playersTitleStart.
   ///
   /// In fr, this message translates to:
-  /// **'Qui joue ce soir ?'**
-  String get playersTitle;
+  /// **'Qui joue'**
+  String get playersTitleStart;
+
+  /// No description provided for @playersTitleHighlight.
+  ///
+  /// In fr, this message translates to:
+  /// **'ce soir ?'**
+  String get playersTitleHighlight;
 
   /// No description provided for @playersSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Ajoute les joueurs autour du téléphone. Tu pourras changer la liste à tout moment.'**
+  /// **'Ajoute au moins 1 joueur — la liste reste d\'une partie à l\'autre.'**
   String get playersSubtitle;
 
   /// No description provided for @playerNameHint.

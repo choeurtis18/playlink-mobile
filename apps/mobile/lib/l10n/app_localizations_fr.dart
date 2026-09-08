@@ -62,11 +62,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get playersTitle => 'Qui joue ce soir ?';
+  String get playersTitleStart => 'Qui joue';
+
+  @override
+  String get playersTitleHighlight => 'ce soir ?';
 
   @override
   String get playersSubtitle =>
-      'Ajoute les joueurs autour du téléphone. Tu pourras changer la liste à tout moment.';
+      'Ajoute au moins 1 joueur — la liste reste d\'une partie à l\'autre.';
 
   @override
   String get playerNameHint => 'Prénom';

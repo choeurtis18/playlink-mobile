@@ -89,7 +89,9 @@ Future<void> playFullGame(
   await tapText(tester, 'Commencer');
 
   // A1 — joueurs de la session.
-  expect(find.text('Qui joue ce soir ?'), findsOneWidget);
+  // Le titre est scindé en deux widgets (texte fixe + pilule dégradée).
+  expect(find.text('Qui joue'), findsOneWidget);
+  expect(find.text('ce soir ?'), findsOneWidget);
   await tester.enterText(find.byType(TextField), 'Lina');
   await tapText(tester, 'Ajouter');
   await tester.enterText(find.byType(TextField), 'Sam');
