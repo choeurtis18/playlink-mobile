@@ -89,7 +89,7 @@ final localeProvider = Provider<Locale>((ref) {
 
 const avatarPool = ['🦊', '⚡', '🎯', '🌟', '🐯', '🎪', '🦋', '🐸', '🐼', '🦁', '🐙', '🍕'];
 
-enum AddPlayerError { empty, duplicate }
+enum AddPlayerError { empty, alreadyInSession }
 
 class PlayersNotifier extends Notifier<List<LocalPlayer>> {
   @override
@@ -103,14 +103,32 @@ class PlayersNotifier extends Notifier<List<LocalPlayer>> {
         .get();
   }
 
-  /// La liste de session : ceux qui jouent ce soir (A1/A2/B1).
+  /// La liste de session : ceux qui jouent ce soir (A1/A2/B1). Seule liste
+  /// affichée à l'écran — les autres profils de l'appareil restent en
+  /// arrière-plan (matching de nom, alimentation du classement).
   List<LocalPlayer> get inSession => state.where((p) => p.inSession).toList();
 
-  Future<AddPlayerError?> add(String rawName) async {
+  /// Profil existant (tous appareil confondus) dont le nom correspond,
+  /// insensible à la casse — pour proposer import/renommage avant création.
+  LocalPlayer? findByName(String rawName) {
+    final name = rawName.trim().toLowerCase();
+    if (name.isEmpty) return null;
+    for (final p in state) {
+      if (p.name.toLowerCase() == name) return p;
+    }
+    return null;
+  }
+
+  /// Crée un nouveau profil. Le nom doit être unique parmi les joueurs
+  /// EN SESSION (deux personnes ne peuvent pas jouer sous le même nom le
+  /// même soir) ; un nom qui correspond à un profil non-actif est autorisé
+  /// ici — c'est `findByName` + le choix de l'utilisateur qui filtrent ce
+  /// cas en amont, côté UI.
+  Future<AddPlayerError?> create(String rawName) async {
     final name = rawName.trim();
     if (name.isEmpty) return AddPlayerError.empty;
-    if (state.any((p) => p.name.toLowerCase() == name.toLowerCase())) {
-      return AddPlayerError.duplicate;
+    if (inSession.any((p) => p.name.toLowerCase() == name.toLowerCase())) {
+      return AddPlayerError.alreadyInSession;
     }
     final used = state.map((p) => p.avatar).toSet();
     final avatar = avatarPool.firstWhere((a) => !used.contains(a), orElse: () => '👤');
@@ -127,6 +145,10 @@ class PlayersNotifier extends Notifier<List<LocalPlayer>> {
     return null;
   }
 
+  /// Ramène dans la session un profil déjà enregistré sur l'appareil —
+  /// aucune retype de nom, ses stats cumulées suivent.
+  Future<void> import(String id) => setInSession(id, true);
+
   Future<void> setInSession(String id, bool value) async {
     await (_db.update(_db.localPlayers)..where((p) => p.id.equals(id)))
         .write(LocalPlayersCompanion(inSession: Value(value)));
@@ -135,13 +157,21 @@ class PlayersNotifier extends Notifier<List<LocalPlayer>> {
 
   /// Un profil qui a déjà joué garde son historique : on le retire de la
   /// session au lieu de le supprimer.
+  ///
+  /// `gamesPlayed` sur le profil lui-même est la source de vérité — pas une
+  /// jointure sur `sessionPlayers` (le journal détaillé des parties), qui
+  /// peut être vide alors que le profil porte déjà un score cumulé (ex. un
+  /// résultat appliqué sans que la ligne de session ait été écrite).
+  /// Vérifier sur les deux le mettrait à la merci de leur désynchronisation ;
+  /// vérifier sur le profil seul, jamais.
   Future<void> remove(String id) async {
-    final played = await (_db.select(_db.sessionPlayers)..where((s) => s.playerId.equals(id))).get();
-    if (played.isEmpty) {
+    final player = state.where((p) => p.id == id).firstOrNull;
+    final hasHistory = player != null && (player.gamesPlayed > 0 || player.totalScore > 0);
+    if (hasHistory) {
+      await setInSession(id, false);
+    } else {
       await (_db.delete(_db.localPlayers)..where((p) => p.id.equals(id))).go();
       await load();
-    } else {
-      await setInSession(id, false);
     }
   }
 

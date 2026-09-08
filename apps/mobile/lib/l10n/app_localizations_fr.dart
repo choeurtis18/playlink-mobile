@@ -69,7 +69,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get playersSubtitle =>
-      'Ajoute au moins 1 joueur — la liste reste d\'une partie à l\'autre.';
+      'Ajoute au moins 1 joueur pour commencer. Tu pourras changer la liste à tout moment !';
 
   @override
   String get playerNameHint => 'Prénom';
@@ -78,10 +78,42 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addPlayer => 'Ajouter';
 
   @override
-  String get duplicatePlayer => 'Ce prénom est déjà utilisé';
+  String duplicatePlayer(String name) {
+    return '$name joue déjà ce soir';
+  }
 
   @override
   String get needOnePlayer => 'Ajoute au moins un joueur';
+
+  @override
+  String playerExistsTitle(String name) {
+    return '$name existe déjà';
+  }
+
+  @override
+  String playerExistsBody(String name, String points, String games) {
+    return 'Tu as déjà un profil $name sur cet appareil, avec $points et $games.';
+  }
+
+  @override
+  String playerExistsImport(String name) {
+    return 'Ajouter $name';
+  }
+
+  @override
+  String get playerExistsRename => 'Non, créer un nouveau profil';
+
+  @override
+  String pointsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points',
+      one: '1 point',
+      zero: '0 point',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get letsPlay => 'C\'est parti';

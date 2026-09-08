@@ -209,7 +209,7 @@ abstract class AppLocalizations {
   /// No description provided for @playersSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Ajoute au moins 1 joueur — la liste reste d\'une partie à l\'autre.'**
+  /// **'Ajoute au moins 1 joueur pour commencer. Tu pourras changer la liste à tout moment !'**
   String get playersSubtitle;
 
   /// No description provided for @playerNameHint.
@@ -227,14 +227,44 @@ abstract class AppLocalizations {
   /// No description provided for @duplicatePlayer.
   ///
   /// In fr, this message translates to:
-  /// **'Ce prénom est déjà utilisé'**
-  String get duplicatePlayer;
+  /// **'{name} joue déjà ce soir'**
+  String duplicatePlayer(String name);
 
   /// No description provided for @needOnePlayer.
   ///
   /// In fr, this message translates to:
   /// **'Ajoute au moins un joueur'**
   String get needOnePlayer;
+
+  /// No description provided for @playerExistsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} existe déjà'**
+  String playerExistsTitle(String name);
+
+  /// No description provided for @playerExistsBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as déjà un profil {name} sur cet appareil, avec {points} et {games}.'**
+  String playerExistsBody(String name, String points, String games);
+
+  /// No description provided for @playerExistsImport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter {name}'**
+  String playerExistsImport(String name);
+
+  /// No description provided for @playerExistsRename.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non, créer un nouveau profil'**
+  String get playerExistsRename;
+
+  /// No description provided for @pointsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{0 point} =1{1 point} other{{count} points}}'**
+  String pointsCount(int count);
 
   /// No description provided for @letsPlay.
   ///

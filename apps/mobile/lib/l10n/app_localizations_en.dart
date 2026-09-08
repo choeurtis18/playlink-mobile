@@ -77,10 +77,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addPlayer => 'Add';
 
   @override
-  String get duplicatePlayer => 'This name is already taken';
+  String duplicatePlayer(String name) {
+    return '$name is already playing tonight';
+  }
 
   @override
   String get needOnePlayer => 'Add at least one player';
+
+  @override
+  String playerExistsTitle(String name) {
+    return '$name already exists';
+  }
+
+  @override
+  String playerExistsBody(String name, String points, String games) {
+    return 'You already have a $name profile on this device, with $points and $games.';
+  }
+
+  @override
+  String playerExistsImport(String name) {
+    return 'Add $name';
+  }
+
+  @override
+  String get playerExistsRename => 'No, create a new profile';
+
+  @override
+  String pointsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points',
+      one: '1 point',
+      zero: '0 point',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get letsPlay => 'Let\'s play';

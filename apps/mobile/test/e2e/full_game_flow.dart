@@ -92,10 +92,14 @@ Future<void> playFullGame(
   // Le titre est scindé en deux widgets (texte fixe + pilule dégradée).
   expect(find.text('Qui joue'), findsOneWidget);
   expect(find.text('ce soir ?'), findsOneWidget);
+  // Le bouton d'ajout est une icône + (dégradé accent), plus un texte.
+  final addButton = find.byIcon(Icons.add_rounded);
   await tester.enterText(find.byType(TextField), 'Lina');
-  await tapText(tester, 'Ajouter');
+  await tester.tap(addButton);
+  await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextField), 'Sam');
-  await tapText(tester, 'Ajouter');
+  await tester.tap(addButton);
+  await tester.pumpAndSettle();
   expect(find.text('Lina'), findsOneWidget);
   expect(find.text('Sam'), findsOneWidget);
   await snap('03-players');
