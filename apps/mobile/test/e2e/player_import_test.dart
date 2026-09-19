@@ -110,4 +110,36 @@ void main() {
     expect(notifier.findByName('  Lina  '), isNotNull);
     expect(notifier.findByName('Lin'), isNull);
   });
+
+  test('updateProfile renomme et change l\'avatar', () async {
+    await notifier.create('Lina');
+    final lina = notifier.inSession.single;
+
+    final err = await notifier.updateProfile(lina.id, name: 'Lina B.', avatar: '🐸');
+    expect(err, isNull);
+
+    final updated = notifier.findByName('Lina B.')!;
+    expect(updated.avatar, '🐸');
+    expect(notifier.findByName('Lina'), isNull, reason: 'l\'ancien nom ne doit plus matcher');
+  });
+
+  test('updateProfile refuse un nom déjà pris par un AUTRE profil', () async {
+    await notifier.create('Lina');
+    await notifier.create('Sam');
+    final sam = notifier.inSession.firstWhere((p) => p.name == 'Sam');
+
+    final err = await notifier.updateProfile(sam.id, name: 'lina'); // insensible à la casse
+    expect(err, UpdatePlayerError.nameTaken);
+    expect(notifier.findByName('Sam'), isNotNull, reason: 'le nom ne doit pas avoir changé');
+  });
+
+  test('updateProfile refuse un nom vide et autorise de garder son propre nom', () async {
+    await notifier.create('Lina');
+    final lina = notifier.inSession.single;
+
+    expect(await notifier.updateProfile(lina.id, name: '   '), UpdatePlayerError.empty);
+    // Reprendre le même nom (insensible à la casse) n'est pas un conflit
+    // avec soi-même.
+    expect(await notifier.updateProfile(lina.id, name: 'LINA'), isNull);
+  });
 }

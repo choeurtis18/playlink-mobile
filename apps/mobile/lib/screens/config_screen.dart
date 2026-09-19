@@ -12,10 +12,21 @@ import '../game/game_controller.dart';
 import '../theme/theme.dart';
 import '../widgets/game_scaffold.dart';
 import 'game_screen.dart';
+import 'rules_sheet.dart';
 
-final _cardsProvider = FutureProvider.family<List<CardVm>, String>((ref, categoryId) {
+/// Pool de tirage d'une catégorie : cartes officielles + cartes perso
+/// ACTIVES de l'appareil (C2 — « entre automatiquement dans le pool »).
+/// Une carte perso n'a pas de tags (pas de champ au formulaire, §14 C1) :
+/// elle ne contribue ni à l'archétype ni à `truth_seeker`.
+final _cardsProvider = FutureProvider.family<List<CardVm>, String>((ref, categoryId) async {
   final locale = ref.watch(localeProvider).languageCode;
-  return ref.watch(contentRepositoryProvider).cards(categoryId, locale);
+  final official = await ref.watch(contentRepositoryProvider).cards(categoryId, locale);
+  final custom = await ref.watch(customCardsRepositoryProvider).activeFor(categoryId);
+  return [
+    ...official,
+    for (final c in custom)
+      CardVm(id: c.id, categoryId: c.categoryId, text: c.text, intensity: c.intensity, tags: const [], canonicalTags: const []),
+  ];
 });
 
 /// B2 : aperçu d'une carte, intensité 1–5 (mémorisée par jeu), cartes par
@@ -32,14 +43,19 @@ class ConfigScreen extends ConsumerStatefulWidget {
 }
 
 class _ConfigScreenState extends ConsumerState<ConfigScreen> {
-  int? _previewIndex;
+  /// Carte d'aperçu tirée une fois par intensité (clé = intensité), pas à
+  /// chaque rebuild ni à chaque changement de segment : changer l'intensité
+  /// doit montrer une carte de cette intensité, mais toujours la MÊME au fil
+  /// des allers-retours — sinon parcourir les 5 segments revient à parcourir
+  /// toutes les cartes de la catégorie depuis cet écran seul.
+  final Map<int, int> _previewIndexByIntensity = {};
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final game = ref.watch(gameBySlugProvider(widget.slug)).value;
     if (game == null) {
-      return const Scaffold(backgroundColor: PlColors.ground, body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final category = ref.watch(categoriesProvider(game.id)).value
         ?.firstWhere((c) => c.id == widget.categoryId);
@@ -49,27 +65,60 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     final count = prefs.cardsPerGame;
     final players = ref.watch(playersProvider).where((p) => p.inSession).toList();
 
-    // Aperçu stable : tiré une fois, pas à chaque rebuild (useMemo web).
-    if (cards.isNotEmpty && _previewIndex == null) {
-      _previewIndex = Random().nextInt(cards.length);
+    // Aperçu stable par intensité : tiré une fois par valeur d'intensité
+    // (pas à chaque rebuild), parmi les cartes de CETTE intensité exacte —
+    // avec repli sur la plus proche si aucune n'y correspond exactement.
+    if (cards.isNotEmpty && !_previewIndexByIntensity.containsKey(intensity)) {
+      final exact = <int>[
+        for (var i = 0; i < cards.length; i++)
+          if (cards[i].intensity == intensity) i,
+      ];
+      _previewIndexByIntensity[intensity] = exact.isNotEmpty
+          ? exact[Random().nextInt(exact.length)]
+          : (List<int>.generate(cards.length, (i) => i)
+                ..sort((a, b) =>
+                    (cards[a].intensity - intensity).abs().compareTo((cards[b].intensity - intensity).abs())))
+              .first;
     }
-    final preview = _previewIndex == null || cards.isEmpty ? null : cards[_previewIndex!];
-    final gradient = gameGradient(game.colorMain, game.colorSecondary);
+    final previewIndex = _previewIndexByIntensity[intensity];
+    final preview = previewIndex == null || cards.isEmpty ? null : cards[previewIndex];
+    final gradient = gameGradient(game.colorMain, game.colorSecondary, vertical: true);
 
     return GameScaffold(
       colorMain: game.colorMain,
       colorSecondary: game.colorSecondary,
-      headerHeight: 100,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        title: Column(
+      headerHeight: 180,
+      headerGradientVertical: true,
+      header: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(game.name.toUpperCase(),
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 11, letterSpacing: 1, fontWeight: FontWeight.w600)),
-            Text(category?.name ?? '', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+            // Niveau 1 : retour + règles, alignés aux extrémités.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CircleButton(icon: Icons.arrow_back_rounded, onTap: () => popOrHome(context)),
+                PillButton(
+                  icon: Icons.menu_book_rounded,
+                  label: t.rules,
+                  onTap: () => showRulesSheet(context, game),
+                ),
+              ],
+            ),
+            // Niveau 2 : jeu puis catégorie.
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(game.name.toUpperCase(),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 11, letterSpacing: 1, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text(category?.name ?? '',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.4)),
+              ],
+            ),
           ],
         ),
       ),
@@ -103,41 +152,60 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(intensityLabels[intensity]!,
-                      style: const TextStyle(color: PlColors.neutral, fontWeight: FontWeight.w600)),
+                  Builder(builder: (context) {
+                    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
+                    return Text(intensityLabels[intensity]!, style: TextStyle(color: soft, fontWeight: FontWeight.w600));
+                  }),
                   const SizedBox(height: 26),
                   _Label(t.cardsPerGame),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      _RoundButton(icon: Icons.remove, onTap: count > 5
-                          ? () => ref.read(prefsProvider.notifier).set(PrefKeys.cardsPerGame, '${count - 1}') : null),
-                      Expanded(
-                        child: Text('$count', textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
-                      ),
-                      _RoundButton(icon: Icons.add, onTap: count < 20
-                          ? () => ref.read(prefsProvider.notifier).set(PrefKeys.cardsPerGame, '${count + 1}') : null),
+                      for (var i = 0; i < cardsPerGameOptions.length; i++) ...[
+                        Expanded(
+                          child: _Segment(
+                            label: '${cardsPerGameOptions[i]}',
+                            selected: cardsPerGameOptions[i] == count,
+                            gradient: gradient,
+                            onTap: () => ref
+                                .read(prefsProvider.notifier)
+                                .set(PrefKeys.cardsPerGame, '${cardsPerGameOptions[i]}'),
+                          ),
+                        ),
+                        if (i < cardsPerGameOptions.length - 1) const SizedBox(width: 6),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: PlColors.surface,
-                      borderRadius: BorderRadius.circular(PlRadius.tile),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(players.map((p) => p.avatar).join(' '), style: const TextStyle(fontSize: 18)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(players.map((p) => p.name).join(', '),
-                              style: const TextStyle(color: PlColors.inkSoft, fontSize: 13)),
-                        ),
-                      ],
-                    ),
-                  ),
+                  Builder(builder: (context) {
+                    // Résumé, pas la liste complète : au-delà de 2 joueurs,
+                    // avatars et noms des suivants sont condensés en "…".
+                    final shown = players.take(2).toList();
+                    final overflow = players.length - shown.length;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(PlRadius.tile),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            overflow > 0 ? '${shown.map((p) => p.avatar).join(' ')} …' : shown.map((p) => p.avatar).join(' '),
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              overflow > 0 ? '${shown.map((p) => p.name).join(', ')}…' : shown.map((p) => p.name).join(', '),
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -174,8 +242,11 @@ class _Label extends StatelessWidget {
   const _Label(this.text);
   final String text;
   @override
-  Widget build(BuildContext context) => Text(text.toUpperCase(),
-      style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w600));
+  Widget build(BuildContext context) {
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
+    return Text(text.toUpperCase(),
+        style: TextStyle(color: soft, fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w600));
+  }
 }
 
 /// Carte d'aperçu dégradée aux couleurs du jeu (réf. visuelle) — plus la
@@ -218,6 +289,8 @@ class _Segment extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final soft = theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurface;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -226,31 +299,11 @@ class _Segment extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           gradient: selected ? gradient : null,
-          color: selected ? null : PlColors.surface,
+          color: selected ? null : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: selected ? null : Border.all(color: PlColors.hairline),
+          border: selected ? null : Border.all(color: theme.dividerColor),
         ),
-        child: Text(label, style: TextStyle(color: selected ? Colors.white : PlColors.inkSoft, fontWeight: FontWeight.w700, fontSize: 16)),
-      ),
-    );
-  }
-}
-
-class _RoundButton extends StatelessWidget {
-  const _RoundButton({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback? onTap;
-  @override
-  Widget build(BuildContext context) {
-    return IconButton.filled(
-      onPressed: onTap,
-      icon: Icon(icon),
-      style: IconButton.styleFrom(
-        backgroundColor: PlColors.surface,
-        foregroundColor: PlColors.ink,
-        disabledBackgroundColor: PlColors.raised,
-        disabledForegroundColor: PlColors.neutralFaint,
-        minimumSize: const Size(52, 52),
+        child: Text(label, style: TextStyle(color: selected ? Colors.white : soft, fontWeight: FontWeight.w700, fontSize: 16)),
       ),
     );
   }

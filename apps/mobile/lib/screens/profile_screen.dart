@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
@@ -14,21 +15,21 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
     return Scaffold(
-      backgroundColor: PlColors.ground,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
           children: [
             Text(t.profileTitle, style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 4),
-            Text(t.profileLocalMode, style: const TextStyle(color: PlColors.neutralFaint, fontSize: 13)),
+            Text(t.profileLocalMode, style: TextStyle(color: soft, fontSize: 13)),
             const SizedBox(height: 20),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: PlColors.surface,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(PlRadius.card),
               ),
               child: Column(
@@ -36,26 +37,40 @@ class ProfileScreen extends ConsumerWidget {
                 children: [
                   Text(t.profileLocalCardTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                   const SizedBox(height: 6),
-                  Text(t.profileLocalCardBody, style: const TextStyle(color: PlColors.inkSoft, fontSize: 13.5, height: 1.4)),
+                  Text(t.profileLocalCardBody, style: TextStyle(color: soft, fontSize: 13.5, height: 1.4)),
                   const SizedBox(height: 14),
-                  OutlinedButton(
-                    onPressed: null,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: PlColors.accent,
-                      side: const BorderSide(color: PlColors.accent),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.pill)),
+                  // Même style dégradé que le CTA "Se connecter" de l'accueil
+                  // (`_AccountButton`) — un seul traitement visuel pour
+                  // l'action compte dans toute l'app.
+                  DecoratedBox(
+                    decoration: BoxDecoration(gradient: accentGradient, borderRadius: BorderRadius.circular(PlRadius.pill)),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: null,
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size.fromHeight(54),
+                          foregroundColor: Colors.white,
+                          disabledForegroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.pill)),
+                        ),
+                        child: Text(t.createAccount, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      ),
                     ),
-                    child: Text(t.createAccount),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            _Row(icon: Icons.style_rounded, label: t.myCards, sublabel: null),
+            // Badges et cartes perso fonctionnent 100 % en local (D4, C1-C3)
+            // — contrairement aux likes, qui exigent un compte (E1, phase 5).
+            _Row(icon: Icons.emoji_events_rounded, label: t.badgesTitle, sublabel: null, onTap: () => context.push('/badges')),
+            const SizedBox(height: 10),
+            _Row(icon: Icons.style_rounded, label: t.myCards, sublabel: null, onTap: () => context.push('/my-cards')),
             const SizedBox(height: 10),
             _Row(icon: Icons.favorite_rounded, label: t.likedCards, sublabel: null),
             const SizedBox(height: 10),
-            _Row(icon: Icons.settings_rounded, label: t.settings, sublabel: t.settingsSubtitle),
+            _Row(icon: Icons.settings_rounded, label: t.settings, sublabel: t.settingsSubtitle, onTap: () => context.push('/settings')),
           ],
         ),
       ),
@@ -64,41 +79,51 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _Row extends StatelessWidget {
-  const _Row({required this.icon, required this.label, required this.sublabel});
+  const _Row({required this.icon, required this.label, required this.sublabel, this.onTap});
   final IconData icon;
   final String label;
   final String? sublabel;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(
-        color: PlColors.surface,
+    final scheme = Theme.of(context).colorScheme;
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? scheme.onSurface;
+    return Material(
+      color: scheme.surface,
+      borderRadius: BorderRadius.circular(PlRadius.tile),
+      child: InkWell(
         borderRadius: BorderRadius.circular(PlRadius.tile),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: PlColors.raisedHigh, borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, size: 18, color: PlColors.inkSoft),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: scheme.brightness == Brightness.dark ? PlColors.raisedHigh : scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 18, color: scheme.onSurface),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                    if (sublabel != null)
+                      Text(sublabel!, style: TextStyle(color: soft, fontSize: 12)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: soft),
+            ],
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                if (sublabel != null)
-                  Text(sublabel!, style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12)),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: PlColors.neutralFaint),
-        ],
+        ),
       ),
     );
   }

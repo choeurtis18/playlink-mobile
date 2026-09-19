@@ -107,19 +107,19 @@ abstract class AppLocalizations {
   /// No description provided for @splashTagline.
   ///
   /// In fr, this message translates to:
-  /// **'Les jeux qui font parler'**
+  /// **'Les jeux qui délient les langues'**
   String get splashTagline;
 
   /// No description provided for @onboardingHowTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Un téléphone, tout le groupe'**
+  /// **'Un téléphone pour tout le groupe'**
   String get onboardingHowTitle;
 
   /// No description provided for @onboardingHowBody.
   ///
   /// In fr, this message translates to:
-  /// **'On choisit un jeu, on se passe le téléphone. À ton tour : tu ouvres la carte, tu joues, le groupe vote.'**
+  /// **'On choisit un jeu, on se passe le téléphone. À ton tour : tu ouvres la carte, tu joues, le groupe vote si tu mérites ou non un point, tu passes le téléphone à la personne suivante.'**
   String get onboardingHowBody;
 
   /// No description provided for @onboardingAccountTitle.
@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAccountBody.
   ///
   /// In fr, this message translates to:
-  /// **'Tout marche hors-ligne. Un compte, plus tard, servira seulement à sauvegarder ta progression.'**
+  /// **'Tout marche hors-ligne. Mais tu peux créer un compte et débloquer des fonctionnalités supplémentaires !'**
   String get onboardingAccountBody;
 
   /// No description provided for @onboardingAnalyticsTitle.
@@ -143,20 +143,14 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAnalyticsBody.
   ///
   /// In fr, this message translates to:
-  /// **'On mesure ce qui est joué pour améliorer le contenu. Jamais d\'email, jamais de nom, jamais le texte de tes réponses.'**
+  /// **'On mesure ce qui est joué pour améliorer le contenu. Aucunes données personnelles ne sont exploitées, jamais d\'email, jamais de nom, jamais le texte de tes réponses.'**
   String get onboardingAnalyticsBody;
 
   /// No description provided for @onboardingAnalyticsToggleTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Partager des stats anonymes'**
+  /// **'Partager ses stats anonymement pour aider à améliorer le jeu.'**
   String get onboardingAnalyticsToggleTitle;
-
-  /// No description provided for @onboardingAnalyticsToggleBody.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucun email, aucun nom, aucun texte de carte'**
-  String get onboardingAnalyticsToggleBody;
 
   /// No description provided for @onboardingStart.
   ///
@@ -260,6 +254,42 @@ abstract class AppLocalizations {
   /// **'Non, créer un nouveau profil'**
   String get playerExistsRename;
 
+  /// No description provided for @editPlayerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier {name}'**
+  String editPlayerTitle(String name);
+
+  /// No description provided for @editPlayerName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prénom'**
+  String get editPlayerName;
+
+  /// No description provided for @editPlayerAvatar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avatar'**
+  String get editPlayerAvatar;
+
+  /// No description provided for @editPlayerSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get editPlayerSave;
+
+  /// No description provided for @editPlayerNameTaken.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce prénom est déjà utilisé'**
+  String get editPlayerNameTaken;
+
+  /// No description provided for @playerExistsChooseAnotherName.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} existe déjà, choisis un autre nom'**
+  String playerExistsChooseAnotherName(String name);
+
   /// No description provided for @pointsCount.
   ///
   /// In fr, this message translates to:
@@ -272,11 +302,23 @@ abstract class AppLocalizations {
   /// **'C\'est parti'**
   String get letsPlay;
 
-  /// No description provided for @homeTitle.
+  /// No description provided for @homeTitleStart_1.
   ///
   /// In fr, this message translates to:
-  /// **'Choisis un jeu'**
-  String get homeTitle;
+  /// **'Quel jeu'**
+  String get homeTitleStart_1;
+
+  /// No description provided for @homeTitleHighlight.
+  ///
+  /// In fr, this message translates to:
+  /// **'oseras-tu'**
+  String get homeTitleHighlight;
+
+  /// No description provided for @homeTitleStart_2.
+  ///
+  /// In fr, this message translates to:
+  /// **'tester ?'**
+  String get homeTitleStart_2;
 
   /// No description provided for @playersButton.
   ///
@@ -290,6 +332,12 @@ abstract class AppLocalizations {
   /// **'{count} cartes'**
   String cardsCount(int count);
 
+  /// No description provided for @categoriesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{0 catégorie} =1{1 catégorie} other{{count} catégories}}'**
+  String categoriesCount(int count);
+
   /// No description provided for @categoriesTitle.
   ///
   /// In fr, this message translates to:
@@ -301,6 +349,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Règles'**
   String get rules;
+
+  /// No description provided for @rulesModalTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règle du jeu'**
+  String get rulesModalTitle;
 
   /// No description provided for @chooseCategory.
   ///
@@ -410,6 +464,18 @@ abstract class AppLocalizations {
   /// **'La carte suivante reste cachée jusqu\'à ce qu\'il confirme.'**
   String get passPhoneHint;
 
+  /// No description provided for @dontPeekHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ne regarde pas l\'écran tant que ce n\'est pas ton tour.'**
+  String get dontPeekHint;
+
+  /// No description provided for @itsMe.
+  ///
+  /// In fr, this message translates to:
+  /// **'C\'est moi, {name}'**
+  String itsMe(String name);
+
   /// No description provided for @imReady.
   ///
   /// In fr, this message translates to:
@@ -421,6 +487,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Partie terminée 🎉'**
   String get gameOver;
+
+  /// No description provided for @winnerAnnounce.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} remporte la manche'**
+  String winnerAnnounce(String name);
 
   /// No description provided for @sessionScore.
   ///
@@ -485,7 +557,7 @@ abstract class AppLocalizations {
   /// No description provided for @navPlay.
   ///
   /// In fr, this message translates to:
-  /// **'Jouer'**
+  /// **'Jeux'**
   String get navPlay;
 
   /// No description provided for @navLeaderboard.
@@ -509,7 +581,7 @@ abstract class AppLocalizations {
   /// No description provided for @leaderboardSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Entre tes profils · calculé en local'**
+  /// **'Alors qui est le meilleur joueur ?'**
   String get leaderboardSubtitle;
 
   /// No description provided for @profileTitle.
@@ -548,6 +620,102 @@ abstract class AppLocalizations {
   /// **'Mes cartes'**
   String get myCards;
 
+  /// No description provided for @myCardsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes cartes, jouables dès qu\'elles sont actives — jamais visibles par personne d\'autre'**
+  String get myCardsSubtitle;
+
+  /// No description provided for @myCardsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune carte créée pour l\'instant'**
+  String get myCardsEmpty;
+
+  /// No description provided for @createCardCta.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer une carte'**
+  String get createCardCta;
+
+  /// No description provided for @createCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle carte'**
+  String get createCardTitle;
+
+  /// No description provided for @editCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la carte'**
+  String get editCardTitle;
+
+  /// No description provided for @createCardGame.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jeu'**
+  String get createCardGame;
+
+  /// No description provided for @createCardCategory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catégorie'**
+  String get createCardCategory;
+
+  /// No description provided for @createCardTextHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Texte de la carte'**
+  String get createCardTextHint;
+
+  /// No description provided for @createCardTextEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le texte de la carte ne peut pas être vide'**
+  String get createCardTextEmpty;
+
+  /// No description provided for @createCardActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer la carte pour qu\'elle soit jouable'**
+  String get createCardActive;
+
+  /// No description provided for @createCardSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get createCardSave;
+
+  /// No description provided for @deleteCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get deleteCard;
+
+  /// No description provided for @deleteCardConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette carte ?'**
+  String get deleteCardConfirmTitle;
+
+  /// No description provided for @deleteCardConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action est définitive.'**
+  String get deleteCardConfirmBody;
+
+  /// No description provided for @cardActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Active'**
+  String get cardActive;
+
+  /// No description provided for @cardInactive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inactive'**
+  String get cardInactive;
+
   /// No description provided for @likedCards.
   ///
   /// In fr, this message translates to:
@@ -563,8 +731,56 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Langue, thème, confidentialité'**
+  /// **'Langue, thème, autres'**
   String get settingsSubtitle;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langue'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'FR/EN — recharge l\'interface et bascule le contenu (les cartes non traduites restent en français)'**
+  String get settingsLanguageBody;
+
+  /// No description provided for @settingsLanguageFr.
+  ///
+  /// In fr, this message translates to:
+  /// **'Français'**
+  String get settingsLanguageFr;
+
+  /// No description provided for @settingsLanguageEn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Anglais'**
+  String get settingsLanguageEn;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In fr, this message translates to:
+  /// **'Thème'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clair'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sombre'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Système'**
+  String get settingsThemeSystem;
 
   /// No description provided for @noPlayersYet.
   ///
@@ -572,11 +788,65 @@ abstract class AppLocalizations {
   /// **'Ajoute des joueurs pour voir le classement'**
   String get noPlayersYet;
 
+  /// No description provided for @badgeUnlockedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Félicitations !'**
+  String get badgeUnlockedTitle;
+
+  /// No description provided for @badgeUnlockedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as débloqué le badge'**
+  String get badgeUnlockedBody;
+
+  /// No description provided for @badgesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Badges'**
+  String get badgesTitle;
+
+  /// No description provided for @badgesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Débloqués en jouant.'**
+  String get badgesSubtitle;
+
+  /// No description provided for @badgeLocked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Verrouillé'**
+  String get badgeLocked;
+
+  /// No description provided for @badgeEarnedOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Débloqué le {date}'**
+  String badgeEarnedOn(String date);
+
   /// No description provided for @offlineReady.
   ///
   /// In fr, this message translates to:
   /// **'Hors-ligne prêt'**
   String get offlineReady;
+
+  /// No description provided for @signIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter'**
+  String get signIn;
+
+  /// No description provided for @goPremium.
+  ///
+  /// In fr, this message translates to:
+  /// **'Devenir premium'**
+  String get goPremium;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bientôt disponible'**
+  String get comingSoon;
 
   /// No description provided for @playersEdit.
   ///

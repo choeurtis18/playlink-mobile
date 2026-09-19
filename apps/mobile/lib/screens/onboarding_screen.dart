@@ -43,7 +43,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final last = _page == pages.length - 1;
 
     return Scaffold(
-      backgroundColor: PlColors.ground,
       body: SafeArea(
         child: Column(
           children: [
@@ -112,7 +111,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               padding: const EdgeInsets.only(bottom: 16),
               child: TextButton(
                 onPressed: _finish,
-                child: Text(t.skip, style: const TextStyle(color: PlColors.neutralFaint)),
+                child: Text(t.skip, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
               ),
             ),
           ],
@@ -133,7 +132,7 @@ class _ConsentToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: PlColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(PlRadius.tile),
       ),
       child: Row(
@@ -149,7 +148,6 @@ class _ConsentToggle extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(t.onboardingAnalyticsToggleTitle, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                Text(t.onboardingAnalyticsToggleBody, style: const TextStyle(color: PlColors.neutralFaint, fontSize: 11.5)),
               ],
             ),
           ),

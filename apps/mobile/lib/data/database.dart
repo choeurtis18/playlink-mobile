@@ -169,9 +169,49 @@ class AppPrefs extends Table {
   Set<Column> get primaryKey => {key};
 }
 
+/// Badges débloqués sur l'appareil (D4) — rattachés à l'appareil, pas à un
+/// profil précis (§01 : « les badges sont rattachés au compte » ; sans
+/// compte en V1, l'appareil en tient lieu). La règle d'attribution est du
+/// code Dart (`core/badges.dart`), jamais stockée ici.
+class EarnedBadges extends Table {
+  TextColumn get badgeKey => text()();
+  DateTimeColumn get earnedAt => dateTime()();
+  /// Renseigné au merge local → cloud (phase 4).
+  DateTimeColumn get syncedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {badgeKey};
+}
+
+/// Cartes personnalisées (C1–C3) — §08 : « compte requis pour exister
+/// au-delà de l'appareil ; sans compte, ne sort jamais du local et n'est
+/// jamais publiable ». En V1 sans compte, rattachées à l'APPAREIL comme les
+/// badges : jouables et gérables localement dès la création, `remoteId`/
+/// `syncedAt` renseignés seulement après un merge local → cloud (phase 4),
+/// et la publication au catalogue (C4) reste hors scope de cette table.
+class CustomCards extends Table {
+  TextColumn get id => text()();
+  TextColumn get gameId => text().references(Games, #id)();
+  TextColumn get categoryId => text().references(Categories, #id)();
+  TextColumn get text_ => text().named('text')();
+  /// Pas de champ intensité au formulaire (§14, C1) — toutes les cartes
+  /// perso valent l'intensité « Normal » par défaut.
+  IntColumn get intensity => integer().withDefault(const Constant(3))();
+  /// Active = entre dans le pool de tirage de sa catégorie (C2) ; inactive
+  /// = gardée mais jamais tirée. Jamais une suppression déguisée.
+  BoolColumn get active => boolean().withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get syncedAt => dateTime().nullable()();
+  TextColumn get remoteId => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(tables: [
   Games, Categories, Cards, RuleSlides, Badges, ContentAssets, ContentMeta,
-  LocalPlayers, GameSessions, SessionPlayers, AppPrefs,
+  LocalPlayers, GameSessions, SessionPlayers, AppPrefs, EarnedBadges, CustomCards,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);

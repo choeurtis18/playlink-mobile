@@ -4,9 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
-/// Coquille avec barre de navigation basse — Jouer / Classement / Profil
-/// (réf. visuelle, absente du blueprint initial). Fond quasi transparent sur
-/// noir, icône + libellé, l'onglet actif en accent.
+/// Coquille avec barre de navigation basse — Jeux / Classement / Profil
+/// (réf. visuelle, absente du blueprint initial). Suit le thème clair/sombre
+/// (F2) plutôt que des couleurs codées en dur, icône + libellé, l'onglet
+/// actif surligné du même dégradé que `homeTitleHighlight`.
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
@@ -15,20 +16,19 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: PlColors.ground,
       body: navigationShell,
       bottomNavigationBar: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: PlColors.groundDeep,
-          border: Border(top: BorderSide(color: PlColors.hairline)),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
         ),
         child: SafeArea(
           child: SizedBox(
-            height: 58,
+            height: 64,
             child: Row(
               children: [
                 _NavItem(
-                  icon: Icons.casino_rounded,
+                  icon: Icons.sports_esports_rounded,
                   label: t.navPlay,
                   selected: navigationShell.currentIndex == 0,
                   onTap: () => navigationShell.goBranch(0),
@@ -63,17 +63,37 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? PlColors.accent : PlColors.neutralFaint;
+    final unselected = Theme.of(context).textTheme.bodyMedium?.color ?? PlColors.neutral;
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 3),
-            Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
-          ],
+        child: Center(
+          // Le focus englobe icône ET libellé (une seule pilule), pas
+          // juste l'icône — demandé pour lire le focus d'un coup d'œil.
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: selected ? accentGradient : null,
+              borderRadius: BorderRadius.circular(PlRadius.pill),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: selected ? Colors.white : unselected, size: 18),
+                  const SizedBox(height: 2),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: selected ? Colors.white : unselected,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

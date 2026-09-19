@@ -32,55 +32,63 @@ class GameScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final game = ref.watch(gameBySlugProvider(slug)).value;
     if (game == null) {
-      return const Scaffold(backgroundColor: PlColors.ground, body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final cats = ref.watch(categoriesProvider(game.id));
     final players = ref.watch(playersProvider).where((p) => p.inSession).length;
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
 
     return GameScaffold(
       colorMain: game.colorMain,
       colorSecondary: game.colorSecondary,
       heroTag: 'game-${game.slug}',
-      headerHeight: 168,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        leading: const BackButton(),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _PillButton(
-              icon: Icons.menu_book_rounded,
-              label: t.rules,
-              onTap: () => showRulesSheet(context, game),
+      headerHeight: 300,
+      headerGradientVertical: true,
+      header: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Niveau 1 : retour + règles, alignés aux extrémités.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CircleButton(icon: Icons.arrow_back_rounded, onTap: () => popOrHome(context)),
+                PillButton(
+                  icon: Icons.menu_book_rounded,
+                  label: t.rules,
+                  onTap: () => showRulesSheet(context, game),
+                ),
+              ],
             ),
-          ),
-        ],
+            // Niveau 2 : icône, nom, sous-titre du jeu.
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(game.icon ?? '', style: const TextStyle(fontSize: 34)),
+                const SizedBox(height: 12),
+                Text(game.name,
+                    maxLines: 2,
+                    style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
+                const SizedBox(height: 6),
+                Text(
+                  '${game.categoryCount} ${t.categoriesTitle.toLowerCase()} · $players 👥',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(game.icon ?? '', style: const TextStyle(fontSize: 34)),
-                const SizedBox(height: 6),
-                Text(game.name,
-                    style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
-                const SizedBox(height: 4),
-                Text(
-                  '${game.categoryCount} ${t.categoriesTitle.toLowerCase()} · ${t.cardsCount(game.cardCount)} · $players 👥',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
             child: Text(t.chooseCategory.toUpperCase(),
-                style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: soft, fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
           ),
           Expanded(
             child: cats.when(
@@ -98,7 +106,7 @@ class GameScreen extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
-                        color: PlColors.surface,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(PlRadius.tile),
                       ),
                       child: Row(
@@ -108,7 +116,9 @@ class GameScreen extends ConsumerWidget {
                             height: 40,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: PlColors.raisedHigh,
+                              color: Theme.of(context).colorScheme.brightness == Brightness.dark
+                                  ? PlColors.raisedHigh
+                                  : Theme.of(context).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(11),
                             ),
                             child: Text(c.icon ?? '🃏', style: const TextStyle(fontSize: 18)),
@@ -119,12 +129,12 @@ class GameScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(c.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                                Text('${t.cardsCount(c.cardCount)} · ${t.intensity.toLowerCase()} 1–5',
-                                    style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12.5)),
+                                Text('${t.intensity.toLowerCase()} 1–5',
+                                    style: TextStyle(color: soft, fontSize: 12.5)),
                               ],
                             ),
                           ),
-                          const Icon(Icons.chevron_right, color: PlColors.neutralFaint),
+                          Icon(Icons.chevron_right, color: soft),
                         ],
                       ),
                     ),
@@ -134,36 +144,6 @@ class GameScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _PillButton extends StatelessWidget {
-  const _PillButton({required this.icon, required this.label, required this.onTap});
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.18),
-      shape: const StadiumBorder(),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 16, color: Colors.white),
-              const SizedBox(width: 6),
-              Text(label, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ),
       ),
     );
   }

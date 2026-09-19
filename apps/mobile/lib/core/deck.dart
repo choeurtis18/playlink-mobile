@@ -10,6 +10,9 @@ const int intensityMax = 5;
 const int intensityDefault = 3;
 const double intensityWeightExponent = 1.5;
 const int cardsPerGameDefault = 10;
+/// Choix proposés pour « cartes par partie » (B2) — même principe que
+/// l'intensité : une sélection à segments fixes plutôt qu'un stepper +/-.
+const List<int> cardsPerGameOptions = [5, 10, 15, 20];
 
 /// Libellés canoniques — ceux de l'app web et des slides de règles.
 const Map<int, String> intensityLabels = {

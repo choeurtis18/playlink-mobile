@@ -7,8 +7,10 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/deck.dart';
+import 'badges_repository.dart';
 import 'content_repository.dart';
 import 'content_seeder.dart';
+import 'custom_cards_repository.dart';
 import 'database.dart';
 
 /// Identifiant local : 128 bits aléatoires en hex. Sert de `localId` lors du
@@ -27,6 +29,12 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 final contentRepositoryProvider =
     Provider<ContentRepository>((ref) => ContentRepository(ref.watch(databaseProvider)));
 
+final badgesRepositoryProvider =
+    Provider<BadgesRepository>((ref) => BadgesRepository(ref.watch(databaseProvider)));
+
+final customCardsRepositoryProvider =
+    Provider<CustomCardsRepository>((ref) => CustomCardsRepository(ref.watch(databaseProvider)));
+
 // ─── Préférences ─────────────────────────────────────────────────────
 
 class PrefKeys {
@@ -36,8 +44,14 @@ class PrefKeys {
   static const themeMode = 'themeMode';
   static const onboardingSeen = 'onboardingSeen';
   static const analyticsConsent = 'analyticsConsent';
+  static const accountState = 'accountState';
   static String intensity(String gameId) => 'intensity:$gameId';
 }
+
+/// Façade de démo tant que Clerk/RevenueCat ne sont pas construits (§ V1
+/// "préparé, pas construit" — CLAUDE.md) : purement locale, ne représente
+/// aucun vrai compte ni abonnement.
+enum AccountState { guest, free, premium }
 
 class PrefsNotifier extends Notifier<Map<String, String>> {
   @override
@@ -74,6 +88,11 @@ extension PrefsView on Map<String, String> {
         '0' => false,
         _ => null,
       };
+  AccountState get accountState => switch (this[PrefKeys.accountState]) {
+        'free' => AccountState.free,
+        'premium' => AccountState.premium,
+        _ => AccountState.guest,
+      };
 }
 
 /// Langue effective : préférence explicite, sinon celle du système,
@@ -87,9 +106,15 @@ final localeProvider = Provider<Locale>((ref) {
 
 // ─── Joueurs ─────────────────────────────────────────────────────────
 
-const avatarPool = ['🦊', '⚡', '🎯', '🌟', '🐯', '🎪', '🦋', '🐸', '🐼', '🦁', '🐙', '🍕'];
+const avatarPool = [
+  '🦊', '⚡', '🎯', '🌟', '🐯', '🎪', '🦋', '🐸', '🐼', '🦁',
+  '🐙', '🍕', '🐨', '🦄', '🐢', '🦖', '🍩', '🎮', '🚀', '🌈',
+];
 
 enum AddPlayerError { empty, alreadyInSession }
+
+/// Édition du nom/emoji d'un profil existant (voir `PlayersEditor`).
+enum UpdatePlayerError { empty, nameTaken }
 
 class PlayersNotifier extends Notifier<List<LocalPlayer>> {
   @override
@@ -148,6 +173,28 @@ class PlayersNotifier extends Notifier<List<LocalPlayer>> {
   /// Ramène dans la session un profil déjà enregistré sur l'appareil —
   /// aucune retype de nom, ses stats cumulées suivent.
   Future<void> import(String id) => setInSession(id, true);
+
+  /// Modifie le nom et/ou l'emoji d'un profil existant. Le nom reste unique
+  /// sur l'appareil (même contrainte qu'à la création) — comparé à tous les
+  /// AUTRES profils, pas seulement ceux en session : sinon deux profils
+  /// pourraient finir avec le même nom dès que l'un des deux sort de la
+  /// session, cassant le matching de `findByName`.
+  Future<UpdatePlayerError?> updateProfile(String id, {String? name, String? avatar}) async {
+    final trimmed = name?.trim();
+    if (trimmed != null) {
+      if (trimmed.isEmpty) return UpdatePlayerError.empty;
+      final clash = state.any((p) => p.id != id && p.name.toLowerCase() == trimmed.toLowerCase());
+      if (clash) return UpdatePlayerError.nameTaken;
+    }
+    await (_db.update(_db.localPlayers)..where((p) => p.id.equals(id))).write(
+      LocalPlayersCompanion(
+        name: trimmed == null ? const Value.absent() : Value(trimmed),
+        avatar: avatar == null ? const Value.absent() : Value(avatar),
+      ),
+    );
+    await load();
+    return null;
+  }
 
   Future<void> setInSession(String id, bool value) async {
     await (_db.update(_db.localPlayers)..where((p) => p.id.equals(id)))

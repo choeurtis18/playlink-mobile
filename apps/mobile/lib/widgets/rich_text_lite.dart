@@ -35,7 +35,9 @@ class RichTextLite extends StatelessWidget {
   }
 
   TextSpan _spans(String text, TextStyle base) {
-    final bold = base.copyWith(fontWeight: FontWeight.w700, color: Colors.white);
+    // Gras du même texte, pas une autre couleur : `Colors.white` fixe
+    // rendait ce texte invisible sur fond clair (mode light, §10).
+    final bold = base.copyWith(fontWeight: FontWeight.w700);
     final children = <InlineSpan>[];
     final re = RegExp(r'\*\*(.+?)\*\*');
     var last = 0;

@@ -5036,6 +5036,895 @@ class AppPrefsCompanion extends UpdateCompanion<AppPref> {
   }
 }
 
+class $EarnedBadgesTable extends EarnedBadges
+    with TableInfo<$EarnedBadgesTable, EarnedBadge> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EarnedBadgesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _badgeKeyMeta = const VerificationMeta(
+    'badgeKey',
+  );
+  @override
+  late final GeneratedColumn<String> badgeKey = GeneratedColumn<String>(
+    'badge_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _earnedAtMeta = const VerificationMeta(
+    'earnedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> earnedAt = GeneratedColumn<DateTime>(
+    'earned_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [badgeKey, earnedAt, syncedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'earned_badges';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EarnedBadge> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('badge_key')) {
+      context.handle(
+        _badgeKeyMeta,
+        badgeKey.isAcceptableOrUnknown(data['badge_key']!, _badgeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_badgeKeyMeta);
+    }
+    if (data.containsKey('earned_at')) {
+      context.handle(
+        _earnedAtMeta,
+        earnedAt.isAcceptableOrUnknown(data['earned_at']!, _earnedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_earnedAtMeta);
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {badgeKey};
+  @override
+  EarnedBadge map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EarnedBadge(
+      badgeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}badge_key'],
+      )!,
+      earnedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}earned_at'],
+      )!,
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      ),
+    );
+  }
+
+  @override
+  $EarnedBadgesTable createAlias(String alias) {
+    return $EarnedBadgesTable(attachedDatabase, alias);
+  }
+}
+
+class EarnedBadge extends DataClass implements Insertable<EarnedBadge> {
+  final String badgeKey;
+  final DateTime earnedAt;
+
+  /// Renseigné au merge local → cloud (phase 4).
+  final DateTime? syncedAt;
+  const EarnedBadge({
+    required this.badgeKey,
+    required this.earnedAt,
+    this.syncedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['badge_key'] = Variable<String>(badgeKey);
+    map['earned_at'] = Variable<DateTime>(earnedAt);
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    return map;
+  }
+
+  EarnedBadgesCompanion toCompanion(bool nullToAbsent) {
+    return EarnedBadgesCompanion(
+      badgeKey: Value(badgeKey),
+      earnedAt: Value(earnedAt),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+    );
+  }
+
+  factory EarnedBadge.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EarnedBadge(
+      badgeKey: serializer.fromJson<String>(json['badgeKey']),
+      earnedAt: serializer.fromJson<DateTime>(json['earnedAt']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'badgeKey': serializer.toJson<String>(badgeKey),
+      'earnedAt': serializer.toJson<DateTime>(earnedAt),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+    };
+  }
+
+  EarnedBadge copyWith({
+    String? badgeKey,
+    DateTime? earnedAt,
+    Value<DateTime?> syncedAt = const Value.absent(),
+  }) => EarnedBadge(
+    badgeKey: badgeKey ?? this.badgeKey,
+    earnedAt: earnedAt ?? this.earnedAt,
+    syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+  );
+  EarnedBadge copyWithCompanion(EarnedBadgesCompanion data) {
+    return EarnedBadge(
+      badgeKey: data.badgeKey.present ? data.badgeKey.value : this.badgeKey,
+      earnedAt: data.earnedAt.present ? data.earnedAt.value : this.earnedAt,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EarnedBadge(')
+          ..write('badgeKey: $badgeKey, ')
+          ..write('earnedAt: $earnedAt, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(badgeKey, earnedAt, syncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EarnedBadge &&
+          other.badgeKey == this.badgeKey &&
+          other.earnedAt == this.earnedAt &&
+          other.syncedAt == this.syncedAt);
+}
+
+class EarnedBadgesCompanion extends UpdateCompanion<EarnedBadge> {
+  final Value<String> badgeKey;
+  final Value<DateTime> earnedAt;
+  final Value<DateTime?> syncedAt;
+  final Value<int> rowid;
+  const EarnedBadgesCompanion({
+    this.badgeKey = const Value.absent(),
+    this.earnedAt = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EarnedBadgesCompanion.insert({
+    required String badgeKey,
+    required DateTime earnedAt,
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : badgeKey = Value(badgeKey),
+       earnedAt = Value(earnedAt);
+  static Insertable<EarnedBadge> custom({
+    Expression<String>? badgeKey,
+    Expression<DateTime>? earnedAt,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (badgeKey != null) 'badge_key': badgeKey,
+      if (earnedAt != null) 'earned_at': earnedAt,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EarnedBadgesCompanion copyWith({
+    Value<String>? badgeKey,
+    Value<DateTime>? earnedAt,
+    Value<DateTime?>? syncedAt,
+    Value<int>? rowid,
+  }) {
+    return EarnedBadgesCompanion(
+      badgeKey: badgeKey ?? this.badgeKey,
+      earnedAt: earnedAt ?? this.earnedAt,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (badgeKey.present) {
+      map['badge_key'] = Variable<String>(badgeKey.value);
+    }
+    if (earnedAt.present) {
+      map['earned_at'] = Variable<DateTime>(earnedAt.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EarnedBadgesCompanion(')
+          ..write('badgeKey: $badgeKey, ')
+          ..write('earnedAt: $earnedAt, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CustomCardsTable extends CustomCards
+    with TableInfo<$CustomCardsTable, CustomCard> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustomCardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gameIdMeta = const VerificationMeta('gameId');
+  @override
+  late final GeneratedColumn<String> gameId = GeneratedColumn<String>(
+    'game_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES games (id)',
+    ),
+  );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
+  @override
+  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
+    'category_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES categories (id)',
+    ),
+  );
+  static const VerificationMeta _text_Meta = const VerificationMeta('text_');
+  @override
+  late final GeneratedColumn<String> text_ = GeneratedColumn<String>(
+    'text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _intensityMeta = const VerificationMeta(
+    'intensity',
+  );
+  @override
+  late final GeneratedColumn<int> intensity = GeneratedColumn<int>(
+    'intensity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(3),
+  );
+  static const VerificationMeta _activeMeta = const VerificationMeta('active');
+  @override
+  late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    gameId,
+    categoryId,
+    text_,
+    intensity,
+    active,
+    createdAt,
+    updatedAt,
+    syncedAt,
+    remoteId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'custom_cards';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustomCard> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('game_id')) {
+      context.handle(
+        _gameIdMeta,
+        gameId.isAcceptableOrUnknown(data['game_id']!, _gameIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gameIdMeta);
+    }
+    if (data.containsKey('category_id')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryIdMeta);
+    }
+    if (data.containsKey('text')) {
+      context.handle(
+        _text_Meta,
+        text_.isAcceptableOrUnknown(data['text']!, _text_Meta),
+      );
+    } else if (isInserting) {
+      context.missing(_text_Meta);
+    }
+    if (data.containsKey('intensity')) {
+      context.handle(
+        _intensityMeta,
+        intensity.isAcceptableOrUnknown(data['intensity']!, _intensityMeta),
+      );
+    }
+    if (data.containsKey('active')) {
+      context.handle(
+        _activeMeta,
+        active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CustomCard map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustomCard(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      gameId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}game_id'],
+      )!,
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category_id'],
+      )!,
+      text_: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text'],
+      )!,
+      intensity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}intensity'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      ),
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+    );
+  }
+
+  @override
+  $CustomCardsTable createAlias(String alias) {
+    return $CustomCardsTable(attachedDatabase, alias);
+  }
+}
+
+class CustomCard extends DataClass implements Insertable<CustomCard> {
+  final String id;
+  final String gameId;
+  final String categoryId;
+  final String text_;
+
+  /// Pas de champ intensité au formulaire (§14, C1) — toutes les cartes
+  /// perso valent l'intensité « Normal » par défaut.
+  final int intensity;
+
+  /// Active = entre dans le pool de tirage de sa catégorie (C2) ; inactive
+  /// = gardée mais jamais tirée. Jamais une suppression déguisée.
+  final bool active;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? syncedAt;
+  final String? remoteId;
+  const CustomCard({
+    required this.id,
+    required this.gameId,
+    required this.categoryId,
+    required this.text_,
+    required this.intensity,
+    required this.active,
+    required this.createdAt,
+    required this.updatedAt,
+    this.syncedAt,
+    this.remoteId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['game_id'] = Variable<String>(gameId);
+    map['category_id'] = Variable<String>(categoryId);
+    map['text'] = Variable<String>(text_);
+    map['intensity'] = Variable<int>(intensity);
+    map['active'] = Variable<bool>(active);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    return map;
+  }
+
+  CustomCardsCompanion toCompanion(bool nullToAbsent) {
+    return CustomCardsCompanion(
+      id: Value(id),
+      gameId: Value(gameId),
+      categoryId: Value(categoryId),
+      text_: Value(text_),
+      intensity: Value(intensity),
+      active: Value(active),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+    );
+  }
+
+  factory CustomCard.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustomCard(
+      id: serializer.fromJson<String>(json['id']),
+      gameId: serializer.fromJson<String>(json['gameId']),
+      categoryId: serializer.fromJson<String>(json['categoryId']),
+      text_: serializer.fromJson<String>(json['text_']),
+      intensity: serializer.fromJson<int>(json['intensity']),
+      active: serializer.fromJson<bool>(json['active']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'gameId': serializer.toJson<String>(gameId),
+      'categoryId': serializer.toJson<String>(categoryId),
+      'text_': serializer.toJson<String>(text_),
+      'intensity': serializer.toJson<int>(intensity),
+      'active': serializer.toJson<bool>(active),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+      'remoteId': serializer.toJson<String?>(remoteId),
+    };
+  }
+
+  CustomCard copyWith({
+    String? id,
+    String? gameId,
+    String? categoryId,
+    String? text_,
+    int? intensity,
+    bool? active,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> syncedAt = const Value.absent(),
+    Value<String?> remoteId = const Value.absent(),
+  }) => CustomCard(
+    id: id ?? this.id,
+    gameId: gameId ?? this.gameId,
+    categoryId: categoryId ?? this.categoryId,
+    text_: text_ ?? this.text_,
+    intensity: intensity ?? this.intensity,
+    active: active ?? this.active,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+  );
+  CustomCard copyWithCompanion(CustomCardsCompanion data) {
+    return CustomCard(
+      id: data.id.present ? data.id.value : this.id,
+      gameId: data.gameId.present ? data.gameId.value : this.gameId,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
+      text_: data.text_.present ? data.text_.value : this.text_,
+      intensity: data.intensity.present ? data.intensity.value : this.intensity,
+      active: data.active.present ? data.active.value : this.active,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomCard(')
+          ..write('id: $id, ')
+          ..write('gameId: $gameId, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('text_: $text_, ')
+          ..write('intensity: $intensity, ')
+          ..write('active: $active, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('remoteId: $remoteId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    gameId,
+    categoryId,
+    text_,
+    intensity,
+    active,
+    createdAt,
+    updatedAt,
+    syncedAt,
+    remoteId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustomCard &&
+          other.id == this.id &&
+          other.gameId == this.gameId &&
+          other.categoryId == this.categoryId &&
+          other.text_ == this.text_ &&
+          other.intensity == this.intensity &&
+          other.active == this.active &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncedAt == this.syncedAt &&
+          other.remoteId == this.remoteId);
+}
+
+class CustomCardsCompanion extends UpdateCompanion<CustomCard> {
+  final Value<String> id;
+  final Value<String> gameId;
+  final Value<String> categoryId;
+  final Value<String> text_;
+  final Value<int> intensity;
+  final Value<bool> active;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> syncedAt;
+  final Value<String?> remoteId;
+  final Value<int> rowid;
+  const CustomCardsCompanion({
+    this.id = const Value.absent(),
+    this.gameId = const Value.absent(),
+    this.categoryId = const Value.absent(),
+    this.text_ = const Value.absent(),
+    this.intensity = const Value.absent(),
+    this.active = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CustomCardsCompanion.insert({
+    required String id,
+    required String gameId,
+    required String categoryId,
+    required String text_,
+    this.intensity = const Value.absent(),
+    this.active = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.syncedAt = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       gameId = Value(gameId),
+       categoryId = Value(categoryId),
+       text_ = Value(text_),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<CustomCard> custom({
+    Expression<String>? id,
+    Expression<String>? gameId,
+    Expression<String>? categoryId,
+    Expression<String>? text_,
+    Expression<int>? intensity,
+    Expression<bool>? active,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? syncedAt,
+    Expression<String>? remoteId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (gameId != null) 'game_id': gameId,
+      if (categoryId != null) 'category_id': categoryId,
+      if (text_ != null) 'text': text_,
+      if (intensity != null) 'intensity': intensity,
+      if (active != null) 'active': active,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CustomCardsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? gameId,
+    Value<String>? categoryId,
+    Value<String>? text_,
+    Value<int>? intensity,
+    Value<bool>? active,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? syncedAt,
+    Value<String?>? remoteId,
+    Value<int>? rowid,
+  }) {
+    return CustomCardsCompanion(
+      id: id ?? this.id,
+      gameId: gameId ?? this.gameId,
+      categoryId: categoryId ?? this.categoryId,
+      text_: text_ ?? this.text_,
+      intensity: intensity ?? this.intensity,
+      active: active ?? this.active,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncedAt: syncedAt ?? this.syncedAt,
+      remoteId: remoteId ?? this.remoteId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (gameId.present) {
+      map['game_id'] = Variable<String>(gameId.value);
+    }
+    if (categoryId.present) {
+      map['category_id'] = Variable<String>(categoryId.value);
+    }
+    if (text_.present) {
+      map['text'] = Variable<String>(text_.value);
+    }
+    if (intensity.present) {
+      map['intensity'] = Variable<int>(intensity.value);
+    }
+    if (active.present) {
+      map['active'] = Variable<bool>(active.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomCardsCompanion(')
+          ..write('id: $id, ')
+          ..write('gameId: $gameId, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('text_: $text_, ')
+          ..write('intensity: $intensity, ')
+          ..write('active: $active, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5050,6 +5939,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $GameSessionsTable gameSessions = $GameSessionsTable(this);
   late final $SessionPlayersTable sessionPlayers = $SessionPlayersTable(this);
   late final $AppPrefsTable appPrefs = $AppPrefsTable(this);
+  late final $EarnedBadgesTable earnedBadges = $EarnedBadgesTable(this);
+  late final $CustomCardsTable customCards = $CustomCardsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5066,6 +5957,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     gameSessions,
     sessionPlayers,
     appPrefs,
+    earnedBadges,
+    customCards,
   ];
 }
 
@@ -5129,6 +6022,24 @@ final class $$GamesTableReferences
     ).filter((f) => f.gameId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_ruleSlidesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CustomCardsTable, List<CustomCard>>
+  _customCardsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.customCards,
+    aliasName: 'games__id__custom_cards__game_id',
+  );
+
+  $$CustomCardsTableProcessedTableManager get customCardsRefs {
+    final manager = $$CustomCardsTableTableManager(
+      $_db,
+      $_db.customCards,
+    ).filter((f) => f.gameId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_customCardsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5229,6 +6140,31 @@ class $$GamesTableFilterComposer extends Composer<_$AppDatabase, $GamesTable> {
           }) => $$RuleSlidesTableFilterComposer(
             $db: $db,
             $table: $db.ruleSlides,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> customCardsRefs(
+    Expression<bool> Function($$CustomCardsTableFilterComposer f) f,
+  ) {
+    final $$CustomCardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.customCards,
+      getReferencedColumn: (t) => t.gameId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomCardsTableFilterComposer(
+            $db: $db,
+            $table: $db.customCards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5385,6 +6321,31 @@ class $$GamesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> customCardsRefs<T extends Object>(
+    Expression<T> Function($$CustomCardsTableAnnotationComposer a) f,
+  ) {
+    final $$CustomCardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.customCards,
+      getReferencedColumn: (t) => t.gameId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomCardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.customCards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$GamesTableTableManager
@@ -5400,7 +6361,11 @@ class $$GamesTableTableManager
           $$GamesTableUpdateCompanionBuilder,
           (Game, $$GamesTableReferences),
           Game,
-          PrefetchHooks Function({bool categoriesRefs, bool ruleSlidesRefs})
+          PrefetchHooks Function({
+            bool categoriesRefs,
+            bool ruleSlidesRefs,
+            bool customCardsRefs,
+          })
         > {
   $$GamesTableTableManager(_$AppDatabase db, $GamesTable table)
     : super(
@@ -5470,12 +6435,17 @@ class $$GamesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({categoriesRefs = false, ruleSlidesRefs = false}) {
+              ({
+                categoriesRefs = false,
+                ruleSlidesRefs = false,
+                customCardsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (categoriesRefs) db.categories,
                     if (ruleSlidesRefs) db.ruleSlides,
+                    if (customCardsRefs) db.customCards,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -5514,6 +6484,27 @@ class $$GamesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (customCardsRefs)
+                        await $_getPrefetchedData<
+                          Game,
+                          $GamesTable,
+                          CustomCard
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GamesTableReferences
+                              ._customCardsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GamesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).customCardsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gameId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5534,7 +6525,11 @@ typedef $$GamesTableProcessedTableManager =
       $$GamesTableUpdateCompanionBuilder,
       (Game, $$GamesTableReferences),
       Game,
-      PrefetchHooks Function({bool categoriesRefs, bool ruleSlidesRefs})
+      PrefetchHooks Function({
+        bool categoriesRefs,
+        bool ruleSlidesRefs,
+        bool customCardsRefs,
+      })
     >;
 typedef $$CategoriesTableCreateCompanionBuilder = CategoriesCompanion Function({
   required String id,
@@ -5596,6 +6591,24 @@ final class $$CategoriesTableReferences
     ).filter((f) => f.categoryId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_cardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CustomCardsTable, List<CustomCard>>
+  _customCardsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.customCards,
+    aliasName: 'categories__id__custom_cards__category_id',
+  );
+
+  $$CustomCardsTableProcessedTableManager get customCardsRefs {
+    final manager = $$CustomCardsTableTableManager(
+      $_db,
+      $_db.customCards,
+    ).filter((f) => f.categoryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_customCardsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5690,6 +6703,31 @@ class $$CategoriesTableFilterComposer
           }) => $$CardsTableFilterComposer(
             $db: $db,
             $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> customCardsRefs(
+    Expression<bool> Function($$CustomCardsTableFilterComposer f) f,
+  ) {
+    final $$CustomCardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.customCards,
+      getReferencedColumn: (t) => t.categoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomCardsTableFilterComposer(
+            $db: $db,
+            $table: $db.customCards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5857,6 +6895,31 @@ class $$CategoriesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> customCardsRefs<T extends Object>(
+    Expression<T> Function($$CustomCardsTableAnnotationComposer a) f,
+  ) {
+    final $$CustomCardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.customCards,
+      getReferencedColumn: (t) => t.categoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomCardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.customCards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CategoriesTableTableManager
@@ -5872,7 +6935,11 @@ class $$CategoriesTableTableManager
           $$CategoriesTableUpdateCompanionBuilder,
           (Category, $$CategoriesTableReferences),
           Category,
-          PrefetchHooks Function({bool gameId, bool cardsRefs})
+          PrefetchHooks Function({
+            bool gameId,
+            bool cardsRefs,
+            bool customCardsRefs,
+          })
         > {
   $$CategoriesTableTableManager(_$AppDatabase db, $CategoriesTable table)
     : super(
@@ -5941,57 +7008,92 @@ class $$CategoriesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({gameId = false, cardsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (cardsRefs) db.cards],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (gameId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.gameId,
-                        referencedTable: $$CategoriesTableReferences
-                            ._gameIdTable(db),
-                        referencedColumn: $$CategoriesTableReferences
-                            ._gameIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({gameId = false, cardsRefs = false, customCardsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (cardsRefs) db.cards,
+                    if (customCardsRefs) db.customCards,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gameId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.gameId,
+                            referencedTable: $$CategoriesTableReferences
+                                ._gameIdTable(db),
+                            referencedColumn: $$CategoriesTableReferences
+                                ._gameIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (cardsRefs)
+                        await $_getPrefetchedData<
+                          Category,
+                          $CategoriesTable,
+                          Card
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CategoriesTableReferences
+                              ._cardsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CategoriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cardsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.categoryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (customCardsRefs)
+                        await $_getPrefetchedData<
+                          Category,
+                          $CategoriesTable,
+                          CustomCard
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CategoriesTableReferences
+                              ._customCardsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CategoriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).customCardsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.categoryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (cardsRefs)
-                    await $_getPrefetchedData<Category, $CategoriesTable, Card>(
-                      currentTable: table,
-                      referencedTable: $$CategoriesTableReferences
-                          ._cardsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$CategoriesTableReferences(db, table, p0).cardsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.categoryId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -6008,7 +7110,11 @@ typedef $$CategoriesTableProcessedTableManager =
       $$CategoriesTableUpdateCompanionBuilder,
       (Category, $$CategoriesTableReferences),
       Category,
-      PrefetchHooks Function({bool gameId, bool cardsRefs})
+      PrefetchHooks Function({
+        bool gameId,
+        bool cardsRefs,
+        bool customCardsRefs,
+      })
     >;
 typedef $$CardsTableCreateCompanionBuilder = CardsCompanion Function({
   required String id,
@@ -8708,6 +9814,671 @@ typedef $$AppPrefsTableProcessedTableManager =
       AppPref,
       PrefetchHooks Function()
     >;
+typedef $$EarnedBadgesTableCreateCompanionBuilder =
+    EarnedBadgesCompanion Function({
+      required String badgeKey,
+      required DateTime earnedAt,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+typedef $$EarnedBadgesTableUpdateCompanionBuilder =
+    EarnedBadgesCompanion Function({
+      Value<String> badgeKey,
+      Value<DateTime> earnedAt,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+
+class $$EarnedBadgesTableFilterComposer
+    extends Composer<_$AppDatabase, $EarnedBadgesTable> {
+  $$EarnedBadgesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get badgeKey => $composableBuilder(
+    column: $table.badgeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get earnedAt => $composableBuilder(
+    column: $table.earnedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$EarnedBadgesTableOrderingComposer
+    extends Composer<_$AppDatabase, $EarnedBadgesTable> {
+  $$EarnedBadgesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get badgeKey => $composableBuilder(
+    column: $table.badgeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get earnedAt => $composableBuilder(
+    column: $table.earnedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$EarnedBadgesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EarnedBadgesTable> {
+  $$EarnedBadgesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get badgeKey =>
+      $composableBuilder(column: $table.badgeKey, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get earnedAt =>
+      $composableBuilder(column: $table.earnedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$EarnedBadgesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EarnedBadgesTable,
+          EarnedBadge,
+          $$EarnedBadgesTableFilterComposer,
+          $$EarnedBadgesTableOrderingComposer,
+          $$EarnedBadgesTableAnnotationComposer,
+          $$EarnedBadgesTableCreateCompanionBuilder,
+          $$EarnedBadgesTableUpdateCompanionBuilder,
+          (
+            EarnedBadge,
+            BaseReferences<_$AppDatabase, $EarnedBadgesTable, EarnedBadge>,
+          ),
+          EarnedBadge,
+          PrefetchHooks Function()
+        > {
+  $$EarnedBadgesTableTableManager(_$AppDatabase db, $EarnedBadgesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EarnedBadgesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EarnedBadgesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EarnedBadgesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> badgeKey = const Value.absent(),
+                Value<DateTime> earnedAt = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EarnedBadgesCompanion(
+                badgeKey: badgeKey,
+                earnedAt: earnedAt,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String badgeKey,
+                required DateTime earnedAt,
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EarnedBadgesCompanion.insert(
+                badgeKey: badgeKey,
+                earnedAt: earnedAt,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$EarnedBadgesTable, EarnedBadge>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $EarnedBadgesTable,
+                    EarnedBadge
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$EarnedBadgesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EarnedBadgesTable,
+      EarnedBadge,
+      $$EarnedBadgesTableFilterComposer,
+      $$EarnedBadgesTableOrderingComposer,
+      $$EarnedBadgesTableAnnotationComposer,
+      $$EarnedBadgesTableCreateCompanionBuilder,
+      $$EarnedBadgesTableUpdateCompanionBuilder,
+      (
+        EarnedBadge,
+        BaseReferences<_$AppDatabase, $EarnedBadgesTable, EarnedBadge>,
+      ),
+      EarnedBadge,
+      PrefetchHooks Function()
+    >;
+typedef $$CustomCardsTableCreateCompanionBuilder =
+    CustomCardsCompanion Function({
+      required String id,
+      required String gameId,
+      required String categoryId,
+      required String text_,
+      Value<int> intensity,
+      Value<bool> active,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> syncedAt,
+      Value<String?> remoteId,
+      Value<int> rowid,
+    });
+typedef $$CustomCardsTableUpdateCompanionBuilder =
+    CustomCardsCompanion Function({
+      Value<String> id,
+      Value<String> gameId,
+      Value<String> categoryId,
+      Value<String> text_,
+      Value<int> intensity,
+      Value<bool> active,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> syncedAt,
+      Value<String?> remoteId,
+      Value<int> rowid,
+    });
+
+final class $$CustomCardsTableReferences
+    extends BaseReferences<_$AppDatabase, $CustomCardsTable, CustomCard> {
+  $$CustomCardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GamesTable _gameIdTable(_$AppDatabase db) =>
+      db.games.createAlias('custom_cards__game_id__games__id');
+
+  $$GamesTableProcessedTableManager get gameId {
+    final $_column = $_itemColumn<String>('game_id')!;
+
+    final manager = $$GamesTableTableManager(
+      $_db,
+      $_db.games,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gameIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CategoriesTable _categoryIdTable(_$AppDatabase db) =>
+      db.categories.createAlias('custom_cards__category_id__categories__id');
+
+  $$CategoriesTableProcessedTableManager get categoryId {
+    final $_column = $_itemColumn<String>('category_id')!;
+
+    final manager = $$CategoriesTableTableManager(
+      $_db,
+      $_db.categories,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CustomCardsTableFilterComposer
+    extends Composer<_$AppDatabase, $CustomCardsTable> {
+  $$CustomCardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get text_ => $composableBuilder(
+    column: $table.text_,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get intensity => $composableBuilder(
+    column: $table.intensity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GamesTableFilterComposer get gameId {
+    final $$GamesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gameId,
+      referencedTable: $db.games,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GamesTableFilterComposer(
+            $db: $db,
+            $table: $db.games,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategoriesTableFilterComposer get categoryId {
+    final $$CategoriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoryId,
+      referencedTable: $db.categories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriesTableFilterComposer(
+            $db: $db,
+            $table: $db.categories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustomCardsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustomCardsTable> {
+  $$CustomCardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get text_ => $composableBuilder(
+    column: $table.text_,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get intensity => $composableBuilder(
+    column: $table.intensity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get active => $composableBuilder(
+    column: $table.active,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GamesTableOrderingComposer get gameId {
+    final $$GamesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gameId,
+      referencedTable: $db.games,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GamesTableOrderingComposer(
+            $db: $db,
+            $table: $db.games,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategoriesTableOrderingComposer get categoryId {
+    final $$CategoriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoryId,
+      referencedTable: $db.categories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.categories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustomCardsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustomCardsTable> {
+  $$CustomCardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get text_ =>
+      $composableBuilder(column: $table.text_, builder: (column) => column);
+
+  GeneratedColumn<int> get intensity =>
+      $composableBuilder(column: $table.intensity, builder: (column) => column);
+
+  GeneratedColumn<bool> get active =>
+      $composableBuilder(column: $table.active, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  $$GamesTableAnnotationComposer get gameId {
+    final $$GamesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gameId,
+      referencedTable: $db.games,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GamesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.games,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategoriesTableAnnotationComposer get categoryId {
+    final $$CategoriesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoryId,
+      referencedTable: $db.categories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.categories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustomCardsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CustomCardsTable,
+          CustomCard,
+          $$CustomCardsTableFilterComposer,
+          $$CustomCardsTableOrderingComposer,
+          $$CustomCardsTableAnnotationComposer,
+          $$CustomCardsTableCreateCompanionBuilder,
+          $$CustomCardsTableUpdateCompanionBuilder,
+          (CustomCard, $$CustomCardsTableReferences),
+          CustomCard,
+          PrefetchHooks Function({bool gameId, bool categoryId})
+        > {
+  $$CustomCardsTableTableManager(_$AppDatabase db, $CustomCardsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CustomCardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CustomCardsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CustomCardsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> gameId = const Value.absent(),
+                Value<String> categoryId = const Value.absent(),
+                Value<String> text_ = const Value.absent(),
+                Value<int> intensity = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CustomCardsCompanion(
+                id: id,
+                gameId: gameId,
+                categoryId: categoryId,
+                text_: text_,
+                intensity: intensity,
+                active: active,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                syncedAt: syncedAt,
+                remoteId: remoteId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String gameId,
+                required String categoryId,
+                required String text_,
+                Value<int> intensity = const Value.absent(),
+                Value<bool> active = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CustomCardsCompanion.insert(
+                id: id,
+                gameId: gameId,
+                categoryId: categoryId,
+                text_: text_,
+                intensity: intensity,
+                active: active,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                syncedAt: syncedAt,
+                remoteId: remoteId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CustomCardsTable, CustomCard>(table),
+                  $$CustomCardsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({gameId = false, categoryId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (gameId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.gameId,
+                        referencedTable: $$CustomCardsTableReferences
+                            ._gameIdTable(db),
+                        referencedColumn: $$CustomCardsTableReferences
+                            ._gameIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (categoryId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.categoryId,
+                        referencedTable: $$CustomCardsTableReferences
+                            ._categoryIdTable(db),
+                        referencedColumn: $$CustomCardsTableReferences
+                            ._categoryIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CustomCardsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CustomCardsTable,
+      CustomCard,
+      $$CustomCardsTableFilterComposer,
+      $$CustomCardsTableOrderingComposer,
+      $$CustomCardsTableAnnotationComposer,
+      $$CustomCardsTableCreateCompanionBuilder,
+      $$CustomCardsTableUpdateCompanionBuilder,
+      (CustomCard, $$CustomCardsTableReferences),
+      CustomCard,
+      PrefetchHooks Function({bool gameId, bool categoryId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8734,4 +10505,8 @@ class $AppDatabaseManager {
       $$SessionPlayersTableTableManager(_db, _db.sessionPlayers);
   $$AppPrefsTableTableManager get appPrefs =>
       $$AppPrefsTableTableManager(_db, _db.appPrefs);
+  $$EarnedBadgesTableTableManager get earnedBadges =>
+      $$EarnedBadgesTableTableManager(_db, _db.earnedBadges);
+  $$CustomCardsTableTableManager get customCards =>
+      $$CustomCardsTableTableManager(_db, _db.customCards);
 }

@@ -48,6 +48,17 @@ Future<void> tapText(WidgetTester tester, String text) async {
   await tester.pumpAndSettle();
 }
 
+/// Comme `tapText`, mais pour un tap qui mène à un écran portant une
+/// animation en boucle infinie (respiration de l'avatar, vibration du
+/// téléphone) — `pumpAndSettle` n'atteindrait jamais un état stable et
+/// expirerait. Un nombre fixe de pumps suffit à laisser la transition finir.
+Future<void> tapTextIntoAnimatedScreen(WidgetTester tester, String text) async {
+  await tester.tap(find.text(text).first);
+  for (var i = 0; i < 10; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+}
+
 /// Joue une partie complète, A1 → B6, sur une base en mémoire seedée
 /// depuis le snapshot embarqué. Partagé par le test widget (rapide) et le
 /// test d'intégration (captures d'écran sur simulateur).
@@ -107,7 +118,9 @@ Future<void> playFullGame(
 
   // B1 — home : les 8 jeux. La grille dépasse l'écran, certains n'y sont
   // visibles qu'après scroll.
-  expect(find.text('Choisis un jeu'), findsOneWidget);
+  expect(find.text('Quel jeu'), findsOneWidget);
+  expect(find.text('oseras-tu'), findsOneWidget);
+  expect(find.text('tester ?'), findsOneWidget);
   expect(find.text('2 joueurs'), findsOneWidget);
   final grid = find.byType(Scrollable).first;
   for (final g in ['Action ou Vérité', 'Icebreaker', 'Mime', 'Dilemme']) {
@@ -129,12 +142,12 @@ Future<void> playFullGame(
   expect(find.text('Lancer la partie'), findsOneWidget);
   expect(find.text('Normal'), findsWidgets); // intensité 3 par défaut
   await snap('06-config');
-  await tapText(tester, 'Lancer la partie');
+  await tapTextIntoAnimatedScreen(tester, 'Lancer la partie');
 
   // B3 → B5 en boucle, 10 cartes, votes alternés Oui/Non.
   var votes = 0;
   var guard = 0;
-  final over = find.text('Partie terminée 🎉');
+  final over = find.text('PARTIE TERMINÉE');
   while (over.evaluate().isEmpty && guard++ < 80) {
     if (find.text('Voir la carte').evaluate().isNotEmpty) {
       if (votes == 0) await snap('07-turn');
@@ -146,11 +159,20 @@ Future<void> playFullGame(
     } else if (find.text('Oui').evaluate().isNotEmpty) {
       // Le bouton empile emoji et libellé (réf. visuelle) : on tape sur le
       // libellé seul plutôt que sur un texte combiné qui n'existe plus.
-      await tapText(tester, votes.isEven ? 'Oui' : 'Non');
+      // Peut mener à l'écran carte suivante ou à « passe le téléphone »
+      // (animé en boucle) — pas de pumpAndSettle ici.
+      await tapTextIntoAnimatedScreen(tester, votes.isEven ? 'Oui' : 'Non');
       votes++;
-    } else if (find.text('Je suis prêt').evaluate().isNotEmpty) {
+    } else if (find.byIcon(Icons.arrow_forward_rounded).evaluate().isNotEmpty) {
+      // Écran « passe le téléphone » : le libellé du CTA porte le nom du
+      // joueur suivant (dynamique), on cible donc l'icône plutôt que le
+      // texte. Mène vers l'écran de tour, animé en boucle — pas de
+      // pumpAndSettle ici (voir tapTextIntoAnimatedScreen).
       if (votes == 1) await snap('10-pass');
-      await tapText(tester, 'Je suis prêt');
+      await tester.tap(find.byIcon(Icons.arrow_forward_rounded));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
     } else {
       await tester.pump(const Duration(milliseconds: 100));
     }
@@ -159,6 +181,15 @@ Future<void> playFullGame(
 
   // B6 — résultats : Lina (joueur 0, cartes paires) a gagné 5 points.
   expect(over, findsOneWidget);
+  // Première partie du profil ⇒ le badge « Première victoire » se
+  // débloque forcément : la modale de félicitations (B6) s'affiche par
+  // dessus les résultats un frame plus tard et doit être refermée avant de
+  // continuer, sinon elle masque le reste de l'écran (dont « Rejouer »).
+  await tester.pumpAndSettle();
+  final okButton = find.text('OK');
+  if (okButton.evaluate().isNotEmpty) {
+    await tapText(tester, 'OK');
+  }
   expect(find.text('5 pts'), findsOneWidget);
   expect(find.text('0 pt'), findsOneWidget);
   await snap('11-results');
@@ -175,9 +206,10 @@ Future<void> playFullGame(
   expect(lina.gamesPlayed, 1);
   expect(lina.tagScoresJson, isNot('{}'), reason: 'les tags gagnés cumulent sur le profil');
 
-  // B7 — Rejouer : retour à la config du même jeu.
+  // B7 — Rejouer : retour à la page catégorie du même jeu (pas directement
+  // la config), pour laisser le choix d'une autre catégorie.
   await tapText(tester, 'Rejouer');
-  expect(find.text('Lancer la partie'), findsOneWidget);
+  expect(find.text('CHOISIS UNE CATÉGORIE'), findsOneWidget);
 
   await db.close();
 }

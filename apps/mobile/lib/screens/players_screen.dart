@@ -8,6 +8,7 @@ import '../data/providers.dart';
 import '../theme/theme.dart';
 import '../widgets/game_scaffold.dart';
 import '../widgets/player_avatar.dart';
+import 'edit_player_sheet.dart';
 
 /// A1/A2 : la liste des joueurs de la session, composée avant la home.
 class PlayersScreen extends ConsumerWidget {
@@ -17,7 +18,6 @@ class PlayersScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: PlColors.ground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
@@ -121,7 +121,9 @@ class _PlayersEditorState extends ConsumerState<PlayersEditor> {
       }
       // "Non, créer un nouveau profil" : on laisse la saisie en place,
       // le nom doit changer pour aboutir (contrainte : un nom = un profil).
-      setState(() => _error = t.duplicatePlayer(existing.name));
+      // Message distinct de `duplicatePlayer` : ce profil n'est PAS dans la
+      // session ce soir, donc "joue déjà ce soir" serait faux.
+      setState(() => _error = t.playerExistsChooseAnotherName(existing.name));
       return;
     }
 
@@ -139,7 +141,6 @@ class _PlayersEditorState extends ConsumerState<PlayersEditor> {
     final t = AppLocalizations.of(context);
     return showModalBottomSheet<bool>(
       context: context,
-      backgroundColor: PlColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(PlRadius.sheet)),
       ),
@@ -186,6 +187,8 @@ class _PlayersEditorState extends ConsumerState<PlayersEditor> {
     );
   }
 
+  Future<void> _onEditPressed(LocalPlayer player) => showEditPlayerSheet(context, ref, player);
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -193,6 +196,7 @@ class _PlayersEditorState extends ConsumerState<PlayersEditor> {
     // change jamais de référence, donc watcher .notifier ne déclenche aucun
     // rebuild quand un joueur est ajouté/retiré/importé.
     final players = ref.watch(playersProvider).where((p) => p.inSession).toList();
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
 
     return Column(
       children: [
@@ -218,41 +222,48 @@ class _PlayersEditorState extends ConsumerState<PlayersEditor> {
         const SizedBox(height: 12),
         Expanded(
           child: players.isEmpty
-              ? Center(child: Text(t.needOnePlayer, style: const TextStyle(color: PlColors.neutralFaint)))
+              ? Center(child: Text(t.needOnePlayer, style: TextStyle(color: soft)))
               : ListView.separated(
                   itemCount: players.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (_, i) {
                     final p = players[i];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
+                    return Material(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(PlRadius.tile),
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(PlRadius.tile),
-                        border: Border.all(color: Theme.of(context).dividerColor),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
-                      child: Row(
-                        children: [
-                          PlayerAvatar(emoji: p.avatar, size: 40),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(p.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                // Visibles dès l'ajout à la session, comme demandé —
-                                // pas seulement après une partie déjà jouée.
-                                Text('${t.pointsCount(p.totalScore)} · ${t.gamesCount(p.gamesPlayed)}',
-                                    style: const TextStyle(fontSize: 12, color: PlColors.neutral)),
-                              ],
-                            ),
+                        onTap: () => _onEditPressed(p),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(PlRadius.tile),
+                            border: Border.all(color: Theme.of(context).dividerColor),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close, size: 20),
-                            color: PlColors.neutralFaint,
-                            onPressed: () => ref.read(playersProvider.notifier).remove(p.id),
+                          padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+                          child: Row(
+                            children: [
+                              PlayerAvatar(emoji: p.avatar, size: 40),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(p.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    // Visibles dès l'ajout à la session, comme demandé —
+                                    // pas seulement après une partie déjà jouée.
+                                    Text('${t.pointsCount(p.totalScore)} · ${t.gamesCount(p.gamesPlayed)}',
+                                        style: const TextStyle(fontSize: 12, color: PlColors.neutral)),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close, size: 20),
+                                color: soft,
+                                onPressed: () => ref.read(playersProvider.notifier).remove(p.id),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     );
                   },

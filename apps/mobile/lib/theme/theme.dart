@@ -38,11 +38,14 @@ Color hexColor(String hex) {
 }
 
 /// Le dégradé d'un jeu — son accent, contenu à sa tuile ou à son écran,
-/// jamais en fond d'app (§10).
-LinearGradient gameGradient(String colorMain, String colorSecondary) {
+/// jamais en fond d'app (§10). Diagonal par défaut (tuiles de l'accueil,
+/// aperçu réf. visuelle) ; `vertical: true` pour les écrans DE la partie
+/// (carte, vote, podium, CTA) — demandé pour une cohérence haut→bas avec
+/// le bandeau d'en-tête (`GameScaffold.headerGradientVertical`).
+LinearGradient gameGradient(String colorMain, String colorSecondary, {bool vertical = false}) {
   return LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    begin: vertical ? Alignment.topCenter : Alignment.topLeft,
+    end: vertical ? Alignment.bottomCenter : Alignment.bottomRight,
     colors: [hexColor(colorMain), hexColor(colorSecondary)],
   );
 }

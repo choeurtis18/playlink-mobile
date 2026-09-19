@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'screens/badges_screen.dart';
 import 'screens/config_screen.dart';
+import 'screens/my_cards_screen.dart';
+import 'screens/settings_screen.dart';
 import 'screens/game_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/leaderboard_screen.dart';
@@ -53,6 +56,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/play', builder: (_, _) => const PlayScreen()),
+      GoRoute(path: '/badges', builder: (_, _) => const BadgesScreen()),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      GoRoute(path: '/my-cards', builder: (_, _) => const MyCardsScreen()),
     ],
   );
 });

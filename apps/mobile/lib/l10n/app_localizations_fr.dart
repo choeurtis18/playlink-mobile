@@ -13,35 +13,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appName => 'Playlink';
 
   @override
-  String get splashTagline => 'Les jeux qui font parler';
+  String get splashTagline => 'Les jeux qui délient les langues';
 
   @override
-  String get onboardingHowTitle => 'Un téléphone, tout le groupe';
+  String get onboardingHowTitle => 'Un téléphone pour tout le groupe';
 
   @override
   String get onboardingHowBody =>
-      'On choisit un jeu, on se passe le téléphone. À ton tour : tu ouvres la carte, tu joues, le groupe vote.';
+      'On choisit un jeu, on se passe le téléphone. À ton tour : tu ouvres la carte, tu joues, le groupe vote si tu mérites ou non un point, tu passes le téléphone à la personne suivante.';
 
   @override
   String get onboardingAccountTitle => 'Aucun compte requis';
 
   @override
   String get onboardingAccountBody =>
-      'Tout marche hors-ligne. Un compte, plus tard, servira seulement à sauvegarder ta progression.';
+      'Tout marche hors-ligne. Mais tu peux créer un compte et débloquer des fonctionnalités supplémentaires !';
 
   @override
   String get onboardingAnalyticsTitle => 'Des stats, pas des données';
 
   @override
   String get onboardingAnalyticsBody =>
-      'On mesure ce qui est joué pour améliorer le contenu. Jamais d\'email, jamais de nom, jamais le texte de tes réponses.';
+      'On mesure ce qui est joué pour améliorer le contenu. Aucunes données personnelles ne sont exploitées, jamais d\'email, jamais de nom, jamais le texte de tes réponses.';
 
   @override
-  String get onboardingAnalyticsToggleTitle => 'Partager des stats anonymes';
-
-  @override
-  String get onboardingAnalyticsToggleBody =>
-      'Aucun email, aucun nom, aucun texte de carte';
+  String get onboardingAnalyticsToggleTitle =>
+      'Partager ses stats anonymement pour aider à améliorer le jeu.';
 
   @override
   String get onboardingStart => 'Commencer';
@@ -104,6 +101,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get playerExistsRename => 'Non, créer un nouveau profil';
 
   @override
+  String editPlayerTitle(String name) {
+    return 'Modifier $name';
+  }
+
+  @override
+  String get editPlayerName => 'Prénom';
+
+  @override
+  String get editPlayerAvatar => 'Avatar';
+
+  @override
+  String get editPlayerSave => 'Enregistrer';
+
+  @override
+  String get editPlayerNameTaken => 'Ce prénom est déjà utilisé';
+
+  @override
+  String playerExistsChooseAnotherName(String name) {
+    return '$name existe déjà, choisis un autre nom';
+  }
+
+  @override
   String pointsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -119,7 +138,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get letsPlay => 'C\'est parti';
 
   @override
-  String get homeTitle => 'Choisis un jeu';
+  String get homeTitleStart_1 => 'Quel jeu';
+
+  @override
+  String get homeTitleHighlight => 'oseras-tu';
+
+  @override
+  String get homeTitleStart_2 => 'tester ?';
 
   @override
   String playersButton(int count) {
@@ -138,10 +163,25 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String categoriesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count catégories',
+      one: '1 catégorie',
+      zero: '0 catégorie',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get categoriesTitle => 'Catégories';
 
   @override
   String get rules => 'Règles';
+
+  @override
+  String get rulesModalTitle => 'Règle du jeu';
 
   @override
   String get chooseCategory => 'Choisis une catégorie';
@@ -215,10 +255,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'La carte suivante reste cachée jusqu\'à ce qu\'il confirme.';
 
   @override
+  String get dontPeekHint =>
+      'Ne regarde pas l\'écran tant que ce n\'est pas ton tour.';
+
+  @override
+  String itsMe(String name) {
+    return 'C\'est moi, $name';
+  }
+
+  @override
   String get imReady => 'Je suis prêt';
 
   @override
   String get gameOver => 'Partie terminée 🎉';
+
+  @override
+  String winnerAnnounce(String name) {
+    return '$name remporte la manche';
+  }
 
   @override
   String sessionScore(int count) {
@@ -264,7 +318,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loadingContent => 'Préparation des cartes…';
 
   @override
-  String get navPlay => 'Jouer';
+  String get navPlay => 'Jeux';
 
   @override
   String get navLeaderboard => 'Classement';
@@ -276,7 +330,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get leaderboardTitle => 'Classement';
 
   @override
-  String get leaderboardSubtitle => 'Entre tes profils · calculé en local';
+  String get leaderboardSubtitle => 'Alors qui est le meilleur joueur ?';
 
   @override
   String get profileTitle => 'Profil';
@@ -298,19 +352,123 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myCards => 'Mes cartes';
 
   @override
+  String get myCardsSubtitle =>
+      'Tes cartes, jouables dès qu\'elles sont actives — jamais visibles par personne d\'autre';
+
+  @override
+  String get myCardsEmpty => 'Aucune carte créée pour l\'instant';
+
+  @override
+  String get createCardCta => 'Créer une carte';
+
+  @override
+  String get createCardTitle => 'Nouvelle carte';
+
+  @override
+  String get editCardTitle => 'Modifier la carte';
+
+  @override
+  String get createCardGame => 'Jeu';
+
+  @override
+  String get createCardCategory => 'Catégorie';
+
+  @override
+  String get createCardTextHint => 'Texte de la carte';
+
+  @override
+  String get createCardTextEmpty =>
+      'Le texte de la carte ne peut pas être vide';
+
+  @override
+  String get createCardActive => 'Activer la carte pour qu\'elle soit jouable';
+
+  @override
+  String get createCardSave => 'Enregistrer';
+
+  @override
+  String get deleteCard => 'Supprimer';
+
+  @override
+  String get deleteCardConfirmTitle => 'Supprimer cette carte ?';
+
+  @override
+  String get deleteCardConfirmBody => 'Cette action est définitive.';
+
+  @override
+  String get cardActive => 'Active';
+
+  @override
+  String get cardInactive => 'Inactive';
+
+  @override
   String get likedCards => 'Cartes likées';
 
   @override
   String get settings => 'Réglages';
 
   @override
-  String get settingsSubtitle => 'Langue, thème, confidentialité';
+  String get settingsSubtitle => 'Langue, thème, autres';
+
+  @override
+  String get settingsLanguage => 'Langue';
+
+  @override
+  String get settingsLanguageBody =>
+      'FR/EN — recharge l\'interface et bascule le contenu (les cartes non traduites restent en français)';
+
+  @override
+  String get settingsLanguageFr => 'Français';
+
+  @override
+  String get settingsLanguageEn => 'Anglais';
+
+  @override
+  String get settingsTheme => 'Thème';
+
+  @override
+  String get settingsThemeLight => 'Clair';
+
+  @override
+  String get settingsThemeDark => 'Sombre';
+
+  @override
+  String get settingsThemeSystem => 'Système';
 
   @override
   String get noPlayersYet => 'Ajoute des joueurs pour voir le classement';
 
   @override
+  String get badgeUnlockedTitle => 'Félicitations !';
+
+  @override
+  String get badgeUnlockedBody => 'Tu as débloqué le badge';
+
+  @override
+  String get badgesTitle => 'Badges';
+
+  @override
+  String get badgesSubtitle => 'Débloqués en jouant.';
+
+  @override
+  String get badgeLocked => 'Verrouillé';
+
+  @override
+  String badgeEarnedOn(String date) {
+    return 'Débloqué le $date';
+  }
+
+  @override
   String get offlineReady => 'Hors-ligne prêt';
+
+  @override
+  String get signIn => 'Se connecter';
+
+  @override
+  String get goPremium => 'Devenir premium';
+
+  @override
+  String get comingSoon => 'Bientôt disponible';
 
   @override
   String get playersEdit => 'Modifier';

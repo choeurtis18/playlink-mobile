@@ -1,0 +1,309 @@
+# Cahier de recette — Playlink Mobile
+
+État au 16/09/2026. Couvre tout ce qui est **construit et testable manuellement**
+aujourd'hui : Phases 0 à 3 (fondations, back-office, jeu offline, progression
+locale). Les phases 4 à 6 (compte, communauté, stores) ne sont pas commencées —
+voir « Ce qui reste à développer » en fin de document.
+
+Coche chaque case au fur et à mesure. Pour un bug, note l'écran, l'action
+exacte et ce qui s'est passé — donne-moi ça et je regarde.
+
+---
+
+## 0. Avant de commencer
+
+### Lancer l'app mobile
+
+```
+cd apps/mobile
+flutter run
+```
+
+Choisis un simulateur iOS ou un appareil Android connecté si plusieurs
+cibles sont proposées. Le premier lancement seed la base locale depuis le
+contenu embarqué (1521 cartes, 8 jeux, 12 badges) — ça prend quelques
+secondes, écran de démarrage « Playlink ».
+
+### Accéder au back-office
+
+URL de production : **https://playlink-backoffice.vercel.app**
+
+Connexion éditeur via Clerk (compte `gamesplaylink@gmail.com` ou celui que
+tu as configuré). C'est un compte **éditeur**, distinct des joueurs de
+l'app — aucun lien entre les deux pour l'instant.
+
+---
+
+## 1. Back-office — CRUD de contenu
+
+### 1.1 Connexion
+- [ ] Aller sur l'URL du back-office sans être connecté → redirigé vers `/sign-in`.
+- [ ] Se connecter → arrive sur le back-office, plus de redirection.
+
+### 1.2 Jeux (`/jeux`)
+- [ ] La liste affiche les 8 jeux : Action ou Vérité, Icebreaker, Dégat Débat,
+  Qui de nous, Mime, Thé ou café, Dilemme, Devine le mot.
+- [ ] Ouvrir un jeu, modifier son nom ou sa description, enregistrer →
+  le changement est visible en revenant sur la liste.
+- [ ] Modifier les couleurs (`colorMain`/`colorSecondary`) d'un jeu →
+  visible plus tard dans l'app une fois republié (§1.6).
+- [ ] Créer un nouveau jeu de test → apparaît dans la liste, une catégorie
+  peut lui être rattachée (§1.3).
+- [ ] Supprimer ce jeu de test → disparaît de la liste.
+
+### 1.3 Catégories (`/categories`)
+- [ ] La liste affiche les catégories groupées par jeu.
+- [ ] Créer une catégorie sur un jeu existant → apparaît dans la liste.
+- [ ] Modifier le nom d'une catégorie → changement visible.
+- [ ] Essayer de créer une catégorie avec un slug déjà utilisé sur le même
+  jeu → message d'erreur clair (pas juste un code Prisma brut).
+
+### 1.4 Cartes (`/cartes`)
+- [ ] La liste affiche les cartes, filtrable par jeu/catégorie.
+- [ ] Créer une carte (texte + intensité 1-5 + tags) → apparaît dans la
+  liste de sa catégorie.
+- [ ] Modifier le texte d'une carte existante → enregistré.
+- [ ] Désactiver une carte (`active` off) → n'apparaît plus dans le compte
+  de cartes actives affiché ailleurs (page Publication notamment).
+- [ ] **Export CSV** : cliquer sur « Export CSV » → un fichier se
+  télécharge avec les cartes.
+- [ ] **Import CSV** (page `/publication`) : importer un petit CSV de
+  cartes → message « N cartes importées », les cartes apparaissent dans
+  `/cartes`.
+
+### 1.5 Règles (`/regles`)
+- [ ] Chaque jeu a des slides de règles (titre, texte, image).
+- [ ] Modifier le texte d'une slide → enregistré.
+- [ ] Réordonner les slides (si un contrôle de tri existe) → l'ordre change.
+
+### 1.6 Badges (`/badges`)
+- [ ] La liste affiche les 12 badges : Première victoire, Légende de
+  soirée, Papillon social, Chercheur de vérité, Triplé, Explorateur,
+  Oiseau de nuit, Auteur, Polyglotte, Curateur, Centurion, Marathonien.
+- [ ] Modifier la description d'un badge → enregistré (rappel : la **règle**
+  d'attribution est codée dans l'app mobile, le back-office ne modifie que
+  les métadonnées — nom/description/icône).
+
+### 1.7 Traductions (`/traductions`)
+- [ ] La page liste le contenu sans traduction anglaise (carte, catégorie,
+  slide…).
+- [ ] Ajouter une traduction EN sur une carte → elle disparaît de la liste
+  des manquants.
+
+### 1.8 Publication (`/publication`)
+- [ ] La page affiche la version courante publiée et le nombre de cartes
+  actives.
+- [ ] Après une modification de contenu (§1.2 à §1.6), un indicateur de
+  changements en attente apparaît.
+- [ ] Publier une nouvelle version → nouvelle ligne dans l'historique des
+  versions, avec la date.
+- [ ] `GET /content/latest` (visible dans l'historique ou en requêtant
+  l'URL directement) renvoie bien la dernière version publiée.
+
+---
+
+## 2. App mobile — Démarrage et onboarding
+
+- [ ] Premier lancement (désinstaller l'app ou vider les données avant si
+  déjà testée) → écran de démarrage « Playlink », puis onboarding.
+- [ ] Onboarding : 3 écrans (comment jouer, pas de compte requis,
+  consentement stats), bouton « Suivant » à chaque étape.
+- [ ] Toggle « Partager des stats anonymes » → togglable, aucun blocage
+  quel que soit le choix.
+- [ ] « Commencer » → arrive sur l'écran « Qui joue ce soir ? ».
+- [ ] Fermer et relancer l'app → l'onboarding ne réapparaît pas, direct sur
+  la home (ou l'écran joueurs si aucun joueur en session).
+
+---
+
+## 3. App mobile — Joueurs
+
+Écran « Qui joue ce soir ? » (premier lancement) et modale « Modifier »
+depuis la home (même comportement aux deux endroits).
+
+- [ ] Taper un prénom + bouton « + » → le joueur apparaît dans la liste
+  avec son avatar.
+- [ ] Ajouter un 2e joueur avec le **même prénom** (même casse ou pas) →
+  message « {nom} joue déjà ce soir », refusé.
+- [ ] Retirer un joueur qui n'a **jamais joué** (bouton ×) → disparaît
+  complètement de la liste.
+- [ ] Jouer une partie complète avec un joueur, puis le retirer (×) →
+  disparaît de la session, mais reste dans le classement (§5).
+- [ ] Retaper le prénom d'un joueur retiré (qui a déjà un historique) →
+  une feuille propose « Ajouter {nom} » (récupère ses stats) ou « Non,
+  créer un nouveau profil » (demande un nom différent).
+- [ ] Taper sur une tuile joueur (pas le ×) → ouvre « Modifier {nom} » :
+  changer le prénom, changer l'emoji (12 choix), enregistrer → visible
+  immédiatement dans la liste.
+- [ ] Essayer de renommer un joueur avec le prénom d'un **autre** joueur
+  existant → message d'erreur, pas d'écrasement silencieux.
+- [ ] « C'est parti » désactivé tant qu'aucun joueur n'est ajouté.
+
+---
+
+## 4. App mobile — Jouer une partie (les 8 jeux)
+
+Répète ce scénario pour **au moins 3 jeux différents** parmi les 8 (idéal :
+les 8, au moins une fois chacun pendant toute la recette — ça sert aussi à
+débloquer le badge Explorateur, voir §6).
+
+- [ ] Home : les 8 jeux sont affichés en grille, chacun avec son icône, son
+  dégradé de couleur, le nombre de catégories.
+- [ ] Ouvrir un jeu → bandeau dégradé avec icône/nom/nombre de catégories,
+  bouton retour, bouton « Règles ».
+- [ ] Bouton « Règles » → modale avec les slides d'explication, image fixe
+  en haut, texte qui scrolle, flèches ‹/› et pagination en bas.
+- [ ] Choisir une catégorie → écran config : aperçu d'une carte, intensité
+  (5 niveaux), nombre de cartes par partie (5/10/15/20).
+- [ ] Changer l'intensité → la carte d'aperçu change et correspond à
+  l'intensité choisie (revenir sur une intensité déjà vue affiche la
+  **même** carte, pas une nouvelle à chaque fois).
+- [ ] « Lancer la partie » → écran « C'est à ton tour ! » avec l'avatar du
+  premier joueur qui pulse doucement.
+- [ ] « Voir la carte » → la carte s'affiche avec son texte, dégradé du
+  jeu, catégorie en badge.
+- [ ] Voter Oui/Non → le score change, passage à la carte suivante ou au
+  joueur suivant.
+- [ ] Avec 2+ joueurs : écran « Passe le téléphone à {nom} » entre chaque
+  tour — fond dégradé plein écran, icône téléphone qui vibre, bouton
+  « C'est moi, {nom} → ».
+- [ ] Jeu « Devine le mot » : vérifier que le système d'indices fonctionne
+  (3 indices max, compteur qui descend).
+- [ ] Terminer une partie complète (toutes les cartes votées) → écran
+  résultats : podium (2e-1er-3e), scores, archétype de chaque joueur.
+- [ ] Si un badge se débloque à ce moment (ex. Première victoire à la
+  toute première partie) → modale « Félicitations ! » avant l'écran de
+  résultats, avec le nom et l'icône du badge.
+- [ ] Résultats : « Rejouer » → retour à la page catégorie du même jeu
+  (pas directement la config). « Accueil » → retour home, scores
+  conservés.
+- [ ] Quitter une partie en cours (bouton X en haut à gauche pendant le
+  jeu) → confirmation demandée avant d'abandonner.
+
+---
+
+## 5. App mobile — Classement (onglet bottom nav)
+
+- [ ] Onglet « Classement » → liste des profils de l'appareil, triés par
+  score total décroissant, avec médaille pour le podium (1er/2e/3e).
+- [ ] Chaque ligne affiche : avatar, nom, archétype, score total, nombre
+  de parties.
+- [ ] Taper sur un joueur dans la liste → ouvre la feuille « Modifier »
+  (même comportement que sur l'écran joueurs, §3).
+- [ ] Un joueur retiré de la session mais ayant déjà joué **reste visible**
+  ici avec ses stats à jour.
+- [ ] Aucun joueur enregistré → message invitant à ajouter des joueurs.
+
+---
+
+## 6. App mobile — Badges (Profil → Badges)
+
+- [ ] Grille 2 colonnes : badges débloqués (icône colorée, date de
+  déblocage) et verrouillés (grisés, condition affichée en clair).
+- [ ] Vérifier qu'au moins ces badges sont atteignables sans trop d'efforts
+  pendant la recette :
+  - [ ] **Première victoire** — dès le premier point marqué.
+  - [ ] **Explorateur** — une partie dans chacun des 8 jeux.
+  - [ ] **Triplé** — gagner 3 parties d'affilée avec le même joueur.
+  - [ ] **Polyglotte** — jouer une partie en FR, une en EN (§8 pour changer
+    la langue).
+  - [ ] **Auteur** — créer 5 cartes personnalisées (§7).
+- [ ] Les badges **Curateur** (likes) restent verrouillés en permanence
+  pour l'instant — normal, la fonctionnalité de likes n'existe pas encore
+  (Phase 5).
+
+---
+
+## 7. App mobile — Mes cartes (Profil → Mes cartes)
+
+- [ ] Liste vide au départ → message « Aucune carte créée pour l'instant ».
+- [ ] Bouton « + » → formulaire : jeu (menu déroulant), catégorie (menu
+  déroulant, **doit être pré-rempli automatiquement** dès l'ouverture,
+  pas vide), texte, « Enregistrer ».
+- [ ] Créer une carte → apparaît dans la liste, active par défaut (switch
+  vert à droite).
+- [ ] Aller jouer une partie dans le jeu/catégorie choisis (§4) avec assez
+  de cartes pour que le tirage ait une chance de la sortir (ou réduire le
+  nombre de cartes par partie pour augmenter la probabilité) → la carte
+  perso doit pouvoir apparaître dans la partie.
+- [ ] Désactiver une carte (switch) directement depuis la liste → elle
+  n'entre plus dans le pool de tirage, mais reste dans la liste « Mes
+  cartes ».
+- [ ] Taper sur une carte de la liste → ouvre « Modifier la carte » avec le
+  texte pré-rempli, jeu/catégorie non modifiables à l'édition, toggle
+  actif visible.
+- [ ] Modifier le texte, enregistrer → changement visible dans la liste.
+- [ ] Supprimer une carte (bouton dans le formulaire d'édition) →
+  confirmation demandée, puis disparaît vraiment de la liste.
+
+---
+
+## 8. App mobile — Réglages (Profil → Réglages)
+
+- [ ] Section Langue : Français / Anglais, sélection visible (pilule
+  dégradée sur le choix actif).
+- [ ] Basculer en anglais → **toute l'interface** change immédiatement
+  (titres, boutons, labels) sans redémarrer l'app.
+- [ ] Basculer en anglais puis rejouer une partie → les cartes affichées
+  sont en anglais (ou en français avec un indicateur discret si la carte
+  n'a pas de traduction — comportement de repli normal).
+- [ ] Revenir en français.
+- [ ] Section Thème : Clair / Sombre / Système.
+- [ ] Basculer sur Clair → **toute l'app** passe en fond clair, texte
+  sombre lisible partout (home, jeu, badges, profil, joueurs…) — pas
+  seulement l'écran Réglages.
+- [ ] Basculer sur Système → l'app suit le réglage clair/sombre de
+  l'appareil (changer ce réglage dans les paramètres iOS/Android doit
+  faire basculer l'app en direct).
+- [ ] Revenir sur Sombre (thème par défaut).
+
+---
+
+## 9. App mobile — Profil et façade compte
+
+- [ ] Écran Profil : bloc « Tout marche sans compte » avec bouton « Créer
+  un compte » — **désactivé pour l'instant**, normal (Phase 4).
+- [ ] Tuiles « Mes cartes » et « Badges » cliquables (§6, §7). Tuile
+  « Cartes likées » **non cliquable** — normal, nécessite un compte
+  (Phase 5).
+- [ ] Sur la home : bouton « Se connecter » en haut à droite → tap →
+  message « Bientôt disponible », le bouton devient « Devenir premium ».
+  Retaper dessus → message à nouveau, le bouton disparaît (état
+  « premium »). C'est une **façade de démonstration**, aucun vrai compte
+  n'est créé — normal, à re-tester à chaque relance de l'app (l'état ne
+  persiste pas entre sessions par design).
+
+---
+
+## 10. Comportements transverses à vérifier
+
+- [ ] Mode avion activé sur l'appareil → l'app fonctionne intégralement
+  (aucune action ne doit être bloquée par l'absence de réseau).
+- [ ] Fermer complètement l'app en pleine partie, la rouvrir → au minimum,
+  aucun crash ; le comportement attendu est de revenir à l'accueil (la
+  reprise de partie en cours n'est pas garantie, ce n'est pas un bug).
+- [ ] Naviguer beaucoup entre les écrans (jeu → règles → retour → config
+  → retour → home) → jamais de bottom nav visible pendant un écran de
+  jeu (page jeu, config, partie).
+- [ ] Bouton retour matériel Android (si testé sur Android) → comportement
+  cohérent avec les flèches retour à l'écran.
+
+---
+
+## Ce qui reste à développer
+
+Rien de ce qui suit n'est testable aujourd'hui — c'est normal de tomber sur
+des tuiles désactivées ou des boutons « Bientôt disponible » aux endroits
+listés ci-dessus.
+
+- **Phase 4 — Compte & synchronisation** : connexion réelle (Clerk) côté
+  app, fusion des données locales vers le cloud, récupération de la
+  progression sur un autre appareil, suppression de compte (RGPD).
+- **Phase 5 — Communauté & analytics** : liker une carte, partager un
+  score (image + lien), publier ses cartes perso au catalogue officiel
+  depuis le back-office, badge Curateur, vrai envoi des statistiques
+  d'usage (PostHog), dashboard de stats et cron d'agrégation.
+- **Phase 6 — Polish & mise en boutique** : notifications push, mise à
+  jour du contenu par-dessus l'app sans nouvelle publication en magasin,
+  icônes et écran de démarrage définitifs, fiches App Store / Google
+  Play, publication sur TestFlight et la piste de test Google Play.

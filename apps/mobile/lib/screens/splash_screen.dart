@@ -77,7 +77,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     style: const TextStyle(color: PlColors.danger, fontSize: 12)),
               )
             else
-              Text(t.loadingContent, style: const TextStyle(color: PlColors.neutralFaint, fontSize: 12)),
+              // Écran toujours sombre (avant chargement des préférences,
+              // §10) : `inkSoft` — la même couleur "soft" que le thème
+              // sombre applique ailleurs — pas `Theme.of(context)`, jamais
+              // pertinent ici.
+              Text(t.loadingContent, style: const TextStyle(color: PlColors.inkSoft, fontSize: 12)),
           ],
         ),
       ),

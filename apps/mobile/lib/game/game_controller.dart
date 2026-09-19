@@ -8,6 +8,7 @@ import '../core/session.dart';
 import '../data/content_repository.dart';
 import '../data/database.dart';
 import '../data/providers.dart';
+import '../screens/badges_screen.dart' show badgesListProvider;
 
 /// Écran à afficher, dérivé de l'état — jamais stocké à part (B3→B6).
 enum GameStage { turn, card, vote, pass, results }
@@ -26,6 +27,7 @@ class GameState {
     this.voting = false,
     this.pendingPass = false,
     this.hintsLeft = 0,
+    this.newlyEarnedBadges = const [],
   });
 
   final GameVm game;
@@ -40,6 +42,10 @@ class GameState {
   final bool voting;
   final bool pendingPass;
   final int hintsLeft;
+  /// Clés de badges débloqués PAR cette partie (B6) — pour la modale de
+  /// félicitations avant l'écran de résultats. Vide tant que la partie
+  /// n'est pas terminée.
+  final List<String> newlyEarnedBadges;
 
   GameStage get stage {
     if (session.phase == SessionPhase.results) return GameStage.results;
@@ -60,6 +66,7 @@ class GameState {
     bool? voting,
     bool? pendingPass,
     int? hintsLeft,
+    List<String>? newlyEarnedBadges,
   }) {
     return GameState(
       game: game, category: category, deck: deck, intensity: intensity,
@@ -70,6 +77,7 @@ class GameState {
       voting: voting ?? this.voting,
       pendingPass: pendingPass ?? this.pendingPass,
       hintsLeft: hintsLeft ?? this.hintsLeft,
+      newlyEarnedBadges: newlyEarnedBadges ?? this.newlyEarnedBadges,
     );
   }
 }
@@ -220,6 +228,17 @@ class GameController extends Notifier<GameState?> {
           },
           cumulativeTagScores: s.session.tagScoresGained,
         );
+
+    // Après le cumul des scores/parties sur les profils : certaines règles
+    // (party_legend, centurion, marathon…) lisent ces totaux à jour.
+    final newlyEarned = await ref.read(badgesRepositoryProvider).checkAndAward();
+    if (newlyEarned.isNotEmpty && state != null) {
+      state = state!.copyWith(newlyEarnedBadges: newlyEarned.toList());
+    }
+    // L'écran Badges (D4), si déjà visité cette session, ne recalculerait
+    // jamais son état sans ça — `badgesListProvider` est `autoDispose` mais
+    // reste vivant tant qu'un widget l'observe encore ailleurs dans la pile.
+    ref.invalidate(badgesListProvider);
   }
 }
 
