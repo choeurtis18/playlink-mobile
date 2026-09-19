@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, ConfirmButton, Field, Input, Modal, Textarea } from "@/components/ui";
+import { BADGE_ICON_CHOICES, Button, ConfirmButton, Field, IconPicker, Input, Modal, Textarea } from "@/components/ui";
 import { deleteBadge, saveBadge } from "@/lib/actions";
 
 type Badge = { id: string; key: string; name: string; description: string; icon: string; order: number };
@@ -14,10 +14,8 @@ function Fields({ badge, presetKey }: { badge?: Badge; presetKey?: string }) {
       </Field>
       <Field label="Nom"><Input name="name" defaultValue={badge?.name} required /></Field>
       <Field label="Description"><Textarea name="description" rows={2} defaultValue={badge?.description} required /></Field>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Icône"><Input name="icon" defaultValue={badge?.icon} required maxLength={4} placeholder="🏆" /></Field>
-        <Field label="Ordre"><Input type="number" name="order" defaultValue={badge?.order ?? 0} min={0} /></Field>
-      </div>
+      <Field label="Icône"><IconPicker name="icon" defaultValue={badge?.icon} choices={BADGE_ICON_CHOICES} /></Field>
+      <Field label="Ordre"><Input type="number" name="order" defaultValue={badge?.order ?? 0} min={0} /></Field>
     </>
   );
 }

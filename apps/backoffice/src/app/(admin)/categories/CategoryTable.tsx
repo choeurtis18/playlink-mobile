@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, ConfirmButton, Field, Input, Modal, Select, Textarea } from "@/components/ui";
+import { Button, ConfirmButton, Field, IconPicker, Input, Modal, Select, Textarea } from "@/components/ui";
 import { deleteCategory, saveCategory } from "@/lib/actions";
 
 type Game = { id: string; name: string; icon: string | null };
@@ -23,10 +23,8 @@ function Fields({ cat, games }: { cat?: Cat; games: Game[] }) {
         <Input name="slug" defaultValue={cat?.slug} required pattern="[a-z0-9-]+" placeholder="ma-categorie" />
       </Field>
       <Field label="Description"><Textarea name="description" rows={2} defaultValue={cat?.description ?? ""} /></Field>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Icône"><Input name="icon" defaultValue={cat?.icon ?? ""} maxLength={4} placeholder="🎲" /></Field>
-        <Field label="Ordre"><Input type="number" name="order" defaultValue={cat?.order ?? 0} min={0} /></Field>
-      </div>
+      <Field label="Icône"><IconPicker name="icon" defaultValue={cat?.icon} /></Field>
+      <Field label="Ordre"><Input type="number" name="order" defaultValue={cat?.order ?? 0} min={0} /></Field>
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ImportForm, PublishButton } from "./PublishForm";
+import { PublishButton } from "./PublishForm";
 
 export const dynamic = "force-dynamic";
 
@@ -35,13 +35,14 @@ export default async function Publication() {
         <PublishButton changes={changes} />
       </div>
 
-      <div className="mb-6 rounded-lg border border-hairline bg-surface p-4">
-        <h2 className="mb-3 font-medium">Import CSV</h2>
-        <ImportForm />
-      </div>
+      <p className="mb-6 text-sm text-neutral-faint">
+        Import en masse : bouton « Importer » sur les pages{" "}
+        <a href="/cartes" className="text-accent hover:underline">Cartes</a> et{" "}
+        <a href="/jeux" className="text-accent hover:underline">Jeux</a>.
+      </p>
 
       <h2 className="mb-3 font-medium">Historique des versions</h2>
-      <div className="mb-6 overflow-hidden rounded-lg border border-hairline">
+      <div className="mb-6 overflow-x-auto rounded-lg border border-hairline">
         <table className="w-full text-sm">
           <thead className="bg-raised text-left text-xs text-neutral-faint">
             <tr><th className="p-3">Version</th><th className="p-3">Publiée le</th><th className="p-3">Changelog</th></tr>
@@ -62,7 +63,7 @@ export default async function Publication() {
       {recentLogs.length > 0 && (
         <>
           <h2 className="mb-3 font-medium">Activité récente</h2>
-          <div className="overflow-hidden rounded-lg border border-hairline">
+          <div className="overflow-x-auto rounded-lg border border-hairline">
             <table className="w-full text-sm">
               <tbody>
                 {recentLogs.map((l) => (

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { DeleteCardButton, EditCardButton, NewCardButton, ToggleActive } from "./CardEditor";
+import { ImportButton } from "@/components/ui";
+import { importCards } from "@/lib/actions";
+import { CardFilters, DeleteCardButton, EditCardButton, NewCardButton, ToggleActive } from "./CardEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -9,22 +11,24 @@ const PER_PAGE = 50;
 export default async function Cartes({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; jeu?: string; intensite?: string; q?: string; sansEn?: string }>;
+  searchParams: Promise<{ page?: string; jeu?: string; categorie?: string; intensite?: string; q?: string; sansEn?: string }>;
 }) {
   const sp = await searchParams;
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
   const where = {
-    ...(sp.jeu ? { category: { game: { slug: sp.jeu } } } : {}),
+    ...(sp.categorie
+      ? { category: { slug: sp.categorie, ...(sp.jeu ? { game: { slug: sp.jeu } } : {}) } }
+      : sp.jeu ? { category: { game: { slug: sp.jeu } } } : {}),
     ...(sp.intensite ? { intensity: parseInt(sp.intensite, 10) } : {}),
     ...(sp.q ? { text: { contains: sp.q, mode: "insensitive" as const } } : {}),
     ...(sp.sansEn ? { translations: { none: { locale: "en" } } } : {}),
   };
 
   const [games, categories, total, cards] = await Promise.all([
-    prisma.game.findMany({ orderBy: { order: "asc" }, select: { slug: true, name: true } }),
+    prisma.game.findMany({ orderBy: { order: "asc" }, select: { id: true, slug: true, name: true, colorMain: true, colorSecondary: true } }),
     prisma.category.findMany({
       orderBy: [{ game: { order: "asc" } }, { order: "asc" }],
-      select: { id: true, name: true, game: { select: { name: true } } },
+      select: { id: true, name: true, slug: true, gameId: true, game: { select: { name: true, slug: true } } },
     }),
     prisma.card.count({ where }),
     prisma.card.findMany({
@@ -55,30 +59,17 @@ export default async function Cartes({
             className="rounded border border-hairline px-3 py-1.5 text-sm text-ink-soft hover:bg-surface">
             Export CSV
           </a>
-          <NewCardButton categories={categories} />
+          <ImportButton
+            templateHref="/api/templates/cards"
+            columns="id, jeu, categorie, texte, intensite, tags, actif, ordre, texte_en"
+            notes="Une ligne avec id met à jour, sans id crée. jeu/categorie doivent correspondre au nom exact existant. Tout ou rien : une erreur annule l'import entier."
+            action={importCards}
+          />
+          <NewCardButton games={games} categories={categories} />
         </div>
       </div>
 
-      <form className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-        <input name="q" defaultValue={sp.q} placeholder="Rechercher…"
-          className="rounded border border-hairline bg-surface px-3 py-1.5" />
-        <select name="jeu" defaultValue={sp.jeu ?? ""} className="rounded border border-hairline bg-surface px-3 py-1.5">
-          <option value="">Tous les jeux</option>
-          {games.map((g) => <option key={g.slug} value={g.slug}>{g.name}</option>)}
-        </select>
-        <select name="intensite" defaultValue={sp.intensite ?? ""} className="rounded border border-hairline bg-surface px-3 py-1.5">
-          <option value="">Toutes intensités</option>
-          {[1, 2, 3, 4, 5].map((i) => <option key={i} value={i}>Intensité {i}</option>)}
-        </select>
-        <label className="flex items-center gap-1.5 text-ink-soft">
-          <input type="checkbox" name="sansEn" value="1" defaultChecked={!!sp.sansEn} />
-          sans traduction EN
-        </label>
-        <button className="rounded bg-accent px-3 py-1.5 font-medium text-white">Filtrer</button>
-        {(sp.q || sp.jeu || sp.intensite || sp.sansEn) && (
-          <Link href="/cartes" className="text-neutral-faint hover:text-ink">réinitialiser</Link>
-        )}
-      </form>
+      <CardFilters games={games} categories={categories} sp={sp} />
 
       <div className="overflow-x-auto rounded-lg border border-hairline">
         <table className="w-full text-sm">
@@ -104,7 +95,7 @@ export default async function Cartes({
                   <div className="flex gap-1">
                     <EditCardButton
                       card={{ id: c.id, text: c.text, intensity: c.intensity, tags: c.tags, active: c.active, order: c.order, categoryId: c.category.id }}
-                      categories={categories} />
+                      games={games} categories={categories} />
                     <ToggleActive id={c.id} active={c.active} />
                     <DeleteCardButton id={c.id} />
                   </div>

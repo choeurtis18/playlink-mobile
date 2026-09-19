@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { DeleteSlideButton, EditSlideButton, NewSlideButton } from "./SlideEditor";
+import { NewSlideButton } from "./SlideEditor";
+import { SlideList } from "./SlideList";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,10 @@ export default async function Regles({ searchParams }: { searchParams: Promise<{
   const sp = await searchParams;
   const games = await prisma.game.findMany({
     orderBy: { order: "asc" },
-    select: { id: true, slug: true, name: true, icon: true, _count: { select: { ruleSlides: true } } },
+    select: {
+      id: true, slug: true, name: true, icon: true, colorMain: true, colorSecondary: true,
+      _count: { select: { ruleSlides: true } },
+    },
   });
   const current = games.find((g) => g.slug === sp.jeu) ?? games[0];
 
@@ -40,32 +44,17 @@ export default async function Regles({ searchParams }: { searchParams: Promise<{
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-medium">{current.icon} {current.name} — {slides.length} slides</h2>
             <NewSlideButton gameId={current.id} gameName={current.name}
+              gameColors={{ colorMain: current.colorMain, colorSecondary: current.colorSecondary }}
               nextOrder={slides.length ? Math.max(...slides.map((s) => s.order)) + 1 : 0} />
           </div>
 
-          <div className="flex flex-col gap-3">
-            {slides.map((s) => (
-              <div key={s.id} className="rounded-lg border border-hairline bg-surface p-4">
-                <div className="flex items-start gap-4">
-                  <span className="mt-1 w-6 shrink-0 text-sm text-neutral-faint">{s.order}</span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium">{s.title}</div>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-ink-soft">{s.content}</p>
-                    {s.imageRef && <code className="mt-2 block text-xs text-neutral-faint">{s.imageRef}</code>}
-                  </div>
-                  <div className="flex shrink-0 gap-1">
-                    <EditSlideButton slide={{ id: s.id, gameId: s.gameId, title: s.title, content: s.content, order: s.order }} />
-                    <DeleteSlideButton id={s.id} />
-                  </div>
-                </div>
-              </div>
-            ))}
-            {!slides.length && (
-              <p className="rounded-lg border border-hairline bg-surface p-4 text-sm text-neutral-faint">
-                Aucune slide pour ce jeu.
-              </p>
-            )}
-          </div>
+          {slides.length ? (
+            <SlideList slides={slides} gameColors={{ colorMain: current.colorMain, colorSecondary: current.colorSecondary }} />
+          ) : (
+            <p className="rounded-lg border border-hairline bg-surface p-4 text-sm text-neutral-faint">
+              Aucune slide pour ce jeu.
+            </p>
+          )}
         </>
       )}
     </>

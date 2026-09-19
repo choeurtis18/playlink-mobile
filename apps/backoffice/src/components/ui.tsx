@@ -38,11 +38,14 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return <select {...props} className={`${inputCls} ${props.className ?? ""}`} />;
 }
 
-/** Modale de formulaire : soumet une Server Action et affiche son erreur. */
-export function Modal({ title, open, onClose, action, children }: {
+/** Modale de formulaire : soumet une Server Action et affiche son erreur.
+ * `wide` : plus large que le formulaire standard — pour les cas avec
+ * aperçu visuel affiché en regard des champs (jeu, carte, règle). */
+export function Modal({ title, open, onClose, action, children, wide = false }: {
   title: string; open: boolean; onClose: () => void;
   action: (form: FormData) => Promise<ActionResult>;
   children: React.ReactNode;
+  wide?: boolean;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -51,7 +54,7 @@ export function Modal({ title, open, onClose, action, children }: {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-6"
       onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-5">
+      <div className={`w-full rounded-lg border border-hairline bg-surface p-5 ${wide ? "max-w-3xl" : "max-w-lg"}`}>
         <h2 className="mb-4 text-lg font-semibold">{title}</h2>
         <form
           action={(fd) => start(async () => {
@@ -69,6 +72,116 @@ export function Modal({ title, open, onClose, action, children }: {
         </form>
       </div>
     </div>
+  );
+}
+
+// Émojis prédéfinis pour jeux/catégories — thématique "jeux de soirée,
+// discussion, confession" plutôt qu'une liste emoji générique. Les icônes
+// déjà présentes dans le contenu réel (content_v3.json) y figurent toutes,
+// pour que resélectionner l'existant reste possible depuis la grille.
+export const ICON_CHOICES = [
+  "🎲", "🎯", "🎭", "🎪", "🎬", "🎤", "🎉", "🎊",
+  "❤️", "💕", "💘", "💔", "😘", "😏", "😄", "😱",
+  "🤡", "🤫", "🤪", "🤝", "🧠", "👀", "🔍", "🕵️",
+  "💬", "💭", "💼", "🏠", "🌍", "🌶️", "🔥", "🧊",
+  "⚖️", "✨", "🔴", "🟡", "🟢", "📦", "🍕", "🍺",
+  "🃏", "🎮", "⏱️", "🏆", "💡", "🎁", "😈", "👑",
+] as const;
+
+/** Émojis prédéfinis pour les badges — récompenses/progression, distincts
+ * de la thématique "jeu de soirée" de `ICON_CHOICES`. */
+export const BADGE_ICON_CHOICES = [
+  "🏆", "🥇", "🥈", "🥉", "🎖️", "🏅", "👑", "⭐",
+  "🌟", "💫", "🔥", "⚡", "🚀", "💎", "🎯", "🧩",
+  "🦋", "🦉", "🦄", "🐉", "🌙", "☀️", "🎓", "📈",
+] as const;
+
+/** Sélecteur d'icône : grille d'émojis prédéfinis + champ libre en repli
+ * (un emoji hors liste reste possible, saisi à la main). `onChange`
+ * optionnel : pour un parent qui veut refléter le choix ailleurs (aperçu
+ * en direct) sans devenir lui-même responsable de la valeur soumise. */
+export function IconPicker({
+  name, defaultValue, choices = ICON_CHOICES, onChange,
+}: { name: string; defaultValue?: string | null; choices?: readonly string[]; onChange?: (v: string) => void }) {
+  const [value, setValue] = useState(defaultValue ?? "");
+  const update = (v: string) => { setValue(v); onChange?.(v); };
+  return (
+    <div>
+      <input type="hidden" name={name} value={value} />
+      <div className="mb-2 grid grid-cols-8 gap-1.5">
+        {choices.map((icon) => (
+          <button key={icon} type="button" onClick={() => update(icon)}
+            aria-pressed={value === icon}
+            className={`flex h-8 w-8 items-center justify-center rounded border text-base transition ${
+              value === icon ? "border-accent bg-accent/20" : "border-hairline hover:bg-raised"
+            }`}>
+            {icon}
+          </button>
+        ))}
+      </div>
+      <input value={value} onChange={(e) => update(e.target.value)} maxLength={4}
+        placeholder="ou un autre émoji…" className={inputCls} />
+    </div>
+  );
+}
+
+/** Bouton "Importer" + modale (upload CSV, lien modèle, doc du format) —
+ * pas basé sur `Modal` : l'action reçoit le texte du fichier lu côté
+ * client, pas un `FormData` de champs de formulaire. */
+export function ImportButton({
+  label = "Importer", templateHref, templateLabel = "Télécharger le modèle CSV",
+  columns, notes, action,
+}: {
+  label?: string;
+  templateHref: string;
+  templateLabel?: string;
+  columns: string;
+  notes: string;
+  action: (csvText: string) => Promise<ActionResult & { count?: number }>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<string | null>(null);
+  const [pending, start] = useTransition();
+
+  return (
+    <>
+      <Button variant="ghost" onClick={() => setOpen(true)}>{label}</Button>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-6"
+          onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+          <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">{label}</h2>
+              <a href={templateHref} className="text-sm text-accent hover:underline">{templateLabel}</a>
+            </div>
+            <input type="file" accept=".csv,text/csv"
+              className="block w-full text-sm text-ink-soft file:mr-3 file:rounded file:border-0 file:bg-raised file:px-3 file:py-1.5 file:text-sm file:text-ink"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                start(async () => {
+                  setError(null); setResult(null);
+                  const text = await file.text();
+                  const r = await action(text);
+                  if (r.ok) setResult(`${r.count} ligne(s) importée(s)`);
+                  else setError(r.error);
+                  e.target.value = "";
+                });
+              }} />
+            <p className="mt-2 text-xs text-neutral-faint">
+              Colonnes attendues : <code>{columns}</code>. {notes}
+            </p>
+            {pending && <p className="mt-2 text-sm text-neutral-faint">Import en cours…</p>}
+            {result && <p className="mt-2 text-sm text-green-400">{result}</p>}
+            {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+            <div className="mt-4 flex justify-end">
+              <Button variant="ghost" onClick={() => setOpen(false)}>Fermer</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

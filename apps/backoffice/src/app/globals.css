@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
 /* Le back-office suit la direction sombre de l'app (§10) : même univers
-   visuel, mais outil de travail — densité d'information avant tout. */
+   visuel, mais outil de travail — densité d'information avant tout.
+   `neutral-faint` éclairci (#5c5770 → #918ca6) : le ton d'origine tombait
+   à ~2.6:1 sur `ground`/`surface`/`raised`, bien en dessous du minimum
+   WCAG AA (4.5:1 texte normal) — illisible en usage réel. La nouvelle
+   valeur reste clairement "en retrait" par rapport à `ink-soft` tout en
+   passant 5:1+ sur les trois fonds. */
 @theme {
   --color-ground: #0b0a0f;
   --color-surface: #17151d;
@@ -9,7 +14,7 @@
   --color-hairline: #2a2733;
   --color-ink: #f3f1ec;
   --color-ink-soft: #c7c2d1;
-  --color-neutral-faint: #5c5770;
+  --color-neutral-faint: #918ca6;
   --color-accent: #f23a6b;
 }
 

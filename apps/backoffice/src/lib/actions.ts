@@ -175,6 +175,16 @@ export async function saveGame(id: string | null, form: FormData): Promise<Actio
   }, ["/jeux", "/categories", "/", "/publication"]);
 }
 
+/** Réordonne les jeux après un drag & drop, même principe que `reorderSlides`. */
+export async function reorderGames(ids: string[]): Promise<ActionResult> {
+  return run(async (adminId) => {
+    await prisma.$transaction(
+      ids.map((id, i) => prisma.game.update({ where: { id }, data: { order: i } })),
+    );
+    await logAction(adminId, "reordered_games", "game", "bulk", { count: ids.length });
+  }, ["/jeux", "/categories", "/", "/publication"]);
+}
+
 // ── Badges ────────────────────────────────────────────────────────────
 
 export async function saveBadge(id: string | null, form: FormData): Promise<ActionResult> {
@@ -227,6 +237,17 @@ export async function deleteSlide(id: string): Promise<ActionResult> {
   return run(async (adminId) => {
     await prisma.gameRuleSlide.delete({ where: { id } });
     await logAction(adminId, "deleted_slide", "slide", id);
+  }, ["/regles", "/"]);
+}
+
+/** Réordonne les slides d'un jeu après un drag & drop : `ids` dans le
+ * nouvel ordre visuel devient le nouvel `order` (0, 1, 2…). */
+export async function reorderSlides(ids: string[]): Promise<ActionResult> {
+  return run(async (adminId) => {
+    await prisma.$transaction(
+      ids.map((id, i) => prisma.gameRuleSlide.update({ where: { id }, data: { order: i } })),
+    );
+    await logAction(adminId, "reordered_slides", "slide", "bulk", { count: ids.length });
   }, ["/regles", "/"]);
 }
 
@@ -297,6 +318,98 @@ export async function importCards(csvText: string): Promise<ActionResult & { cou
     await logAction(editor.id, "imported_cards", "card", "bulk", { count: ops.length });
     revalidatePath("/cartes"); revalidatePath("/"); revalidatePath("/traductions");
     return { ok: true, count: ops.length };
+  } catch (e) {
+    return { ok: false, error: humanize(e) };
+  }
+}
+
+/**
+ * Import en masse de jeux et catégories, dans le même CSV.
+ *
+ * Une ligne où `categorie_slug` est vide crée/met à jour le JEU
+ * (`jeu_slug` upsert) ; une ligne où il est rempli crée/met à jour une
+ * CATÉGORIE rattachée à ce jeu. `jeu_slug` seul suffit alors — les autres
+ * colonnes jeu_* sont ignorées sur ces lignes (le jeu existe déjà, créé
+ * par sa propre ligne, avant ou après peu importe l'ordre).
+ */
+export async function importGames(csvText: string): Promise<ActionResult & { count?: number }> {
+  try {
+    const editor = await requireEditor();
+    const { parseCsv } = await import("./csv");
+    const rows = parseCsv(csvText);
+    if (!rows.length) return { ok: false, error: "CSV vide ou en-tête manquant" };
+
+    const gameOps: { slug: string; data: Record<string, unknown> }[] = [];
+    const catOps: { gameSlug: string; slug: string; data: Record<string, unknown> }[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const line = i + 2;
+      const gameSlug = (r.jeu_slug ?? "").trim();
+      if (!gameSlug) throw new Error(`Ligne ${line} : jeu_slug vide`);
+
+      const catSlug = (r.categorie_slug ?? "").trim();
+      if (!catSlug) {
+        // Ligne jeu.
+        const name = (r.jeu_nom ?? "").trim();
+        if (!name) throw new Error(`Ligne ${line} : jeu_nom vide`);
+        const colorMain = (r.jeu_couleur1 ?? "").trim();
+        const colorSecondary = (r.jeu_couleur2 ?? "").trim();
+        if (!/^#[0-9A-Fa-f]{6}$/.test(colorMain)) throw new Error(`Ligne ${line} : jeu_couleur1 "${colorMain}" invalide (format #RRGGBB)`);
+        if (!/^#[0-9A-Fa-f]{6}$/.test(colorSecondary)) throw new Error(`Ligne ${line} : jeu_couleur2 "${colorSecondary}" invalide (format #RRGGBB)`);
+        gameOps.push({
+          slug: gameSlug,
+          data: {
+            name, slug: gameSlug,
+            description: (r.jeu_description ?? "").trim() || null,
+            icon: (r.jeu_icone ?? "").trim() || null,
+            colorMain, colorSecondary,
+            active: r.jeu_actif !== "0",
+            order: parseInt(r.jeu_ordre ?? "0", 10) || 0,
+          },
+        });
+      } else {
+        // Ligne catégorie, rattachée au jeu de cette même ligne.
+        const name = (r.categorie_nom ?? "").trim();
+        if (!name) throw new Error(`Ligne ${line} : categorie_nom vide`);
+        catOps.push({
+          gameSlug,
+          slug: catSlug,
+          data: {
+            name, slug: catSlug,
+            description: (r.categorie_description ?? "").trim() || null,
+            icon: (r.categorie_icone ?? "").trim() || null,
+            order: parseInt(r.categorie_ordre ?? "0", 10) || 0,
+          },
+        });
+      }
+    }
+
+    let count = 0;
+    await prisma.$transaction(async (tx) => {
+      for (const op of gameOps) {
+        await tx.game.upsert({
+          where: { slug: op.slug },
+          create: { ...op.data, originalLocale: "fr" } as never,
+          update: op.data,
+        });
+        count++;
+      }
+      for (const op of catOps) {
+        const game = await tx.game.findUnique({ where: { slug: op.gameSlug }, select: { id: true } });
+        if (!game) throw new Error(`Catégorie "${op.slug}" : jeu "${op.gameSlug}" introuvable`);
+        await tx.category.upsert({
+          where: { gameId_slug: { gameId: game.id, slug: op.slug } },
+          create: { ...op.data, gameId: game.id, originalLocale: "fr" } as never,
+          update: op.data,
+        });
+        count++;
+      }
+    });
+
+    await logAction(editor.id, "imported_games", "game", "bulk", { count });
+    revalidatePath("/jeux"); revalidatePath("/categories"); revalidatePath("/"); revalidatePath("/publication");
+    return { ok: true, count };
   } catch (e) {
     return { ok: false, error: humanize(e) };
   }

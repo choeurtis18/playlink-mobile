@@ -2,39 +2,60 @@
 
 import { useState } from "react";
 import { Button, ConfirmButton, Field, Input, Modal, Textarea } from "@/components/ui";
+import { RulesSlidePreview } from "@/components/RulesSlidePreview";
 import { deleteSlide, saveSlide } from "@/lib/actions";
 
 type Slide = { id: string; gameId: string; title: string; content: string; order: number };
+type Game = { colorMain: string; colorSecondary: string };
 
-export function NewSlideButton({ gameId, gameName, nextOrder }: { gameId: string; gameName: string; nextOrder: number }) {
+function SlideFields({ slide, defaultOrder, gameColors }: { slide?: Slide; defaultOrder: number; gameColors: Game }) {
+  const [title, setTitle] = useState(slide?.title ?? "");
+  const [content, setContent] = useState(slide?.content ?? "");
+
+  return (
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-[1fr_auto]">
+      <div className="flex flex-col gap-3">
+        <Field label="Titre">
+          <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={200} />
+        </Field>
+        <Field label="Contenu" hint="Markdown accepté (**gras**).">
+          <Textarea name="content" rows={7} value={content} onChange={(e) => setContent(e.target.value)} required maxLength={2000} />
+        </Field>
+        <Field label="Ordre"><Input type="number" name="order" defaultValue={defaultOrder} min={0} /></Field>
+      </div>
+      <div className="flex min-w-0 flex-col items-center gap-2">
+        <span className="text-xs text-neutral-faint">Aperçu dans l&apos;app</span>
+        <RulesSlidePreview title={title} content={content} colorMain={gameColors.colorMain} colorSecondary={gameColors.colorSecondary} />
+      </div>
+    </div>
+  );
+}
+
+export function NewSlideButton({ gameId, gameName, gameColors, nextOrder }: {
+  gameId: string; gameName: string; gameColors: Game; nextOrder: number;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button onClick={() => setOpen(true)}>Nouvelle slide</Button>
-      <Modal title={`Nouvelle slide — ${gameName}`} open={open} onClose={() => setOpen(false)}
+      <Modal title={`Nouvelle slide — ${gameName}`} open={open} onClose={() => setOpen(false)} wide
         action={(fd) => saveSlide(null, fd)}>
         <input type="hidden" name="gameId" value={gameId} />
-        <Field label="Titre"><Input name="title" required maxLength={200} /></Field>
-        <Field label="Contenu" hint="Markdown accepté.">
-          <Textarea name="content" rows={5} required maxLength={2000} />
-        </Field>
-        <Field label="Ordre"><Input type="number" name="order" defaultValue={nextOrder} min={0} /></Field>
+        <SlideFields defaultOrder={nextOrder} gameColors={gameColors} />
       </Modal>
     </>
   );
 }
 
-export function EditSlideButton({ slide }: { slide: Slide }) {
+export function EditSlideButton({ slide, gameColors }: { slide: Slide; gameColors: Game }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button variant="ghost" onClick={() => setOpen(true)}>Éditer</Button>
-      <Modal title="Modifier la slide" open={open} onClose={() => setOpen(false)}
+      <Modal title="Modifier la slide" open={open} onClose={() => setOpen(false)} wide
         action={(fd) => saveSlide(slide.id, fd)}>
         <input type="hidden" name="gameId" value={slide.gameId} />
-        <Field label="Titre"><Input name="title" defaultValue={slide.title} required maxLength={200} /></Field>
-        <Field label="Contenu"><Textarea name="content" rows={5} defaultValue={slide.content} required maxLength={2000} /></Field>
-        <Field label="Ordre"><Input type="number" name="order" defaultValue={slide.order} min={0} /></Field>
+        <SlideFields slide={slide} defaultOrder={slide.order} gameColors={gameColors} />
       </Modal>
     </>
   );
