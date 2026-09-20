@@ -8,6 +8,8 @@
   "scripts": {
     "backoffice:dev": "pnpm --filter @playlink/backoffice dev",
     "backoffice:build": "pnpm --filter @playlink/backoffice build",
+    "web:dev": "pnpm --filter @playlink/web dev",
+    "web:build": "pnpm --filter @playlink/web build",
     "mobile:run": "cd apps/mobile && flutter run",
     "mobile:test": "cd apps/mobile && flutter test"
   },
