@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -51,6 +51,9 @@ export default async function LocaleLayout({
     notFound();
   }
   setRequestLocale(locale);
+  // next-intl 3.x n'hérite pas les messages automatiquement : sans cette
+  // prop, tout `useTranslations` dans un Client Component lève MISSING_MESSAGE.
+  const messages = await getMessages();
 
   return (
     <html lang={locale}>
@@ -67,7 +70,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="bg-ground text-ink font-sans antialiased">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

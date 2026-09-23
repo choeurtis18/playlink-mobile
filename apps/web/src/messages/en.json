@@ -5,9 +5,26 @@
   },
   "hero": {
     "eyebrow": "Coming soon",
-    "title": "The party games your phone was missing",
-    "lede": "8 games, hundreds of cards, playable with friends with no connection needed. Playlink is coming soon to iOS and Android.",
-    "cta": "Notify me at launch"
+    "eyebrowReleased": "Available now"
+  },
+  "games": {
+    "title": "8 games, one app",
+    "lede": "Each game has its own world of cards — from light-hearted fun to the intensity that gets people talking."
+  },
+  "demo": {
+    "title": "Try it before you download it",
+    "lede": "A preview of a few categories, with real cards from the game.",
+    "categoryLabel": "Choose a category",
+    "prev": "Previous card",
+    "next": "Next card",
+    "cardOf": "Card {n} of {total}",
+    "comingSoon": "The playable preview is coming very soon."
+  },
+  "social": {
+    "title": "Find us here in the meantime",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "reddit": "Reddit"
   },
   "footer": {
     "legal": "Legal notice",

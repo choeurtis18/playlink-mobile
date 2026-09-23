@@ -5,9 +5,26 @@
   },
   "hero": {
     "eyebrow": "Bientôt disponible",
-    "title": "Les jeux de soirée qui manquaient à votre téléphone",
-    "lede": "8 jeux, des centaines de cartes, jouables entre amis sans connexion. Playlink arrive bientôt sur iOS et Android.",
-    "cta": "Prévenez-moi au lancement"
+    "eyebrowReleased": "Disponible"
+  },
+  "games": {
+    "title": "8 jeux, une seule appli",
+    "lede": "Chaque jeu a son propre univers de cartes — de l'ambiance légère à l'intensité qui pousse à se dévoiler."
+  },
+  "demo": {
+    "title": "Essayez avant de télécharger",
+    "lede": "Un aperçu de quelques catégories, avec de vraies cartes du jeu.",
+    "categoryLabel": "Choisir une catégorie",
+    "prev": "Carte précédente",
+    "next": "Carte suivante",
+    "cardOf": "Carte {n} sur {total}",
+    "comingSoon": "L'aperçu jouable arrive très bientôt."
+  },
+  "social": {
+    "title": "On se retrouve ici en attendant",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "reddit": "Reddit"
   },
   "footer": {
     "legal": "Mentions légales",
