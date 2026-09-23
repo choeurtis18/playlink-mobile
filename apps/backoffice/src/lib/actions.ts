@@ -1,11 +1,12 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "./prisma";
 import { requireEditor, logAction } from "./auth";
 import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
 import {
   CardInput, CategoryInput, GameInput, BadgeInput, SlideInput, TranslationInput,
+  SiteContentInput,
 } from "./validation";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -211,6 +212,79 @@ export async function deleteBadge(id: string): Promise<ActionResult> {
     await prisma.badge.delete({ where: { id } });
     await logAction(adminId, "deleted_badge", "badge", id);
   }, ["/badges", "/"]);
+}
+
+// ── Landing page (plan landing §05) ────────────────────────────────────
+
+const HERO_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+
+/** Upload direct, pas de modale — le formulaire Site a besoin de l'URL
+ * avant de pouvoir enregistrer, contrairement aux formulaires `Modal`
+ * standard qui n'ont qu'une seule Server Action à soumettre. */
+export async function uploadHeroImage(form: FormData): Promise<ActionResult & { url?: string }> {
+  try {
+    await requireEditor();
+    const file = form.get("file");
+    if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Aucun fichier reçu." };
+    if (file.size > HERO_IMAGE_MAX_BYTES) return { ok: false, error: "Image trop lourde (5 Mo max)." };
+    if (!file.type.startsWith("image/")) return { ok: false, error: "Le fichier doit être une image." };
+
+    const { put } = await import("@vercel/blob");
+    const ext = file.name.split(".").pop() || "jpg";
+    const blob = await put(`site/hero-${Date.now()}.${ext}`, file, {
+      access: "public", contentType: file.type, addRandomSuffix: false,
+    });
+    return { ok: true, url: blob.url };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Échec de l'upload." };
+  }
+}
+
+export async function saveSiteContent(form: FormData): Promise<ActionResult> {
+  return run(async (adminId) => {
+    const parsed = SiteContentInput.safeParse({
+      releaseDate: field(form, "releaseDate"),
+      heroImageUrl: field(form, "heroImageUrl"),
+      heroImageAlt: field(form, "heroImageAlt"),
+      instagramUrl: field(form, "instagramUrl"),
+      tiktokUrl: field(form, "tiktokUrl"),
+      redditUrl: field(form, "redditUrl"),
+      featuredGameIds: form.getAll("featuredGameIds"),
+      heroTitleFr: form.get("heroTitleFr"), heroLedeFr: form.get("heroLedeFr"), ctaLabelFr: form.get("ctaLabelFr"),
+      heroTitleEn: form.get("heroTitleEn"), heroLedeEn: form.get("heroLedeEn"), ctaLabelEn: form.get("ctaLabelEn"),
+    });
+    if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+    const {
+      heroTitleFr, heroLedeFr, ctaLabelFr, heroTitleEn, heroLedeEn, ctaLabelEn,
+      ...site
+    } = parsed.data;
+
+    await prisma.siteContent.upsert({
+      where: { id: "default" }, create: { id: "default", ...site }, update: site,
+    });
+    await prisma.siteContentTranslation.upsert({
+      where: { siteContentId_locale: { siteContentId: "default", locale: "fr" } },
+      create: { siteContentId: "default", locale: "fr", heroTitle: heroTitleFr, heroLede: heroLedeFr, ctaLabel: ctaLabelFr },
+      update: { heroTitle: heroTitleFr, heroLede: heroLedeFr, ctaLabel: ctaLabelFr },
+    });
+    await prisma.siteContentTranslation.upsert({
+      where: { siteContentId_locale: { siteContentId: "default", locale: "en" } },
+      create: { siteContentId: "default", locale: "en", heroTitle: heroTitleEn, heroLede: heroLedeEn, ctaLabel: ctaLabelEn },
+      update: { heroTitle: heroTitleEn, heroLede: heroLedeEn, ctaLabel: ctaLabelEn },
+    });
+    await logAction(adminId, "updated_site_content", "site_content", "default");
+    // Le site (apps/web) fetch /api/site-config avec ce tag — invalider ici
+    // plutôt qu'attendre un redéploiement.
+    revalidateTag("site-config");
+  }, ["/site"]);
+}
+
+export async function toggleCategoryPreviewEligible(id: string, previewEligible: boolean): Promise<ActionResult> {
+  return run(async (adminId) => {
+    await prisma.category.update({ where: { id }, data: { previewEligible } });
+    await logAction(adminId, "toggled_preview_eligible", "category", id, { previewEligible });
+    revalidateTag("preview-content");
+  }, ["/site"]);
 }
 
 // ── Slides de règles ──────────────────────────────────────────────────

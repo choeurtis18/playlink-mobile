@@ -129,6 +129,12 @@ model Category {
   order       Int     @default(0)
   tier        Tier    @default(free)
 
+  // Catégorie incluse dans l'échantillon jouable de la landing (apps/web),
+  // servi en lecture seule par GET /api/preview-content. Pas de granularité
+  // par carte : un pilotage par catégorie suffit à choisir un échantillon
+  // représentatif sans exposer un contrôle disproportionné au back-office.
+  previewEligible Boolean @default(false)
+
   originalLocale String @default("fr")
 
   cards        Card[]
@@ -411,6 +417,52 @@ model CustomCard {
 
   @@index([accountId])
   @@map("custom_cards")
+}
+
+// ─────────────────────────────────────────────────────────────
+// LANDING PAGE — contenu marketing de apps/web (plan landing §05)
+// ─────────────────────────────────────────────────────────────
+
+// Singleton (une seule ligne, id fixe "default") : la landing a une
+// structure de page fixe en V1, seul le contenu est éditable. Un vrai
+// page builder serait disproportionné pour une unique page à maintenir.
+model SiteContent {
+  id String @id @default("default")
+
+  // "Bientôt disponible" tant que releaseDate est vide ou dans le futur.
+  releaseDate DateTime?
+
+  heroImageUrl String? // Vercel Blob
+  heroImageAlt String? // obligatoire côté formulaire si heroImageUrl est renseigné
+
+  instagramUrl String?
+  tiktokUrl    String?
+  redditUrl    String?
+
+  // Jeux mis en avant sur la landing, dans cet ordre. Stocke des Game.id ;
+  // pas de relation Prisma many-to-many car l'ordre choisi par l'éditeur
+  // doit être préservé tel quel, ce qu'une relation implicite ne garantit pas.
+  featuredGameIds String[]
+
+  translations SiteContentTranslation[]
+
+  updatedAt DateTime @updatedAt
+
+  @@map("site_content")
+}
+
+model SiteContentTranslation {
+  id            String      @id @default(cuid())
+  siteContentId String
+  siteContent   SiteContent @relation(fields: [siteContentId], references: [id], onDelete: Cascade)
+  locale        String
+
+  heroTitle    String
+  heroLede     String
+  ctaLabel     String
+
+  @@unique([siteContentId, locale])
+  @@map("site_content_translations")
 }
 
 // ─────────────────────────────────────────────────────────────
