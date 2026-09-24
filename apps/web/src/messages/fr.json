@@ -1,4 +1,20 @@
 {
+  "nav": {
+    "home": "Playlink — accueil",
+    "main": "Navigation principale",
+    "mobile": "Navigation mobile",
+    "menu": "Menu",
+    "games": "Jeux",
+    "demo": "Démo",
+    "about": "À propos",
+    "social": "Réseaux",
+    "language": "Langue",
+    "cta": "Bientôt sur les stores",
+    "notify": "Me prévenir à la sortie",
+    "soon": "Bientôt sur iOS & Android",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
   "hero": {
     "eyebrow": "Bientôt disponible",
     "eyebrowReleased": "Disponible"
@@ -19,6 +35,8 @@
     "legal": "Mentions légales",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "controller": "Responsable de traitement :",
+    "nav": "Liens légaux"
   }
 }

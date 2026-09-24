@@ -2,7 +2,23 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
+import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { getSiteConfig, landingTexts } from "@/lib/backoffice";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { RevealRoot } from "@/components/RevealRoot";
+
+// Auto-hébergées par next/font : aucune requête vers Google au chargement,
+// et des polices de repli ajustées pour éviter le saut de mise en page.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight", display: "swap" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
 import { notFound } from "next/navigation";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -59,21 +75,16 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-        />
-      </head>
+    <html lang={locale} className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-ground text-ink font-sans antialiased">
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
+          <Header locale={locale} />
+          {/* Réserve la hauteur du header fixe. */}
+          <div aria-hidden className="h-[72px]" />
+          <main id="top">{children}</main>
+          <Footer locale={locale} />
+          <RevealRoot locale={locale} />
+        </NextIntlClientProvider>
       </body>
     </html>
   );
