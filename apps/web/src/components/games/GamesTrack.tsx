@@ -166,7 +166,7 @@ function GameTile({ game, num }: { game: GameTileData; num: string }) {
       role="listitem"
       onPointerMove={onMove}
       onPointerLeave={onLeave}
-      className="relative isolate flex min-h-[290px] shrink-0 grow-0 basis-[78%] snap-start flex-col gap-3.5 overflow-hidden rounded-[22px] border border-hairline bg-surface p-6 transition-[transform,border-color] duration-[350ms] ease-[cubic-bezier(.2,.8,.2,1)] [transform-style:preserve-3d] min-[640px]:basis-[calc((100%-32px)/2.3)] min-[900px]:basis-auto"
+      className="relative isolate flex min-h-[290px] shrink-0 grow-0 basis-[78%] snap-start flex-col gap-3.5 overflow-clip rounded-[22px] border border-hairline bg-surface p-6 transition-[transform,border-color] duration-[350ms] ease-[cubic-bezier(.2,.8,.2,1)] [transform-style:preserve-3d] min-[640px]:basis-[calc((100%-32px)/2.3)] min-[900px]:basis-auto"
     >
       <div
         aria-hidden

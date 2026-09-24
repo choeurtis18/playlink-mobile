@@ -59,7 +59,7 @@ export const LANDING_SECTIONS = [
       'Pick a game, a category, an intensity — and play a real three-player round, just like in the app.'),
   ] },
   { id: 'about', label: 'Comment ça marche', anchor: '#apropos', fields: [
-    f('about.title', 'Titre', 80, false, 'Un téléphone. Tout le monde autour.', 'One phone. Everyone around it.'),
+    f('about.title', 'Titre (*passage* = en retrait)', 80, false, 'Un téléphone. *Tout le monde autour.*', 'One phone. *Everyone around it.*'),
     f('about.step1', 'Étape 1 — titre', 60, false, 'Choisis le jeu et l’intensité', 'Pick the game and intensity'),
     f('about.step1Body', 'Étape 1 — texte', 160, true,
       'De « Soft » à « Trash » : c’est vous qui décidez jusqu’où la soirée peut aller.',

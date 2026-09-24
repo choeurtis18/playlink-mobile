@@ -1,6 +1,9 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getSiteConfig, getPreviewContent, landingTexts, landingSections } from "@/lib/backoffice";
 import { DemoSection } from "@/components/demo/DemoSection";
+import { HowItWorks } from "@/components/sections/HowItWorks";
+import { NotifSection } from "@/components/sections/NotifSection";
+import { SocialSection } from "@/components/sections/SocialSection";
 import { Hero } from "@/components/hero/Hero";
 import { GamesSection } from "@/components/games/GamesSection";
 import { Marquee } from "@/components/hero/Marquee";
@@ -14,11 +17,10 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [site, preview, tHero, tSocial] = await Promise.all([
+  const [site, preview, tHero] = await Promise.all([
     getSiteConfig(),
     getPreviewContent(),
     getTranslations("hero"),
-    getTranslations("social"),
   ]);
 
   // Repli langue → FR (langue d'origine, CLAUDE.md) → texte par défaut :
@@ -44,30 +46,9 @@ export default async function HomePage({
 
       <DemoSection texts={t} categories={preview.categories} locale={locale} settings={site.demo} />
 
-      {/* ── Réseaux sociaux ───────────────────────────────────────── */}
-      {sections.includes("reseaux") && (
-        <section id="reseaux" className="border-t border-hairline px-6 py-16 text-center">
-          <h2 className="mb-5 font-[family-name:var(--font-display)] text-xl font-semibold">{t["social.title"]}</h2>
-          <div className="flex justify-center gap-4 font-mono text-sm">
-            {site.social.instagram && (
-              <a href={site.social.instagram} target="_blank" rel="noreferrer" className="text-ink-soft hover:text-accent">
-                {tSocial("instagram")}
-              </a>
-            )}
-            {site.social.tiktok && (
-              <a href={site.social.tiktok} target="_blank" rel="noreferrer" className="text-ink-soft hover:text-accent">
-                {tSocial("tiktok")}
-              </a>
-            )}
-            {site.social.reddit && (
-              <a href={site.social.reddit} target="_blank" rel="noreferrer" className="text-ink-soft hover:text-accent">
-                {tSocial("reddit")}
-              </a>
-            )}
-          </div>
-        </section>
-      )}
-
+      <HowItWorks texts={t} stats={site.stats} locale={locale} />
+      <NotifSection texts={t} locale={locale} />
+      {sections.includes("reseaux") && <SocialSection texts={t} social={site.social} />}
     </div>
   );
 }

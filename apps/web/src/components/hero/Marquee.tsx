@@ -13,7 +13,7 @@ export function Marquee({ items, label }: { items: MarqueeItem[]; label: string 
   return (
     <section
       aria-label={label}
-      className="flex flex-col gap-3 overflow-hidden border-y border-hairline bg-ground-deep py-[22px]"
+      className="flex flex-col gap-3 overflow-clip border-y border-hairline bg-ground-deep py-[22px]"
       style={{
         maskImage: "linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent)",
         WebkitMaskImage: "linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent)",
