@@ -11,10 +11,11 @@ export async function Footer({ locale }: { locale: string }) {
     { href: `/${locale}/confidentialite`, label: t("privacy") },
     { href: `/${locale}/cgu`, label: t("terms") },
     { href: `/${locale}/cookies`, label: t("cookies") },
+    { href: `/${locale}/supprimer-mes-donnees`, label: t("deleteData") },
   ];
 
   return (
-    <footer className="overflow-hidden border-t border-hairline bg-ground-deep px-6 pt-12">
+    <footer className="overflow-clip border-t border-hairline bg-ground-deep px-6 pt-12">
       <div className="mx-auto flex max-w-[1200px] flex-col gap-8">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex flex-col gap-2 text-sm text-neutral-faint">

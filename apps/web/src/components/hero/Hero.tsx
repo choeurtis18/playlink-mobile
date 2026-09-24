@@ -4,32 +4,13 @@ import type { SiteStats } from "@/lib/backoffice";
 import { HeroFan, type FanCard } from "./HeroFan";
 import { HeroGlow } from "./HeroGlow";
 import { frenchSpacing } from "@/lib/typography";
+import { Emphasis } from "../Emphasis";
 
 /** Entrée du héros en CSS (et non via RevealRoot) : il est visible dès le
  * chargement, une animation déclenchée après hydratation le ferait
  * clignoter. `backwards` garde l'état de départ pendant le délai. */
 const ENTER = "motion-safe:animate-[pl-reveal_0.8s_cubic-bezier(.2,.8,.2,1)_backwards]";
 const delay = (ms: number) => ({ animationDelay: `${ms}ms` });
-
-/** Un mot entre astérisques dans le titre (« Le jeu qui a *brisé*… ») est
- * mis en valeur par le dégradé animé du design. Sans astérisque, le titre
- * s'affiche simplement. Réglé depuis le back-office, sans HTML. */
-function Emphasis({ text }: { text: string }) {
-  const parts = text.split(/\*([^*]+)\*/);
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <em
-        key={i}
-        className="bg-[length:200%_100%] bg-clip-text pr-[0.06em] font-medium italic text-transparent motion-safe:animate-[pl-shine_6s_linear_infinite]"
-        style={{ backgroundImage: "linear-gradient(100deg, #f23a6b, #ff6b93, #EC4899, #f23a6b)" }}
-      >
-        {part}
-      </em>
-    ) : (
-      part
-    ),
-  );
-}
 
 export async function Hero({
   texts,
@@ -57,7 +38,7 @@ export async function Hero({
   const cardsRounded = stats && stats.cards >= 100 ? Math.floor(stats.cards / 100) * 100 : stats?.cards;
 
   return (
-    <section className="relative overflow-hidden px-[clamp(20px,4vw,24px)] pb-[clamp(64px,10vw,104px)] pt-[clamp(48px,9vw,88px)]">
+    <section className="relative overflow-clip px-[clamp(20px,4vw,24px)] pb-[clamp(64px,10vw,104px)] pt-[clamp(48px,9vw,88px)]">
       <HeroGlow />
       <div
         aria-hidden
@@ -88,7 +69,7 @@ export async function Hero({
             style={delay(80)}
             className={`${ENTER} m-0 text-balance font-display text-[clamp(44px,6.6vw,88px)] font-semibold leading-[0.98] tracking-[-0.035em]`}
           >
-            <Emphasis text={frenchSpacing(texts["hero.title"])} />
+            <Emphasis text={frenchSpacing(texts["hero.title"])} variant="shine" />
           </h1>
           <p
             style={delay(160)}

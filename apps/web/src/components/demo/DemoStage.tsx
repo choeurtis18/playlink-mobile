@@ -63,7 +63,7 @@ export function DemoStage(props: Props) {
       onKeyDown={onKeyDown}
       aria-label={t("stageLabel")}
       role="region"
-      className="relative flex min-h-[600px] flex-col overflow-hidden rounded-[26px] border border-hairline bg-sunk/70 p-[clamp(16px,3vw,24px)]"
+      className="relative flex min-h-[600px] flex-col overflow-clip rounded-[26px] border border-hairline bg-sunk/70 p-[clamp(16px,3vw,24px)]"
     >
       {/* En-tête : jeu, catégorie · intensité, avancement du deck. */}
       <div className="flex items-center justify-between gap-3">

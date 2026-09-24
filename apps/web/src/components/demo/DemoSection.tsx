@@ -15,7 +15,7 @@ export async function DemoSection({ texts, categories, locale, settings }: {
   return (
     <section
       id="demo"
-      className="relative overflow-hidden border-y border-hairline bg-ground-deep px-[clamp(20px,4vw,24px)] py-[clamp(72px,11vw,120px)]"
+      className="relative overflow-clip border-y border-hairline bg-ground-deep px-[clamp(20px,4vw,24px)] py-[clamp(72px,11vw,120px)]"
     >
       <div className="mx-auto flex max-w-[1200px] flex-col gap-12">
         <div className="relative flex max-w-[720px] flex-col gap-[18px]">

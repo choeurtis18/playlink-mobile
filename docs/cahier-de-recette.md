@@ -396,6 +396,33 @@ Même déroulé que dans l'app, avec 3 joueurs fixes : Alex, Sam, Léa.
 - [ ] Deux parties de suite ne tirent pas forcément les mêmes cartes, et
   les cartes proches de l'intensité choisie sont les plus fréquentes.
 
+### 11.6 Comment ça marche, pré-inscription, réseaux (lot 5)
+Prérequis : `LANDING_API_SECRET` identique sur le site et le back-office ;
+pour le double opt-in, `RESEND_API_KEY` et le domaine vérifié dans Resend.
+- [ ] En-tête : les liens « À propos » et « Réseaux » et le bouton
+  « Bientôt sur les stores » sont là et mènent à leur section ; le
+  deuxième bouton du héros mène au formulaire.
+- [ ] « Comment ça marche » : 3 étapes éditables ; les chiffres (jeux,
+  catégories, cartes arrondies, 100 %) comptent depuis 0 en apparaissant.
+- [ ] Formulaire : envoyer vide ou avec une adresse invalide → « Cette
+  adresse e-mail ne semble pas valide. » ; sans cocher la case → « Coche
+  la case… » ; les messages sont en texte, sous le formulaire.
+- [ ] Inscription valide → message de succès et pluie de mini-cartes ;
+  l'inscrit apparaît en base (adresse en minuscules).
+- [ ] Se réinscrire avec la même adresse (même en changeant la casse) →
+  même message, aucun doublon.
+- [ ] Double opt-in activé : message « Plus qu'une étape », e-mail reçu
+  (expéditeur no-reply@playlink-game.fr, réponse vers
+  gamesplaylink@gmail.com) ; le lien affiche « C'est confirmé ! », un
+  second clic « Ce lien ne fonctionne plus ».
+- [ ] Back-office coupé → « L'inscription n'a pas pu être enregistrée… ».
+- [ ] Réseaux : un réseau sans lien au back-office n'apparaît pas ; aucun
+  lien → ni section ni entrée « Réseaux » dans le menu.
+- [ ] Pied de page → « Supprimer mes données » : page explicative, le
+  bouton ouvre la messagerie avec un e-mail pré-rempli vers
+  gamesplaylink@gmail.com.
+- [ ] Au clavier dans le formulaire, rien ne glisse ni ne se décale.
+
 ---
 
 ## Ce qui reste à développer

@@ -86,7 +86,14 @@
   "social": {
     "instagram": "Instagram",
     "tiktok": "TikTok",
-    "reddit": "Reddit"
+    "reddit": "Reddit",
+    "kicker": "05 — En attendant",
+    "newTab": "(nouvel onglet)",
+    "notes": {
+      "instagram": "Défis de la semaine",
+      "tiktok": "Parties filmées",
+      "reddit": "Proposer des cartes"
+    }
   },
   "footer": {
     "legal": "Mentions légales",
@@ -94,6 +101,50 @@
     "terms": "Conditions d’utilisation",
     "cookies": "Cookies",
     "controller": "Responsable de traitement :",
-    "nav": "Liens légaux"
+    "nav": "Liens légaux",
+    "deleteData": "Supprimer mes données"
+  },
+  "about": {
+    "kicker": "03 — Comment ça marche",
+    "games": "{n, plural, one {jeu} other {jeux}}",
+    "categories": "{n, plural, one {catégorie} other {catégories}}",
+    "cards": "{n, plural, one {carte} other {cartes}}",
+    "percentSuffix": " %",
+    "offline": "hors-ligne, sans compte"
+  },
+  "notif": {
+    "kicker": "04 — Pré-inscription",
+    "emailLabel": "Adresse e-mail",
+    "placeholder": "toi@exemple.fr",
+    "sending": "Envoi…",
+    "privacy": "Voir la <link>politique de confidentialité</link>.",
+    "errors": {
+      "email": "Cette adresse e-mail ne semble pas valide.",
+      "consent": "Coche la case pour qu’on puisse te prévenir.",
+      "server": "L’inscription n’a pas pu être enregistrée. Réessaie dans un instant."
+    },
+    "doneBody": "Inscrit·e avec {email}",
+    "pendingTitle": "Plus qu’une étape : confirme ton adresse.",
+    "pendingBody": "On vient d’envoyer un lien à {email}. Pense à regarder dans les indésirables."
+  },
+  "confirmation": {
+    "kicker": "Pré-inscription",
+    "okTitle": "C’est confirmé !",
+    "okBody": "Tu recevras un e-mail le jour où Playlink arrive sur les stores. Un seul, promis.",
+    "koTitle": "Ce lien ne fonctionne plus.",
+    "koBody": "Il a peut-être déjà servi, ou il a expiré. Tu peux te réinscrire depuis la page d’accueil.",
+    "back": "Retour à l’accueil"
+  },
+  "deleteData": {
+    "metaTitle": "Supprimer mes données — Playlink",
+    "kicker": "Tes données",
+    "title": "Supprimer mes données",
+    "intro": "Si tu t’es pré-inscrit·e, Playlink conserve seulement ton adresse e-mail, ta langue et la date d’inscription — pour te prévenir de la sortie de l’app, rien d’autre.",
+    "how": "Pour les supprimer, écris-nous depuis l’adresse concernée : on efface ton inscription et on te le confirme.",
+    "cta": "Demander la suppression",
+    "mailSubject": "Supprimer mes données Playlink",
+    "mailBody": "Bonjour,\n\nMerci de supprimer ma pré-inscription à Playlink (adresse de cet e-mail).\n",
+    "delay": "Réponse sous 30 jours au plus tard, comme le prévoit le RGPD. Adresse : {email}.",
+    "back": "Retour à l’accueil"
   }
 }
