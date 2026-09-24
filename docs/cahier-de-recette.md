@@ -365,6 +365,37 @@ puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 30
   la fin, ← recule bien.
 - [ ] Bouton « Jouer » d'une tuile → la page descend à la démo, sur ce jeu.
 
+### 11.5 Démo jouable (lot 4)
+Même déroulé que dans l'app, avec 3 joueurs fixes : Alex, Sam, Léa.
+- [ ] Seuls les jeux ayant une catégorie cochée « jouable » au back-office
+  sont proposés ; changer de jeu met à jour les catégories et le halo de
+  couleur de la section.
+- [ ] Intensités au-delà du maximum réglé au back-office (3 par défaut) :
+  cadenas, non cliquables, avec la mention « dans l'app ».
+- [ ] « Lancer la partie » → carte face cachée + « C'est au tour d'Alex »
+  → « Voir la carte » (ou clic sur la carte) → la carte se retourne →
+  « Voter » (ou glisser la carte) → « Est-ce qu'Alex mérite un point ? »
+  → Oui / Non → carte face cachée + « C'est au tour de Sam »… jusqu'à la
+  dernière carte.
+- [ ] Nombre de cartes = réglage du back-office (5 par défaut), ou moins si
+  la catégorie en a moins ; compteur « 2 / 5 » et barres en haut à droite.
+- [ ] Fin de partie : podium 🥇🥈🥉 avec les points, « X remporte la
+  manche » ou « Égalité en tête ! », rappel de l'app, boutons « Bientôt
+  sur App Store / Google Play », « Rejouer » (nouveau tirage) et
+  « Changer de jeu ».
+- [ ] Devine le mot : « 3 indices restants » ; « Indice utilisé » décompte
+  jusqu'à « Plus d'indice » (bouton alors désactivé) ; remis à 3 à la
+  carte suivante.
+- [ ] Changer de jeu, de catégorie ou d'intensité en cours de partie →
+  retour à l'écran de départ.
+- [ ] Clavier seul : Entrée enchaîne les étapes, P = point, N = pas de
+  point ; le contour rose suit le bouton de chaque étape.
+- [ ] Mobile : les rangées « jeu » et « catégorie » tiennent sur une ligne
+  qui défile, avec un fondu à droite ; l'option choisie se recentre ;
+  « Lancer la partie » fait descendre jusqu'à la carte.
+- [ ] Deux parties de suite ne tirent pas forcément les mêmes cartes, et
+  les cartes proches de l'intensité choisie sont les plus fréquentes.
+
 ---
 
 ## Ce qui reste à développer
