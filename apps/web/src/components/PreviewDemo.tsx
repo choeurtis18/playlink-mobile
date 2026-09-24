@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { PreviewCategory } from "@/lib/backoffice";
+import { OPEN_DEMO_EVENT, type OpenDemoDetail } from "@/lib/demo-events";
 
 /** Démo jouable de la landing : un aperçu du flux carte-swipeable, pas un
  * simulateur complet. Aucun tirage aléatoire, aucun score — cette logique
@@ -22,6 +23,22 @@ export function PreviewDemo({
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
+
+  // Carte du héros cliquée : première catégorie de ce jeu. Remplacé par
+  // la vraie démo au lot 4.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const { gameSlug } = (e as CustomEvent<OpenDemoDetail>).detail;
+      const i = categories.findIndex((c) => c.game.slug === gameSlug);
+      if (i >= 0) {
+        setCategoryIndex(i);
+        setCardIndex(0);
+        setDragX(0);
+      }
+    };
+    window.addEventListener(OPEN_DEMO_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_DEMO_EVENT, onOpen);
+  }, [categories]);
 
   const category = categories[categoryIndex];
   const card = category?.cards[cardIndex];

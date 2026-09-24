@@ -16,8 +16,15 @@
     "closeMenu": "Close menu"
   },
   "hero": {
-    "eyebrow": "Coming soon",
-    "eyebrowReleased": "Available now"
+    "eyebrowReleased": "Available on iOS & Android",
+    "statGames": "{n} games",
+    "statCards": "{n}{plus} cards",
+    "statOffline": "0 connection",
+    "fanLabel": "Game preview",
+    "playDemo": "Play the demo →",
+    "tryGame": "{name} — try the demo",
+    "showGame": "Show {name}",
+    "marqueeLabel": "Sample cards"
   },
   "demo": {
     "categoryLabel": "Choose a category",

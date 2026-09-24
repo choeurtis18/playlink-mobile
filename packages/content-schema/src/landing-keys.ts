@@ -35,9 +35,10 @@ const f = (key: string, label: string, max: number, multiline: boolean, fr: stri
 export const LANDING_SECTIONS = [
   { id: 'hero', label: 'Héros', anchor: '', fields: [
     f('hero.eyebrow', 'Sur-titre', 40, false, 'Bientôt sur iOS & Android', 'Coming soon to iOS & Android'),
-    f('hero.title', 'Titre', 120, false,
-      'Le jeu qui a brisé plus d’amitiés que les groupes WhatsApp.',
-      'The game that has ended more friendships than WhatsApp groups.'),
+    // *mot* : mis en valeur par le dégradé animé du héros.
+    f('hero.title', 'Titre (*mot* = mis en valeur)', 120, false,
+      'Le jeu qui a *brisé* plus d’amitiés que les groupes WhatsApp.',
+      'The game that has *ended* more friendships than WhatsApp groups.'),
     f('hero.lede', 'Accroche', 220, true,
       '8 jeux de soirée, jouables entre amis sur un seul téléphone. Hors-ligne, sans compte — on se le passe, les scores se cumulent.',
       '8 party games, played with friends on a single phone. Offline, no account — pass it around, scores add up.'),
