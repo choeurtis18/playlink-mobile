@@ -328,6 +328,27 @@ puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 30
   grand « Playlink » en filigrane. Les liens légaux mènent encore à une
   page introuvable (lot 7).
 
+### 11.3 Héros et bandeaux (lot 2)
+- [ ] Au chargement, sur-titre, titre, accroche, bouton et chiffres
+  apparaissent l'un après l'autre ; le mot entre astérisques du titre
+  (« *brisé* » par défaut) est en italique, avec un dégradé qui ondule.
+- [ ] Au back-office, retirer les astérisques du titre → plus de mot mis
+  en valeur, aucun astérisque visible.
+- [ ] Éventail : une carte par jeu mis en avant, avec une vraie carte du
+  jeu ; il tourne toutes les 2,5 s ; survol → il s'arrête ; points sous
+  l'éventail → affichent le jeu choisi.
+- [ ] Clic sur la carte du dessus → la page descend à la démo, sur une
+  catégorie de ce jeu.
+- [ ] Sur ordinateur, un halo rose suit la souris dans le héros.
+- [ ] Chiffres « N jeux / N cartes / 0 connexion » : nombre de cartes
+  arrondi à la centaine inférieure avec un « + » (1 521 → « 1 500+ »).
+- [ ] Bandeaux : deux rangées de vraies cartes douces qui défilent en sens
+  opposés, sans saut visible à la fin de la boucle ; survol → la rangée
+  s'arrête.
+- [ ] Un « ? » ou un « : » n'est jamais rejeté seul en début de ligne.
+- [ ] « Réduire les animations » → l'éventail ne tourne plus, les
+  bandeaux sont immobiles, pas de halo.
+
 ---
 
 ## Ce qui reste à développer
