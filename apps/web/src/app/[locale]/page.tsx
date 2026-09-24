@@ -1,6 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getSiteConfig, getPreviewContent, landingTexts, landingSections } from "@/lib/backoffice";
-import { PreviewDemo } from "@/components/PreviewDemo";
+import { DemoSection } from "@/components/demo/DemoSection";
 import { Hero } from "@/components/hero/Hero";
 import { GamesSection } from "@/components/games/GamesSection";
 import { Marquee } from "@/components/hero/Marquee";
@@ -42,16 +42,7 @@ export default async function HomePage({
 
       {sections.includes("jeux") && <GamesSection texts={t} games={site.featuredGames} locale={locale} />}
 
-      {/* ── Démo jouable ──────────────────────────────────────────── */}
-      <section id="demo" className="border-t border-hairline px-6 py-20">
-        <div className="mx-auto max-w-3xl">
-          <div data-reveal className="mb-10 text-center">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{t["demo.title"]}</h2>
-            <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{t["demo.lede"]}</p>
-          </div>
-          <PreviewDemo categories={preview.categories} locale={locale} />
-        </div>
-      </section>
+      <DemoSection texts={t} categories={preview.categories} locale={locale} settings={site.demo} />
 
       {/* ── Réseaux sociaux ───────────────────────────────────────── */}
       {sections.includes("reseaux") && (
