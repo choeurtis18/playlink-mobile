@@ -1,5 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { getSiteConfig, getPreviewContent, FALLBACK_HERO } from "@/lib/backoffice";
+import { getSiteConfig, getPreviewContent, landingTexts } from "@/lib/backoffice";
 import { GameTile } from "@/components/GameTile";
 import { PreviewDemo } from "@/components/PreviewDemo";
 
@@ -11,21 +11,17 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [site, preview, tHero, tGames, tDemo, tSocial, tFooter] = await Promise.all([
+  const [site, preview, tHero, tSocial, tFooter] = await Promise.all([
     getSiteConfig(),
     getPreviewContent(),
     getTranslations("hero"),
-    getTranslations("games"),
-    getTranslations("demo"),
     getTranslations("social"),
     getTranslations("footer"),
   ]);
 
-  // FR est la langue d'origine du contenu (CLAUDE.md), d'où ce fallback.
-  // Le dernier niveau couvre le cas d'un SiteContent existant mais encore
-  // vide de traductions : un héros sans titre ne doit jamais s'afficher.
-  const t =
-    site.translations[locale] ?? site.translations.fr ?? FALLBACK_HERO[locale] ?? FALLBACK_HERO.fr;
+  // Repli langue → FR (langue d'origine, CLAUDE.md) → texte par défaut :
+  // un héros sans titre ne doit jamais s'afficher.
+  const t = landingTexts(site, locale);
   const isReleased = site.releaseDate ? new Date(site.releaseDate) <= new Date() : false;
   const hasSocial = site.social.instagram || site.social.tiktok || site.social.reddit;
 
@@ -43,13 +39,13 @@ export default async function HomePage({
             {isReleased ? tHero("eyebrowReleased") : tHero("eyebrow")}
           </p>
           <h1 className="text-balance font-[family-name:var(--font-display)] text-4xl font-semibold leading-tight tracking-tight motion-safe:animate-[fade-up_0.6s_ease-out_0.08s_backwards] sm:text-5xl">
-            {t.heroTitle}
+            {t["hero.title"]}
           </h1>
           <p className="mx-auto max-w-[60ch] text-lg text-ink-soft motion-safe:animate-[fade-up_0.6s_ease-out_0.16s_backwards]">
-            {t.heroLede}
+            {t["hero.lede"]}
           </p>
           <p className="mx-auto inline-flex w-fit items-center gap-2 rounded-full border border-hairline-firm px-4 py-2 font-mono text-xs text-neutral-faint motion-safe:animate-[fade-up_0.6s_ease-out_0.24s_backwards]">
-            {t.ctaLabel} — {isReleased ? tHero("eyebrowReleased") : tHero("eyebrow")}
+            {t["hero.ctaSecondary"]} — {isReleased ? tHero("eyebrowReleased") : tHero("eyebrow")}
           </p>
         </div>
       </section>
@@ -59,12 +55,12 @@ export default async function HomePage({
         <section className="border-t border-hairline px-6 py-20">
           <div className="mx-auto max-w-5xl">
             <div className="mb-10 text-center">
-              <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{tGames("title")}</h2>
-              <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{tGames("lede")}</p>
+              <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{t["games.title"]}</h2>
+              <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{t["games.lede"]}</p>
             </div>
             <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {site.featuredGames.map((game, i) => (
-                <GameTile key={game.id} game={game} index={i} />
+                <GameTile key={game.id} game={game} index={i} locale={locale} />
               ))}
             </ul>
           </div>
@@ -75,8 +71,8 @@ export default async function HomePage({
       <section className="border-t border-hairline px-6 py-20">
         <div className="mx-auto max-w-3xl">
           <div className="mb-10 text-center">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{tDemo("title")}</h2>
-            <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{tDemo("lede")}</p>
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{t["demo.title"]}</h2>
+            <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{t["demo.lede"]}</p>
           </div>
           <PreviewDemo categories={preview.categories} locale={locale} />
         </div>
@@ -85,7 +81,7 @@ export default async function HomePage({
       {/* ── Réseaux sociaux ───────────────────────────────────────── */}
       {hasSocial && (
         <section className="border-t border-hairline px-6 py-16 text-center">
-          <h2 className="mb-5 font-[family-name:var(--font-display)] text-xl font-semibold">{tSocial("title")}</h2>
+          <h2 className="mb-5 font-[family-name:var(--font-display)] text-xl font-semibold">{t["social.title"]}</h2>
           <div className="flex justify-center gap-4 font-mono text-sm">
             {site.social.instagram && (
               <a href={site.social.instagram} target="_blank" rel="noreferrer" className="text-ink-soft hover:text-accent">

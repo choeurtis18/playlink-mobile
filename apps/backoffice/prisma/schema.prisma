@@ -444,6 +444,17 @@ model SiteContent {
   // doit être préservé tel quel, ce qu'une relation implicite ne garantit pas.
   featuredGameIds String[]
 
+  // Réglages de la démo jouable. `demoMaxIntensity` s'ajoute au filtre
+  // `Category.previewEligible` : une catégorie éligible n'expose au public
+  // que ses cartes jusqu'à cette intensité.
+  demoDeckSize     Int @default(5)
+  demoMaxIntensity Int @default(3)
+
+  // Pré-inscription : e-mail de confirmation avant de compter l'inscription.
+  doubleOptIn Boolean @default(false)
+
+  // Remplacé par LandingText. Conservé le temps que la landing déjà
+  // déployée lise encore `translations` dans /api/site-config.
   translations SiteContentTranslation[]
 
   updatedAt DateTime @updatedAt
@@ -463,6 +474,40 @@ model SiteContentTranslation {
 
   @@unique([siteContentId, locale])
   @@map("site_content_translations")
+}
+
+// Textes de la landing en clé/valeur. Les clés autorisées et leurs limites
+// sont définies une seule fois dans packages/content-schema/landing-keys.ts :
+// ajouter un texte à la page ne demande pas de migration.
+model LandingText {
+  id     String @id @default(cuid())
+  locale String
+  key    String
+  value  String
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([locale, key])
+  @@map("landing_texts")
+}
+
+// Pré-inscriptions de la landing. Une adresse = une ligne : se réinscrire
+// met à jour la langue et le consentement, sans doublon.
+model LandingPreRegistration {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  locale            String    @default("fr")
+  consentNewsletter Boolean
+  // Double opt-in : jeton envoyé par e-mail, effacé à la confirmation.
+  // Inscription comptée seulement si `confirmedAt` est renseigné (ou si le
+  // double opt-in était inactif, auquel cas il vaut `createdAt`).
+  confirmToken      String?   @unique
+  confirmedAt       DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("landing_pre_registrations")
 }
 
 // ─────────────────────────────────────────────────────────────

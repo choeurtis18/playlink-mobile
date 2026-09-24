@@ -7,7 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./tag-mapping.ts": "./src/tag-mapping.ts",
-    "./snapshot.ts": "./src/snapshot.ts"
+    "./snapshot.ts": "./src/snapshot.ts",
+    "./landing-keys.ts": "./src/landing-keys.ts"
   },
   "scripts": {
     "test": "node --experimental-strip-types --test src/*.test.ts",

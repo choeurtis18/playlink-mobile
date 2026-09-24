@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import { getSiteConfig, landingTexts } from "@/lib/backoffice";
 import { notFound } from "next/navigation";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -16,25 +17,27 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "metadata" });
+  const texts = landingTexts(await getSiteConfig(), locale);
+  const title = texts["meta.title"];
+  const description = texts["meta.description"];
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title,
+    description,
     alternates: {
       canonical: `/${locale}`,
       languages: { fr: "/fr", en: "/en" },
     },
     openGraph: {
-      title: t("title"),
-      description: t("description"),
+      title,
+      description,
       locale,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: t("title"),
-      description: t("description"),
+      title,
+      description,
     },
   };
 }
