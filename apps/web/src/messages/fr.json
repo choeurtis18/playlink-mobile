@@ -26,6 +26,15 @@
     "showGame": "Afficher {name}",
     "marqueeLabel": "Exemples de cartes"
   },
+  "games": {
+    "listLabel": "Les jeux",
+    "categoryCount": "{n, plural, =0 {Aucune catégorie} one {# catégorie} other {# catégories}}",
+    "play": "Jouer",
+    "playAria": "Jouer à {name} dans la démo",
+    "goTo": "Aller à {name}",
+    "prev": "Jeu précédent",
+    "next": "Jeu suivant"
+  },
   "demo": {
     "categoryLabel": "Choisir une catégorie",
     "prev": "Carte précédente",

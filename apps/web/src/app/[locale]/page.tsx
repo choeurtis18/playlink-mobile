@@ -1,8 +1,8 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getSiteConfig, getPreviewContent, landingTexts, landingSections } from "@/lib/backoffice";
-import { GameTile } from "@/components/GameTile";
 import { PreviewDemo } from "@/components/PreviewDemo";
 import { Hero } from "@/components/hero/Hero";
+import { GamesSection } from "@/components/games/GamesSection";
 import { Marquee } from "@/components/hero/Marquee";
 import { heroFanCards, marqueeItems } from "@/lib/hero-content";
 
@@ -40,22 +40,7 @@ export default async function HomePage({
       />
       <Marquee items={marqueeItems(site.featuredGames, preview, locale)} label={tHero("marqueeLabel")} />
 
-      {/* ── Jeux ──────────────────────────────────────────────────── */}
-      {sections.includes("jeux") && (
-        <section id="jeux" className="border-t border-hairline px-6 py-20">
-          <div className="mx-auto max-w-5xl">
-            <div data-reveal className="mb-10 text-center">
-              <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{t["games.title"]}</h2>
-              <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{t["games.lede"]}</p>
-            </div>
-            <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {site.featuredGames.map((game, i) => (
-                <GameTile key={game.id} game={game} index={i} locale={locale} />
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
+      {sections.includes("jeux") && <GamesSection texts={t} games={site.featuredGames} locale={locale} />}
 
       {/* ── Démo jouable ──────────────────────────────────────────── */}
       <section id="demo" className="border-t border-hairline px-6 py-20">
