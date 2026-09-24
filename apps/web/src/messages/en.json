@@ -26,6 +26,15 @@
     "showGame": "Show {name}",
     "marqueeLabel": "Sample cards"
   },
+  "games": {
+    "listLabel": "The games",
+    "categoryCount": "{n, plural, =0 {No category} one {# category} other {# categories}}",
+    "play": "Play",
+    "playAria": "Play {name} in the demo",
+    "goTo": "Go to {name}",
+    "prev": "Previous game",
+    "next": "Next game"
+  },
   "demo": {
     "categoryLabel": "Choose a category",
     "prev": "Previous card",

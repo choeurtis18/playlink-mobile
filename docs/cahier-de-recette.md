@@ -349,6 +349,22 @@ puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 30
 - [ ] « Réduire les animations » → l'éventail ne tourne plus, les
   bandeaux sont immobiles, pas de halo.
 
+### 11.4 Section « 01 — Les jeux » (lot 3)
+- [ ] Sur-titre, titre et texte viennent du back-office (section Jeux).
+- [ ] Tuiles dans l'ordre des jeux choisis au back-office, avec icône,
+  numéro, nom, description et « N catégories » (« 1 catégorie » au
+  singulier).
+- [ ] Ordinateur (≥ 900 px) : grille ; au survol, la tuile s'incline vers
+  la souris et une lueur à la couleur du jeu la suit ; en sortant, elle se
+  remet à plat.
+- [ ] Tablette : slider, un peu plus de 2 tuiles visibles ; mobile : une
+  tuile et le bord de la suivante. Le glisser s'arrête toujours sur une
+  tuile.
+- [ ] Sous le slider : compteur « 01 / 08 » qui suit le défilement, points
+  cliquables, flèches ← → désactivées en début et en fin de liste ; depuis
+  la fin, ← recule bien.
+- [ ] Bouton « Jouer » d'une tuile → la page descend à la démo, sur ce jeu.
+
 ---
 
 ## Ce qui reste à développer
