@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import type { LandingSectionId } from "@/lib/backoffice";
 import { LogoMark } from "./Logo";
 
-const SECTIONS = [
+const NAV = [
   { id: "jeux", key: "games" },
   { id: "demo", key: "demo" },
   { id: "apropos", key: "about" },
@@ -16,7 +17,10 @@ const SECTIONS = [
 /** En-tête fixe de la landing : logo, navigation par ancres, choix de la
  * langue, CTA pré-inscription, barre de progression du scroll. Sous 900 px,
  * la navigation passe dans un menu plein écran (burger). */
-export function Header({ locale }: { locale: string }) {
+export function Header({ locale, sections }: { locale: string; sections: LandingSectionId[] }) {
+  const links = NAV.filter((n) => sections.includes(n.id));
+  // Sans section de pré-inscription, le CTA n'aurait nulle part où mener.
+  const hasNotif = sections.includes("notif");
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -101,7 +105,7 @@ export function Header({ locale }: { locale: string }) {
           </a>
 
           <nav aria-label={t("main")} className="hidden gap-[26px] text-[15px] font-medium min-[900px]:flex">
-            {SECTIONS.map((s) => (
+            {links.map((s) => (
               <a key={s.id} href={anchor(s.id)} className="text-ink-soft transition-colors hover:text-ink">
                 {t(s.key)}
               </a>
@@ -130,13 +134,13 @@ export function Header({ locale }: { locale: string }) {
               ))}
             </div>
 
-            <a
+            {hasNotif && <a
               href={anchor("notif")}
               className="hidden items-center gap-2 rounded-full border border-accent px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-accent-wash hover:text-ink min-[640px]:flex"
             >
               <span className="h-[7px] w-[7px] rounded-full bg-accent motion-safe:animate-[pl-pulse_2.2s_infinite]" />
               {t("cta")}
-            </a>
+            </a>}
 
             <button
               ref={burgerRef}
@@ -174,7 +178,7 @@ export function Header({ locale }: { locale: string }) {
         }`}
       >
         <nav aria-label={t("mobile")} className="flex flex-col">
-          {SECTIONS.map((s, i) => (
+          {links.map((s, i) => (
             <a
               key={s.id}
               href={anchor(s.id)}
@@ -192,14 +196,16 @@ export function Header({ locale }: { locale: string }) {
           ))}
         </nav>
         <div className="mt-auto flex flex-col gap-3.5">
-          <a
-            href={anchor("notif")}
-            onClick={() => setMenuOpen(false)}
-            className="flex items-center justify-center rounded-full px-6 py-4 text-base font-bold text-ground-deep hover:text-ground-deep"
-            style={{ background: "var(--gradient-accent)" }}
-          >
-            {t("notify")}
-          </a>
+          {hasNotif && (
+            <a
+              href={anchor("notif")}
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center justify-center rounded-full px-6 py-4 text-base font-bold text-ground-deep hover:text-ground-deep"
+              style={{ background: "var(--gradient-accent)" }}
+            >
+              {t("notify")}
+            </a>
+          )}
           <p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-neutral-faint">{t("soon")}</p>
         </div>
       </div>

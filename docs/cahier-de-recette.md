@@ -290,6 +290,46 @@ débloquer le badge Explorateur, voir §6).
 
 ---
 
+## 11. Landing (`apps/web`) — refonte en cours
+
+Refonte par lots (voir le plan d'implémentation). Tester à 390 px (mobile),
+820 px (tablette) et 1280 px (ordinateur). En local : `pnpm backoffice:dev`,
+puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 3001`.
+
+### 11.1 Contenu depuis le back-office (lot 0)
+- [ ] Modifier le titre du héros dans `/site` et enregistrer → le nouveau
+  titre apparaît sur la landing **dans l'heure** (le site garde sa copie
+  1 h) ; en local, redémarrer le site pour le voir tout de suite.
+- [ ] Vider le titre EN au back-office → la version EN affiche le titre FR.
+- [ ] Couper le back-office → la landing s'affiche quand même, avec les
+  textes par défaut et le bon titre d'onglet.
+- [ ] Une catégorie cochée « jouable » dont toutes les cartes dépassent
+  l'intensité max (3 par défaut) n'apparaît pas dans la démo.
+
+### 11.2 En-tête, menu et pied de page (lot 1)
+- [ ] L'en-tête reste en haut en défilant ; une fine bordure apparaît dès
+  qu'on quitte le haut de page ; la barre dégradée sous l'en-tête suit la
+  progression du scroll.
+- [ ] Clic sur « Jeux » / « Démo » → défilement doux, le titre de la
+  section arrive juste sous l'en-tête (pas caché dessous).
+- [ ] Sans lien Instagram/TikTok/Reddit au back-office → pas de lien
+  « Réseaux » dans le menu.
+- [ ] FR ↔ EN → l'adresse passe de `/fr` à `/en`, tous les textes changent.
+- [ ] Sous 900 px : burger à droite ; ouverture → menu plein écran, les
+  liens arrivent un à un, la page derrière ne défile plus. Échap ou clic
+  sur un lien → le menu se ferme (et le lien amène à sa section).
+- [ ] Le bouton « Bientôt sur les stores » et le lien « À propos »
+  n'apparaissent pas encore : ils arrivent avec leurs sections (lot 5).
+- [ ] Au clavier seul (Tab) : chaque lien et bouton de l'en-tête reçoit un
+  contour rose visible.
+- [ ] Réglage système « réduire les animations » activé → aucune
+  apparition animée, tout est affiché d'emblée.
+- [ ] Pied de page : adresse de contact cliquable (ouvre la messagerie),
+  grand « Playlink » en filigrane. Les liens légaux mènent encore à une
+  page introuvable (lot 7).
+
+---
+
 ## Ce qui reste à développer
 
 Rien de ce qui suit n'est testable aujourd'hui — c'est normal de tomber sur

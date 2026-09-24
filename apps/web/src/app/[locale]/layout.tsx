@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
-import { getSiteConfig, landingTexts } from "@/lib/backoffice";
+import { getSiteConfig, landingTexts, landingSections } from "@/lib/backoffice";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RevealRoot } from "@/components/RevealRoot";
@@ -72,13 +72,13 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   // next-intl 3.x n'hérite pas les messages automatiquement : sans cette
   // prop, tout `useTranslations` dans un Client Component lève MISSING_MESSAGE.
-  const messages = await getMessages();
+  const [messages, site] = await Promise.all([getMessages(), getSiteConfig()]);
 
   return (
     <html lang={locale} className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-ground text-ink font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
-          <Header locale={locale} />
+          <Header locale={locale} sections={landingSections(site)} />
           {/* Réserve la hauteur du header fixe. */}
           <div aria-hidden className="h-[72px]" />
           <main id="top">{children}</main>

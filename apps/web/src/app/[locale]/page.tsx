@@ -1,5 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { getSiteConfig, getPreviewContent, landingTexts } from "@/lib/backoffice";
+import { getSiteConfig, getPreviewContent, landingTexts, landingSections } from "@/lib/backoffice";
 import { GameTile } from "@/components/GameTile";
 import { PreviewDemo } from "@/components/PreviewDemo";
 
@@ -22,7 +22,7 @@ export default async function HomePage({
   // un héros sans titre ne doit jamais s'afficher.
   const t = landingTexts(site, locale);
   const isReleased = site.releaseDate ? new Date(site.releaseDate) <= new Date() : false;
-  const hasSocial = site.social.instagram || site.social.tiktok || site.social.reddit;
+  const sections = landingSections(site);
 
   return (
     <div className="flex flex-col">
@@ -50,7 +50,7 @@ export default async function HomePage({
       </section>
 
       {/* ── Jeux ──────────────────────────────────────────────────── */}
-      {site.featuredGames.length > 0 && (
+      {sections.includes("jeux") && (
         <section id="jeux" className="border-t border-hairline px-6 py-20">
           <div className="mx-auto max-w-5xl">
             <div data-reveal className="mb-10 text-center">
@@ -78,7 +78,7 @@ export default async function HomePage({
       </section>
 
       {/* ── Réseaux sociaux ───────────────────────────────────────── */}
-      {hasSocial && (
+      {sections.includes("reseaux") && (
         <section id="reseaux" className="border-t border-hairline px-6 py-16 text-center">
           <h2 className="mb-5 font-[family-name:var(--font-display)] text-xl font-semibold">{t["social.title"]}</h2>
           <div className="flex justify-center gap-4 font-mono text-sm">

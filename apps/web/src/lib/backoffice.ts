@@ -110,3 +110,19 @@ export function landingTexts(site: SiteConfig, locale: string): LandingTexts {
 export function getPreviewContent() {
   return fetchJson<PreviewContent>("/api/preview-content", { categories: [] });
 }
+
+/** Ancres de la landing, dans l'ordre de la page. */
+export type LandingSectionId = "jeux" | "demo" | "apropos" | "notif" | "reseaux";
+
+/** Sections réellement rendues, pour que le header ne propose jamais un
+ * lien vers une section absente (réseaux sans lien, jeux non choisis…).
+ * Calculé côté serveur : pas de lien qui apparaît ou disparaît après
+ * hydratation. « apropos » et « notif » arrivent avec leurs sections. */
+export function landingSections(site: SiteConfig): LandingSectionId[] {
+  const hasSocial = Boolean(site.social.instagram || site.social.tiktok || site.social.reddit);
+  return [
+    site.featuredGames.length > 0 && "jeux",
+    "demo",
+    hasSocial && "reseaux",
+  ].filter((s): s is LandingSectionId => Boolean(s));
+}
