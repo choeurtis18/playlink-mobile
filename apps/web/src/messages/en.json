@@ -1,19 +1,9 @@
 {
-  "metadata": {
-    "title": "Playlink — Party games, coming soon on mobile",
-    "description": "8 games to liven up your nights with friends: Truth or Dare, Charades, Dilemma and more. The Playlink app is coming soon to iOS and Android."
-  },
   "hero": {
     "eyebrow": "Coming soon",
     "eyebrowReleased": "Available now"
   },
-  "games": {
-    "title": "8 games, one app",
-    "lede": "Each game has its own world of cards — from light-hearted fun to the intensity that gets people talking."
-  },
   "demo": {
-    "title": "Try it before you download it",
-    "lede": "A preview of a few categories, with real cards from the game.",
     "categoryLabel": "Choose a category",
     "prev": "Previous card",
     "next": "Next card",
@@ -21,7 +11,6 @@
     "comingSoon": "The playable preview is coming very soon."
   },
   "social": {
-    "title": "Find us here in the meantime",
     "instagram": "Instagram",
     "tiktok": "TikTok",
     "reddit": "Reddit"

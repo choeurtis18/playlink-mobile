@@ -1,19 +1,9 @@
 {
-  "metadata": {
-    "title": "Playlink — Les jeux de soirée, bientôt sur mobile",
-    "description": "8 jeux pour animer vos soirées entre amis : Action ou Vérité, Mime, Dilemme et plus. L'application Playlink arrive bientôt sur iOS et Android."
-  },
   "hero": {
     "eyebrow": "Bientôt disponible",
     "eyebrowReleased": "Disponible"
   },
-  "games": {
-    "title": "8 jeux, une seule appli",
-    "lede": "Chaque jeu a son propre univers de cartes — de l'ambiance légère à l'intensité qui pousse à se dévoiler."
-  },
   "demo": {
-    "title": "Essayez avant de télécharger",
-    "lede": "Un aperçu de quelques catégories, avec de vraies cartes du jeu.",
     "categoryLabel": "Choisir une catégorie",
     "prev": "Carte précédente",
     "next": "Carte suivante",
@@ -21,7 +11,6 @@
     "comingSoon": "L'aperçu jouable arrive très bientôt."
   },
   "social": {
-    "title": "On se retrouve ici en attendant",
     "instagram": "Instagram",
     "tiktok": "TikTok",
     "reddit": "Reddit"

@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "./prisma";
 import { requireEditor, logAction } from "./auth";
 import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
+import { LandingTextInputSchema, DemoSettingsSchema } from "@playlink/content-schema/landing-keys.ts";
 import {
   CardInput, CategoryInput, GameInput, BadgeInput, SlideInput, TranslationInput,
   SiteContentInput,
@@ -46,6 +47,12 @@ async function run(fn: (adminId: string) => Promise<void>, paths: string[]): Pro
     const editor = await requireEditor();
     await fn(editor.id);
     for (const p of paths) revalidatePath(p);
+    // Presque toute modification touche ce que la landing expose (chiffres
+    // de /api/site-config, cartes de /api/preview-content). Invalider les
+    // deux à chaque écriture coûte deux requêtes au prochain visiteur ;
+    // l'oublier sur une action affiche un contenu périmé pendant une heure.
+    revalidateTag("site-config");
+    revalidateTag("preview-content");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: humanize(e) };
@@ -272,10 +279,64 @@ export async function saveSiteContent(form: FormData): Promise<ActionResult> {
       create: { siteContentId: "default", locale: "en", heroTitle: heroTitleEn, heroLede: heroLedeEn, ctaLabel: ctaLabelEn },
       update: { heroTitle: heroTitleEn, heroLede: heroLedeEn, ctaLabel: ctaLabelEn },
     });
+    // Tant que ce formulaire existe (remplacé au lot 11 par l'éditeur par
+    // section), ses 3 textes alimentent aussi LandingText : c'est là que la
+    // nouvelle landing les lit.
+    await upsertLandingTexts([
+      { locale: "fr", key: "hero.title", value: heroTitleFr },
+      { locale: "fr", key: "hero.lede", value: heroLedeFr },
+      { locale: "fr", key: "hero.ctaSecondary", value: ctaLabelFr },
+      { locale: "en", key: "hero.title", value: heroTitleEn },
+      { locale: "en", key: "hero.lede", value: heroLedeEn },
+      { locale: "en", key: "hero.ctaSecondary", value: ctaLabelEn },
+    ]);
     await logAction(adminId, "updated_site_content", "site_content", "default");
-    // Le site (apps/web) fetch /api/site-config avec ce tag — invalider ici
-    // plutôt qu'attendre un redéploiement.
-    revalidateTag("site-config");
+  }, ["/site"]);
+}
+
+function upsertLandingTexts(entries: { locale: string; key: string; value: string }[]) {
+  return prisma.$transaction(entries.map(({ locale, key, value }) =>
+    prisma.landingText.upsert({
+      where: { locale_key: { locale, key } },
+      create: { locale, key, value },
+      update: { value },
+    }),
+  ));
+}
+
+/** Textes de la landing, section par section (éditeur « Contenu du site »).
+ * Reçoit uniquement les entrées modifiées ; tout ou rien — une clé
+ * invalide refuse l'ensemble plutôt que de publier une page à moitié. */
+export async function saveLandingTexts(entries: { locale: string; key: string; value: string }[]): Promise<ActionResult> {
+  return run(async (adminId) => {
+    if (entries.length === 0) return;
+    const parsed = entries.map((e) => LandingTextInputSchema.safeParse(e));
+    const failed = parsed.find((r) => !r.success);
+    if (failed && !failed.success) throw new Error(failed.error.issues[0].message);
+    const valid = parsed.flatMap((r) => (r.success ? [r.data] : []));
+    await upsertLandingTexts(valid);
+    await logAction(adminId, "updated_landing_texts", "site_content", "default", {
+      keys: [...new Set(valid.map((e) => `${e.locale}:${e.key}`))],
+    });
+  }, ["/site"]);
+}
+
+/** Réglages de la démo jouable et du formulaire de pré-inscription. */
+export async function saveLandingSettings(form: FormData): Promise<ActionResult> {
+  return run(async (adminId) => {
+    const parsed = DemoSettingsSchema.safeParse({
+      deckSize: form.get("deckSize"), maxIntensity: form.get("maxIntensity"),
+    });
+    if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+    const data = {
+      demoDeckSize: parsed.data.deckSize,
+      demoMaxIntensity: parsed.data.maxIntensity,
+      doubleOptIn: form.get("doubleOptIn") === "on",
+    };
+    await prisma.siteContent.upsert({
+      where: { id: "default" }, create: { id: "default", featuredGameIds: [], ...data }, update: data,
+    });
+    await logAction(adminId, "updated_landing_settings", "site_content", "default", data);
   }, ["/site"]);
 }
 
@@ -283,7 +344,6 @@ export async function toggleCategoryPreviewEligible(id: string, previewEligible:
   return run(async (adminId) => {
     await prisma.category.update({ where: { id }, data: { previewEligible } });
     await logAction(adminId, "toggled_preview_eligible", "category", id, { previewEligible });
-    revalidateTag("preview-content");
   }, ["/site"]);
 }
 
