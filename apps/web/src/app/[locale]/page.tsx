@@ -1,5 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { getSiteConfig, getPreviewContent, landingTexts } from "@/lib/backoffice";
+import { getSiteConfig, getPreviewContent, landingTexts, landingSections } from "@/lib/backoffice";
 import { GameTile } from "@/components/GameTile";
 import { PreviewDemo } from "@/components/PreviewDemo";
 
@@ -11,22 +11,21 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [site, preview, tHero, tSocial, tFooter] = await Promise.all([
+  const [site, preview, tHero, tSocial] = await Promise.all([
     getSiteConfig(),
     getPreviewContent(),
     getTranslations("hero"),
     getTranslations("social"),
-    getTranslations("footer"),
   ]);
 
   // Repli langue → FR (langue d'origine, CLAUDE.md) → texte par défaut :
   // un héros sans titre ne doit jamais s'afficher.
   const t = landingTexts(site, locale);
   const isReleased = site.releaseDate ? new Date(site.releaseDate) <= new Date() : false;
-  const hasSocial = site.social.instagram || site.social.tiktok || site.social.reddit;
+  const sections = landingSections(site);
 
   return (
-    <main className="flex flex-col">
+    <div className="flex flex-col">
       {/* ── Héros ─────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-6 py-24 sm:py-32">
         <div
@@ -51,10 +50,10 @@ export default async function HomePage({
       </section>
 
       {/* ── Jeux ──────────────────────────────────────────────────── */}
-      {site.featuredGames.length > 0 && (
-        <section className="border-t border-hairline px-6 py-20">
+      {sections.includes("jeux") && (
+        <section id="jeux" className="border-t border-hairline px-6 py-20">
           <div className="mx-auto max-w-5xl">
-            <div className="mb-10 text-center">
+            <div data-reveal className="mb-10 text-center">
               <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{t["games.title"]}</h2>
               <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{t["games.lede"]}</p>
             </div>
@@ -68,9 +67,9 @@ export default async function HomePage({
       )}
 
       {/* ── Démo jouable ──────────────────────────────────────────── */}
-      <section className="border-t border-hairline px-6 py-20">
+      <section id="demo" className="border-t border-hairline px-6 py-20">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-10 text-center">
+          <div data-reveal className="mb-10 text-center">
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold">{t["demo.title"]}</h2>
             <p className="mx-auto mt-2 max-w-[50ch] text-ink-soft">{t["demo.lede"]}</p>
           </div>
@@ -79,8 +78,8 @@ export default async function HomePage({
       </section>
 
       {/* ── Réseaux sociaux ───────────────────────────────────────── */}
-      {hasSocial && (
-        <section className="border-t border-hairline px-6 py-16 text-center">
+      {sections.includes("reseaux") && (
+        <section id="reseaux" className="border-t border-hairline px-6 py-16 text-center">
           <h2 className="mb-5 font-[family-name:var(--font-display)] text-xl font-semibold">{t["social.title"]}</h2>
           <div className="flex justify-center gap-4 font-mono text-sm">
             {site.social.instagram && (
@@ -102,13 +101,6 @@ export default async function HomePage({
         </section>
       )}
 
-      {/* ── Footer ────────────────────────────────────────────────── */}
-      <footer className="mx-auto flex w-full max-w-5xl flex-wrap gap-6 border-t border-hairline px-6 py-8 font-mono text-xs text-neutral-faint">
-        <a href={`/${locale}/mentions-legales`} className="hover:text-ink">{tFooter("legal")}</a>
-        <a href={`/${locale}/confidentialite`} className="hover:text-ink">{tFooter("privacy")}</a>
-        <a href={`/${locale}/cgu`} className="hover:text-ink">{tFooter("terms")}</a>
-        <a href={`/${locale}/cookies`} className="hover:text-ink">{tFooter("cookies")}</a>
-      </footer>
-    </main>
+    </div>
   );
 }
