@@ -100,11 +100,15 @@ function Counter({ length, max }: { length: number; max: number }) {
   );
 }
 
-/** Longueur initiale pour le compteur, en contrôlé comme en non contrôlé. */
-const initialLength = (value: unknown, defaultValue: unknown) => String(value ?? defaultValue ?? "").length;
+/** Longueur pour le compteur : lue sur `value` en contrôlé (elle peut
+ * changer sans saisie, ex. « Annuler »), suivie à la frappe sinon. */
+function useLength(value: unknown, defaultValue: unknown) {
+  const [typed, setTyped] = useState(() => String(defaultValue ?? "").length);
+  return [value !== undefined ? String(value).length : typed, setTyped] as const;
+}
 
 export function Input({ counter = false, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { counter?: boolean }) {
-  const [length, setLength] = useState(() => initialLength(props.value, props.defaultValue));
+  const [length, setLength] = useLength(props.value, props.defaultValue);
   const input = (
     <input
       {...props}
@@ -117,7 +121,7 @@ export function Input({ counter = false, ...props }: React.InputHTMLAttributes<H
 }
 
 export function Textarea({ counter = false, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { counter?: boolean }) {
-  const [length, setLength] = useState(() => initialLength(props.value, props.defaultValue));
+  const [length, setLength] = useLength(props.value, props.defaultValue);
   const area = (
     <textarea
       {...props}
@@ -178,6 +182,8 @@ export function Segmented<T extends string | number>({
             )}
           >
             {o.label}
+            {/* L'infobulle n'est pas lue : le libellé complet l'est. */}
+            {o.title && <span className="sr-only"> — {o.title}</span>}
           </button>
         );
       })}

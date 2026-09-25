@@ -33,9 +33,11 @@ const getSiteConfig = cache(
 export async function GET() {
   const { site, texts, games, categories, cards } = await getSiteConfig();
 
-  const featuredGames = (site?.featuredGameIds ?? [])
-    .map((id) => games.find((g) => g.id === id))
-    .filter((g): g is NonNullable<typeof g> => Boolean(g))
+  // Ordre de la page Jeux (`games` est trié par `order`) : réordonner
+  // les jeux au back-office réordonne aussi la landing.
+  const featured = new Set(site?.featuredGameIds ?? []);
+  const featuredGames = games
+    .filter((g) => featured.has(g.id))
     .map(({ translations, _count, ...g }) => ({
       ...g,
       categoryCount: _count.categories,

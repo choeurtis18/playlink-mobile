@@ -532,6 +532,38 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
   (« Carte modifiée — « … » »), avec l'éditeur et l'heure (« il y a
   12 min », « hier · 22:40 »). Sur téléphone, l'heure passe sous le texte.
 
+### 12.3 Contenu du site (lot 11)
+- [ ] 7 sections à gauche (Héros, Jeux, Démo jouable, Comment ça marche,
+  Pré-inscription, Réseaux, SEO & partage) avec une pastille : verte
+  (complet), orange (modifié, non publié), rouge (anglais à revoir).
+  Sous 1280 px : sections en pastilles au-dessus, aperçu en dessous.
+- [ ] Chaque texte en FR et EN côte à côte, avec compteur « n / max ».
+  Modifier un texte FR seulement → sous l'EN : « Le FR a changé —
+  l'anglais est encore le texte d'origine ». Vider un EN → « Traduction
+  manquante ».
+- [ ] L'aperçu à droite suit la frappe ; boutons Bureau/Mobile et FR/EN.
+  En EN, un texte vide s'affiche en FR avec l'étiquette « Textes EN
+  manquants — repli sur le FR ».
+- [ ] Rien n'est enregistré avant « Publier sur le site » : le statut
+  indique « N modifications non publiées », « Annuler » revient à la
+  version publiée. Quitter la page avec des modifications → le
+  navigateur demande confirmation.
+- [ ] Publier → notification « Site publié », statut « En ligne · publié
+  à l'instant » ; la landing affiche le changement en quelques secondes.
+- [ ] Héros : date de sortie passée → l'aperçu affiche « Disponible sur
+  iOS & Android ».
+- [ ] Jeux : 8 jeux au plus ; ordre = celui de la page Jeux (réordonner
+  les jeux réordonne la landing).
+- [ ] Démo : taille du deck (3 à 6), intensité maximale (1 à 5, libellé
+  affiché), catégories jouables ; le nombre de cartes exposées se met à
+  jour en direct.
+- [ ] Réseaux : un lien invalide (« pas-un-lien ») est refusé à la
+  publication avec un message clair ; un réseau vide est masqué.
+- [ ] SEO : aperçu du résultat Google (titre coupé à 60 caractères,
+  description à 160) et de la carte de partage.
+- [ ] Tableau de bord → « N textes EN à mettre à jour » ouvre directement
+  la bonne section.
+
 ---
 
 ## Ce qui reste à développer

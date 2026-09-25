@@ -53,25 +53,30 @@ export const TranslationInput = z.object({
   text: z.string().trim().min(1).max(500),
 });
 
-// Une seule ligne (id "default") : voir le commentaire sur SiteContent
-// dans schema.prisma. Le formulaire édite toujours FR + EN ensemble.
-export const SiteContentInput = z.object({
-  releaseDate: z.coerce.date().nullable(),
-  heroImageUrl: z.string().trim().url().nullable(),
-  // Obligatoire dès qu'une image est renseignée — accessibilité (plan
-  // landing §07), pas une simple convention de style.
-  heroImageAlt: z.string().trim().max(300).nullable(),
-  instagramUrl: z.string().trim().url().nullable(),
-  tiktokUrl: z.string().trim().url().nullable(),
-  redditUrl: z.string().trim().url().nullable(),
-  featuredGameIds: z.array(z.string().min(1)).max(8),
-  heroTitleFr: z.string().trim().min(1).max(200),
-  heroLedeFr: z.string().trim().min(1).max(500),
-  ctaLabelFr: z.string().trim().min(1).max(80),
-  heroTitleEn: z.string().trim().min(1).max(200),
-  heroLedeEn: z.string().trim().min(1).max(500),
-  ctaLabelEn: z.string().trim().min(1).max(80),
-}).refine(
-  (v) => !v.heroImageUrl || !!v.heroImageAlt,
-  { message: "Le texte alternatif est obligatoire pour une image de héros.", path: ["heroImageAlt"] }
-);
+// ── Landing (SiteContent, une seule ligne id "default") ───────────────
+
+/** URL de réseau social : vide = réseau masqué sur la landing. */
+const socialUrl = z
+  .string()
+  .trim()
+  .transform((v) => v || null)
+  .pipe(z.string().url("Lien invalide — il doit commencer par https://").nullable());
+
+/** Réglages de la landing publiés avec les textes (éditeur « Contenu du
+ * site »). Les textes, eux, sont validés clé par clé par
+ * LandingTextInputSchema (content-schema). */
+export const SiteSettingsInput = z.object({
+  releaseDate: z
+    .string()
+    .trim()
+    .transform((v) => (v ? new Date(`${v}T00:00:00Z`) : null))
+    .refine((d) => d === null || !Number.isNaN(d.getTime()), "Date de sortie invalide"),
+  featuredGameIds: z.array(z.string().min(1)).max(8, "8 jeux au plus sur la landing"),
+  demoDeckSize: z.number().int().min(3).max(6),
+  demoMaxIntensity: z.number().int().min(1).max(5),
+  doubleOptIn: z.boolean(),
+  instagramUrl: socialUrl,
+  tiktokUrl: socialUrl,
+  redditUrl: socialUrl,
+});
+export type SiteSettingsInput = z.input<typeof SiteSettingsInput>;

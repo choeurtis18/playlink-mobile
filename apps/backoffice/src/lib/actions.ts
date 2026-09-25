@@ -8,7 +8,7 @@ import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
 import { LandingTextInputSchema, DemoSettingsSchema } from "@playlink/content-schema/landing-keys.ts";
 import {
   CardInput, CategoryInput, GameInput, BadgeInput, SlideInput, TranslationInput,
-  SiteContentInput,
+  SiteSettingsInput,
 } from "./validation";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -225,130 +225,50 @@ export async function deleteBadge(id: string): Promise<ActionResult> {
   }, ["/badges", "/"]);
 }
 
-// ── Landing page (plan landing §05) ────────────────────────────────────
+// ── Landing : éditeur « Contenu du site » ─────────────────────────────
 
-const HERO_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export type SitePublishPayload = {
+  /** Seulement les textes modifiés depuis la dernière publication. */
+  texts: { locale: string; key: string; value: string }[];
+  settings: SiteSettingsInput;
+  /** Catégories dont l'éligibilité à la démo a changé. */
+  eligibility: { categoryId: string; previewEligible: boolean }[];
+};
 
-/** Upload direct, pas de modale — le formulaire Site a besoin de l'URL
- * avant de pouvoir enregistrer, contrairement aux formulaires `Modal`
- * standard qui n'ont qu'une seule Server Action à soumettre. */
-export async function uploadHeroImage(form: FormData): Promise<ActionResult & { url?: string }> {
-  try {
-    await requireEditor();
-    const file = form.get("file");
-    if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Aucun fichier reçu." };
-    if (file.size > HERO_IMAGE_MAX_BYTES) return { ok: false, error: "Image trop lourde (5 Mo max)." };
-    if (!file.type.startsWith("image/")) return { ok: false, error: "Le fichier doit être une image." };
-
-    const { put } = await import("@vercel/blob");
-    const ext = file.name.split(".").pop() || "jpg";
-    const blob = await put(`site/hero-${Date.now()}.${ext}`, file, {
-      access: "public", contentType: file.type, addRandomSuffix: false,
-    });
-    return { ok: true, url: blob.url };
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Échec de l'upload." };
-  }
-}
-
-export async function saveSiteContent(form: FormData): Promise<ActionResult> {
+/** « Publier sur le site » : textes, réglages et catégories de la démo en
+ * une seule transaction — la landing ne voit jamais une page à moitié
+ * publiée. Une clé ou une valeur invalide refuse l'ensemble. */
+export async function publishSite(payload: SitePublishPayload): Promise<ActionResult> {
   return run(async (adminId) => {
-    const parsed = SiteContentInput.safeParse({
-      releaseDate: field(form, "releaseDate"),
-      heroImageUrl: field(form, "heroImageUrl"),
-      heroImageAlt: field(form, "heroImageAlt"),
-      instagramUrl: field(form, "instagramUrl"),
-      tiktokUrl: field(form, "tiktokUrl"),
-      redditUrl: field(form, "redditUrl"),
-      featuredGameIds: form.getAll("featuredGameIds"),
-      heroTitleFr: form.get("heroTitleFr"), heroLedeFr: form.get("heroLedeFr"), ctaLabelFr: form.get("ctaLabelFr"),
-      heroTitleEn: form.get("heroTitleEn"), heroLedeEn: form.get("heroLedeEn"), ctaLabelEn: form.get("ctaLabelEn"),
-    });
-    if (!parsed.success) throw new Error(parsed.error.issues[0].message);
-    const {
-      heroTitleFr, heroLedeFr, ctaLabelFr, heroTitleEn, heroLedeEn, ctaLabelEn,
-      ...site
-    } = parsed.data;
+    const texts = payload.texts.map((e) => LandingTextInputSchema.safeParse(e));
+    const badText = texts.find((r) => !r.success);
+    if (badText && !badText.success) throw new Error(badText.error.issues[0].message);
+    const validTexts = texts.flatMap((r) => (r.success ? [r.data] : []));
 
-    await prisma.siteContent.upsert({
-      where: { id: "default" }, create: { id: "default", ...site }, update: site,
-    });
-    await prisma.siteContentTranslation.upsert({
-      where: { siteContentId_locale: { siteContentId: "default", locale: "fr" } },
-      create: { siteContentId: "default", locale: "fr", heroTitle: heroTitleFr, heroLede: heroLedeFr, ctaLabel: ctaLabelFr },
-      update: { heroTitle: heroTitleFr, heroLede: heroLedeFr, ctaLabel: ctaLabelFr },
-    });
-    await prisma.siteContentTranslation.upsert({
-      where: { siteContentId_locale: { siteContentId: "default", locale: "en" } },
-      create: { siteContentId: "default", locale: "en", heroTitle: heroTitleEn, heroLede: heroLedeEn, ctaLabel: ctaLabelEn },
-      update: { heroTitle: heroTitleEn, heroLede: heroLedeEn, ctaLabel: ctaLabelEn },
-    });
-    // Tant que ce formulaire existe (remplacé au lot 11 par l'éditeur par
-    // section), ses 3 textes alimentent aussi LandingText : c'est là que la
-    // nouvelle landing les lit.
-    await upsertLandingTexts([
-      { locale: "fr", key: "hero.title", value: heroTitleFr },
-      { locale: "fr", key: "hero.lede", value: heroLedeFr },
-      { locale: "fr", key: "hero.ctaSecondary", value: ctaLabelFr },
-      { locale: "en", key: "hero.title", value: heroTitleEn },
-      { locale: "en", key: "hero.lede", value: heroLedeEn },
-      { locale: "en", key: "hero.ctaSecondary", value: ctaLabelEn },
+    const settings = SiteSettingsInput.safeParse(payload.settings);
+    if (!settings.success) throw new Error(settings.error.issues[0].message);
+    const demo = DemoSettingsSchema.safeParse({ deckSize: settings.data.demoDeckSize, maxIntensity: settings.data.demoMaxIntensity });
+    if (!demo.success) throw new Error("Réglages de la démo invalides.");
+
+    const eligibility = payload.eligibility.filter((e) => typeof e.categoryId === "string" && typeof e.previewEligible === "boolean");
+
+    await prisma.$transaction([
+      ...validTexts.map(({ locale, key, value }) =>
+        prisma.landingText.upsert({
+          where: { locale_key: { locale, key } },
+          create: { locale, key, value },
+          update: { value },
+        }),
+      ),
+      prisma.siteContent.upsert({ where: { id: "default" }, create: { id: "default", ...settings.data }, update: settings.data }),
+      ...eligibility.map((e) => prisma.category.update({ where: { id: e.categoryId }, data: { previewEligible: e.previewEligible } })),
     ]);
-    await logAction(adminId, "updated_site_content", "site_content", "default");
-  }, ["/site"]);
-}
 
-function upsertLandingTexts(entries: { locale: string; key: string; value: string }[]) {
-  return prisma.$transaction(entries.map(({ locale, key, value }) =>
-    prisma.landingText.upsert({
-      where: { locale_key: { locale, key } },
-      create: { locale, key, value },
-      update: { value },
-    }),
-  ));
-}
-
-/** Textes de la landing, section par section (éditeur « Contenu du site »).
- * Reçoit uniquement les entrées modifiées ; tout ou rien — une clé
- * invalide refuse l'ensemble plutôt que de publier une page à moitié. */
-export async function saveLandingTexts(entries: { locale: string; key: string; value: string }[]): Promise<ActionResult> {
-  return run(async (adminId) => {
-    if (entries.length === 0) return;
-    const parsed = entries.map((e) => LandingTextInputSchema.safeParse(e));
-    const failed = parsed.find((r) => !r.success);
-    if (failed && !failed.success) throw new Error(failed.error.issues[0].message);
-    const valid = parsed.flatMap((r) => (r.success ? [r.data] : []));
-    await upsertLandingTexts(valid);
-    await logAction(adminId, "updated_landing_texts", "site_content", "default", {
-      keys: [...new Set(valid.map((e) => `${e.locale}:${e.key}`))],
+    await logAction(adminId, "published_site", "site_content", "default", {
+      keys: [...new Set(validTexts.map((e) => `${e.locale}:${e.key}`))],
+      categories: eligibility.length,
     });
-  }, ["/site"]);
-}
-
-/** Réglages de la démo jouable et du formulaire de pré-inscription. */
-export async function saveLandingSettings(form: FormData): Promise<ActionResult> {
-  return run(async (adminId) => {
-    const parsed = DemoSettingsSchema.safeParse({
-      deckSize: form.get("deckSize"), maxIntensity: form.get("maxIntensity"),
-    });
-    if (!parsed.success) throw new Error(parsed.error.issues[0].message);
-    const data = {
-      demoDeckSize: parsed.data.deckSize,
-      demoMaxIntensity: parsed.data.maxIntensity,
-      doubleOptIn: form.get("doubleOptIn") === "on",
-    };
-    await prisma.siteContent.upsert({
-      where: { id: "default" }, create: { id: "default", featuredGameIds: [], ...data }, update: data,
-    });
-    await logAction(adminId, "updated_landing_settings", "site_content", "default", data);
-  }, ["/site"]);
-}
-
-export async function toggleCategoryPreviewEligible(id: string, previewEligible: boolean): Promise<ActionResult> {
-  return run(async (adminId) => {
-    await prisma.category.update({ where: { id }, data: { previewEligible } });
-    await logAction(adminId, "toggled_preview_eligible", "category", id, { previewEligible });
-  }, ["/site"]);
+  }, ["/site", "/"]);
 }
 
 // ── Slides de règles ──────────────────────────────────────────────────

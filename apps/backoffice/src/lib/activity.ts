@@ -32,6 +32,7 @@ const ACTIONS: Record<string, { label: string; icon: ActivityIcon }> = {
   updated_site_content: { label: "Site mis à jour", icon: "site" },
   updated_landing_texts: { label: "Textes du site mis à jour", icon: "site" },
   updated_landing_settings: { label: "Réglages du site mis à jour", icon: "site" },
+  published_site: { label: "Site publié", icon: "site" },
   published_release: { label: "Version publiée", icon: "publish" },
 };
 
@@ -101,6 +102,12 @@ function detailOf(action: string, entityId: string, meta: Meta, name: Map<string
   if (action.endsWith("_translation")) {
     const locale = str(meta?.locale)?.toUpperCase();
     return `${name.get(entityId) ?? "Carte supprimée"}${locale ? ` (${locale})` : ""}`;
+  }
+  if (action === "published_site") {
+    const keys = Array.isArray(meta?.keys) ? meta.keys.length : 0;
+    const cats = typeof meta?.categories === "number" ? meta.categories : 0;
+    const parts = [keys && `${keys} texte${keys > 1 ? "s" : ""}`, cats && `${cats} catégorie${cats > 1 ? "s" : ""} de la démo`].filter(Boolean);
+    return parts.length ? parts.join(", ") : "réglages";
   }
   if (action === "updated_landing_texts" && Array.isArray(meta?.keys)) {
     // Clés tracées sous la forme « fr:hero.title » → « hero.title (FR) ».
