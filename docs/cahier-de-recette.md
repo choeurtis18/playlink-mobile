@@ -423,6 +423,31 @@ pour le double opt-in, `RESEND_API_KEY` et le domaine vérifié dans Resend.
   gamesplaylink@gmail.com.
 - [ ] Au clavier dans le formulaire, rien ne glisse ni ne se décale.
 
+### 11.7 Cookies et mesure d'audience (lot 6)
+Prérequis : `NEXT_PUBLIC_POSTHOG_KEY_LANDING` sur le projet Vercel du site.
+Pour vérifier les envois : PostHog → Activity (quelques secondes de délai).
+Tester dans une fenêtre privée, pour repartir sans choix enregistré.
+- [ ] Première visite : le bandeau glisse en bas à gauche après ~1,5 s ;
+  aucun événement n'arrive dans PostHog tant qu'on n'a pas choisi.
+- [ ] « Fonctionnels seulement » → le bandeau disparaît, rien n'arrive
+  dans PostHog, même en jouant à la démo ; au rechargement, le bandeau ne
+  revient pas.
+- [ ] « Gérer les préférences » → deux lignes : Fonctionnels (toujours
+  actifs) et Mesure d'audience (interrupteur) ; « Enregistrer » applique
+  le choix.
+- [ ] « Tout accepter » → `$pageview` arrive dans PostHog ; une partie de
+  démo envoie `demo_started`, `demo_card_revealed`,
+  `demo_vote_submitted`, `demo_completed` ; un clic sur un réseau envoie
+  `social_link_clicked` ; une pré-inscription `preregister_submitted`.
+- [ ] Pied de page → « Gérer les cookies » rouvre le bandeau sur les
+  préférences ; couper la mesure d'audience → plus rien n'arrive, et les
+  cookies `ph_…` disparaissent (outils de développement → Application →
+  Cookies).
+- [ ] Le choix est conservé 12 mois (cookie `playlink-consent-v1`).
+- [ ] Dans PostHog, aucun événement ne porte d'e-mail ni de nom :
+  seulement la langue, le jeu, la catégorie, l'intensité, le numéro de
+  carte et le vote.
+
 ---
 
 ## Ce qui reste à développer

@@ -102,7 +102,8 @@
     "cookies": "Cookies",
     "controller": "Responsable de traitement :",
     "nav": "Liens légaux",
-    "deleteData": "Supprimer mes données"
+    "deleteData": "Supprimer mes données",
+    "manageCookies": "Gérer les cookies"
   },
   "about": {
     "kicker": "03 — Comment ça marche",
@@ -146,5 +147,21 @@
     "mailBody": "Bonjour,\n\nMerci de supprimer ma pré-inscription à Playlink (adresse de cet e-mail).\n",
     "delay": "Réponse sous 30 jours au plus tard, comme le prévoit le RGPD. Adresse : {email}.",
     "back": "Retour à l’accueil"
+  },
+  "cookies": {
+    "label": "Préférences cookies",
+    "title": "Cookies.",
+    "body": "Nous utilisons des cookies de fonctionnement (obligatoires) et, avec ton accord, une mesure d’audience anonyme. Aucun cookie publicitaire.",
+    "policy": "En savoir plus",
+    "functional": "Fonctionnels",
+    "functionalHint": "— langue, sécurité",
+    "always": "Toujours actifs",
+    "analytics": "Mesure d’audience",
+    "analyticsHint": "— PostHog, hébergé en UE",
+    "acceptAll": "Tout accepter",
+    "functionalOnly": "Fonctionnels seulement",
+    "save": "Enregistrer",
+    "managePrefs": "Gérer les préférences",
+    "hidePrefs": "Masquer"
   }
 }

@@ -35,6 +35,8 @@ export async function SocialSection({ texts, social }: { texts: LandingTexts; so
                 href={l.href}
                 target="_blank"
                 rel="noreferrer"
+                data-analytics="social_link_clicked"
+                data-analytics-platform={l.key}
                 className="flex items-center justify-between gap-4 border-b border-hairline px-1 py-[26px] text-ink transition-[padding,color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] hover:pl-4 hover:text-accent-deep"
               >
                 <span className="font-display text-[clamp(28px,3vw,40px)] font-medium tracking-[-0.02em]">{l.name}</span>

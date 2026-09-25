@@ -7,6 +7,8 @@ import { getSiteConfig, landingTexts, landingSections } from "@/lib/backoffice";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RevealRoot } from "@/components/RevealRoot";
+import { CookieBanner } from "@/components/CookieBanner";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
 // Auto-hébergées par next/font : aucune requête vers Google au chargement,
 // et des polices de repli ajustées pour éviter le saut de mise en page.
@@ -84,6 +86,8 @@ export default async function LocaleLayout({
           <main id="top">{children}</main>
           <Footer locale={locale} />
           <RevealRoot locale={locale} />
+          <CookieBanner policyHref={`/${locale}/cookies`} />
+          <AnalyticsProvider locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>

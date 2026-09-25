@@ -6,7 +6,8 @@ import type { DemoSettings } from "@playlink/content-schema/landing-keys.ts";
 import type { PreviewCategory } from "@/lib/backoffice";
 import { OPEN_DEMO_EVENT, type OpenDemoDetail } from "@/lib/demo-events";
 import { buildDeck, INTENSITY_DEFAULT } from "@/lib/demo/deck";
-import { reduce, startGame, type Action, type DemoPlayer, type GameState } from "@/lib/demo/game";
+import { reduce, stageOf, startGame, type Action, type DemoPlayer, type GameState } from "@/lib/demo/game";
+import { capture } from "@/lib/analytics";
 import { frenchSpacing } from "@/lib/typography";
 import { DemoStage, type DemoGame } from "./DemoStage";
 
@@ -55,6 +56,7 @@ export function Demo({ categories, locale, settings }: { categories: PreviewCate
   }));
   const [game, dispatch] = useReducer(gameReducer, null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const startedAt = useRef(0);
 
   const current = games.find((g) => g.slug === sel.gameSlug) ?? games[0];
   const category = current?.categories.find((c) => c.slug === sel.categorySlug) ?? current?.categories[0];
@@ -95,11 +97,32 @@ export function Demo({ categories, locale, settings }: { categories: PreviewCate
     }));
     const deck = buildDeck(cards, sel.intensity, settings.deckSize, (c) => c.intensity);
     dispatch({ type: "start", state: startGame(PLAYERS, deck, hintsPerCard(current!.slug)) });
+    startedAt.current = Date.now();
+    capture("demo_started", { gameSlug: current!.slug, category: category!.slug, intensity: sel.intensity, deckSize: deck.length });
     // Sous 900 px, la scène est sous les réglages : on l'amène à l'écran.
     if (!window.matchMedia("(min-width: 900px)").matches) {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       stageRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
     }
+  }
+
+  function act(a: Action) {
+    if (game) {
+      const stage = stageOf(game);
+      const base = { gameSlug: current!.slug, cardIndex: game.index };
+      if (a.type === "reveal" && stage === "turn") capture("demo_card_revealed", base);
+      if (a.type === "vote" && stage === "vote") {
+        capture("demo_vote_submitted", { ...base, point: a.point });
+        if (game.index + 1 >= game.deck.length) {
+          capture("demo_completed", {
+            gameSlug: current!.slug,
+            category: category!.slug,
+            timeSpentS: Math.round((Date.now() - startedAt.current) / 1000),
+          });
+        }
+      }
+    }
+    dispatch(a);
   }
 
   const gradient = `linear-gradient(135deg, ${current.colorMain}, ${current.colorSecondary})`;
@@ -198,7 +221,7 @@ export function Demo({ categories, locale, settings }: { categories: PreviewCate
           intensityLabel={levelLabel(sel.intensity)}
           deckSize={Math.min(settings.deckSize, category.cards.length)}
           state={game}
-          dispatch={dispatch}
+          dispatch={act}
           onReplay={play}
           onChangeGame={() => dispatch({ type: "stop" })}
         />

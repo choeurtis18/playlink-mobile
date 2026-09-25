@@ -80,6 +80,8 @@ export async function Hero({
           <div style={delay(240)} className={`${ENTER} flex flex-wrap gap-3`}>
             <a
               href={primaryHref}
+              data-analytics="cta_clicked"
+              data-analytics-cta="hero_primary"
               className="flex items-center gap-2.5 rounded-full px-6 py-4 text-base font-bold text-ground-deep shadow-[0_10px_30px_-10px_rgb(242_58_107/0.7)] transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:text-ground-deep hover:shadow-[0_16px_40px_-12px_rgb(242_58_107/0.9)] active:translate-y-0"
               style={{ background: "var(--gradient-accent)" }}
             >
@@ -89,6 +91,8 @@ export async function Hero({
             {secondaryHref && (
               <a
                 href={secondaryHref}
+                data-analytics="cta_clicked"
+                data-analytics-cta="hero_notify"
                 className="rounded-full border border-hairline-firm bg-surface/50 px-6 py-4 text-base font-semibold text-ink transition-colors hover:border-neutral hover:bg-surface hover:text-ink"
               >
                 {texts["hero.ctaSecondary"]}
