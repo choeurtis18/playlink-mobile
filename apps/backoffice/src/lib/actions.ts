@@ -3,7 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "./prisma";
 import { requireEditor, logAction } from "./auth";
-import { notifySite } from "./notify-site";
+import { notifySite, type NotifyResult } from "./notify-site";
 import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
 import { LandingTextInputSchema, DemoSettingsSchema } from "@playlink/content-schema/landing-keys.ts";
 import {
@@ -11,7 +11,9 @@ import {
   SiteSettingsInput,
 } from "./validation";
 
-export type ActionResult = { ok: true } | { ok: false; error: string };
+/** `notify` : la landing a-t-elle été prévenue du changement ? (absent
+ * pour les actions qui ne la touchent pas). */
+export type ActionResult = { ok: true; notify?: NotifyResult } | { ok: false; error: string };
 
 /**
  * Traduit les erreurs Prisma en messages lisibles.
@@ -56,8 +58,8 @@ async function run(fn: (adminId: string) => Promise<void>, paths: string[]): Pro
     for (const tag of tags) revalidateTag(tag);
     // Attendu (pas lancé en arrière-plan) : sur Vercel, une fonction peut
     // être figée dès la réponse envoyée, et l'appel serait perdu.
-    await notifySite(tags);
-    return { ok: true };
+    const notify = await notifySite(tags);
+    return { ok: true, notify };
   } catch (e) {
     return { ok: false, error: humanize(e) };
   }
