@@ -118,7 +118,10 @@ export async function Hero({
         </div>
 
         {cards.length > 0 && (
-          <div style={delay(200)} className={ENTER}>
+          // Glissement sans fondu, comme le titre : la légende sous
+          // l'éventail est souvent l'affichage principal mesuré (LCP) sur
+          // grand écran, un fondu le retardait.
+          <div style={delay(200)} className={RISE}>
             <HeroFan cards={cards} />
           </div>
         )}
