@@ -111,7 +111,9 @@ export function HeroFan({ cards }: { cards: FanCard[] }) {
             <strong className="font-semibold text-ink">{current.name}</strong>
             {current.description && <> — {current.description}</>}
           </p>
-          <div className="flex gap-1.5">
+          {/* Zone de clic de 24 px (cible tactile minimale), trait visible
+              centré dedans : le design reste fin, le doigt ne rate pas. */}
+          <div className="flex">
             {cards.map((c, i) => (
               <button
                 key={c.slug}
@@ -119,12 +121,17 @@ export function HeroFan({ cards }: { cards: FanCard[] }) {
                 onClick={() => setActive(i)}
                 aria-label={t("showGame", { name: c.name })}
                 aria-current={i === active ? "true" : undefined}
-                className="h-1.5 rounded-[3px] transition-[width,background] duration-[400ms] ease-[cubic-bezier(.2,.8,.2,1)]"
-                style={{
-                  width: i === active ? 26 : 6,
-                  background: i === active ? `linear-gradient(135deg, ${c.colorMain}, ${c.colorSecondary})` : "var(--color-hairline-firm)",
-                }}
-              />
+                className="flex h-6 min-w-6 items-center justify-center px-[3px]"
+              >
+                <span
+                  aria-hidden
+                  className="h-1.5 rounded-[3px] transition-[width,background] duration-[400ms] ease-[cubic-bezier(.2,.8,.2,1)]"
+                  style={{
+                    width: i === active ? 26 : 6,
+                    background: i === active ? `linear-gradient(135deg, ${c.colorMain}, ${c.colorSecondary})` : "var(--color-hairline-firm)",
+                  }}
+                />
+              </button>
             ))}
           </div>
         </div>

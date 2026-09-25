@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "./prisma";
 import { requireEditor, logAction } from "./auth";
+import { notifySite } from "./notify-site";
 import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
 import { LandingTextInputSchema, DemoSettingsSchema } from "@playlink/content-schema/landing-keys.ts";
 import {
@@ -51,9 +52,11 @@ async function run(fn: (adminId: string) => Promise<void>, paths: string[]): Pro
     // de /api/site-config, cartes de /api/preview-content). Invalider les
     // deux à chaque écriture coûte deux requêtes au prochain visiteur ;
     // l'oublier sur une action affiche un contenu périmé pendant une heure.
-    revalidateTag("site-config");
-    revalidateTag("preview-content");
-    revalidateTag("legal-content");
+    const tags = ["site-config", "preview-content", "legal-content"];
+    for (const tag of tags) revalidateTag(tag);
+    // Attendu (pas lancé en arrière-plan) : sur Vercel, une fonction peut
+    // être figée dès la réponse envoyée, et l'appel serait perdu.
+    await notifySite(tags);
     return { ok: true };
   } catch (e) {
     return { ok: false, error: humanize(e) };

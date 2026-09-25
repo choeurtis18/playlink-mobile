@@ -466,6 +466,22 @@ Tester dans une fenêtre privée, pour repartir sans choix enregistré.
   erreur.
 - [ ] Google Search Console : domaine vérifié, sitemap soumis.
 
+### 11.9 Mise à jour immédiate et qualité (lot 8)
+Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
+- [ ] Modifier un texte ou un jeu au back-office → la landing affiche le
+  changement en quelques secondes (recharger la page), sans redéploiement.
+- [ ] PageSpeed Insights (pagespeed.web.dev) sur l'URL de production :
+  mobile ≥ 90 en performance, 100 en accessibilité, bonnes pratiques et
+  SEO ; ordinateur 100 partout.
+- [ ] Au clavier : le premier Tab fait apparaître « Aller au contenu » en
+  haut à gauche ; Entrée saute le menu.
+- [ ] Onglet du navigateur : icône Playlink (éventail de cartes).
+- [ ] Téléphone très étroit (320 px, ex. iPhone SE 1re génération) : rien
+  ne dépasse sur le côté ; sous le slider des jeux, compteur et flèches
+  (les points n'apparaissent qu'à partir de 400 px).
+- [ ] Les points sous l'éventail et sous le slider se touchent facilement
+  au doigt.
+
 ---
 
 ## Ce qui reste à développer

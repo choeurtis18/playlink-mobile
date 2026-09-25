@@ -10,6 +10,10 @@ import { Emphasis } from "../Emphasis";
  * chargement, une animation déclenchée après hydratation le ferait
  * clignoter. `backwards` garde l'état de départ pendant le délai. */
 const ENTER = "motion-safe:animate-[pl-reveal_0.8s_cubic-bezier(.2,.8,.2,1)_backwards]";
+/** Titre et accroche : glissement sans fondu. Chrome ne compte un texte
+ * comme affiché qu'une fois visible ; un fondu retardait l'affichage
+ * principal mesuré (LCP) de près de 3 s sur mobile. */
+const RISE = "motion-safe:animate-[pl-rise_0.8s_cubic-bezier(.2,.8,.2,1)_backwards]";
 const delay = (ms: number) => ({ animationDelay: `${ms}ms` });
 
 export async function Hero({
@@ -67,13 +71,13 @@ export async function Hero({
           </p>
           <h1
             style={delay(80)}
-            className={`${ENTER} m-0 text-balance font-display text-[clamp(44px,6.6vw,88px)] font-semibold leading-[0.98] tracking-[-0.035em]`}
+            className={`${RISE} m-0 text-balance font-display text-[clamp(44px,6.6vw,88px)] font-semibold leading-[0.98] tracking-[-0.035em]`}
           >
             <Emphasis text={frenchSpacing(texts["hero.title"])} variant="shine" />
           </h1>
           <p
             style={delay(160)}
-            className={`${ENTER} m-0 max-w-[52ch] text-pretty text-[clamp(17px,1.6vw,20px)] leading-[1.55] text-ink-soft`}
+            className={`${RISE} m-0 max-w-[52ch] text-pretty text-[clamp(17px,1.6vw,20px)] leading-[1.55] text-ink-soft`}
           >
             {frenchSpacing(texts["hero.lede"])}
           </p>
