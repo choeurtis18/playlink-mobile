@@ -488,7 +488,11 @@ export function Modal({ title, open, onClose, action, children, wide = false, su
       <form
         action={(fd) => start(async () => {
           const r = await action(fd);
-          if (r.ok) { close(); if (successMessage) toast(successMessage); } else setError(r.error);
+          if (r.ok) {
+            close();
+            if (r.notify && !r.notify.ok) toast("Enregistré, mais la landing n’a pas été prévenue", "error");
+            else if (successMessage) toast(successMessage);
+          } else setError(r.error);
         })}
         className="flex flex-col"
       >

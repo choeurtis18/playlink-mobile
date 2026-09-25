@@ -78,6 +78,8 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
   const [section, setSection] = useState(initialSection as SectionId);
   const [published, setPublished] = useState(lastPublishedAt);
   const [error, setError] = useState<string | null>(null);
+  /** Publication réussie mais landing non prévenue : cause à corriger. */
+  const [syncWarning, setSyncWarning] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const count = changeCount(saved, draft);
@@ -106,7 +108,13 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
       if (r.ok) {
         setSaved(draft);
         setPublished(new Date().toISOString());
-        toast("Site publié — la landing se met à jour");
+        if (r.notify && !r.notify.ok) {
+          setSyncWarning(r.notify.reason);
+          toast("Site publié, mais la landing n’a pas été prévenue", "error");
+        } else {
+          setSyncWarning(null);
+          toast("Site publié — landing prévenue, visible en quelques secondes");
+        }
       } else {
         setError(r.error);
         toast("Publication refusée", "error");
@@ -140,6 +148,15 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
       />
 
       {error && <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>}
+      {syncWarning && (
+        <div role="alert" className="mb-4 flex flex-col gap-1 rounded-lg border border-warning/40 bg-warning/10 px-3.5 py-2.5 text-sm">
+          <strong className="font-semibold text-warning">Publié, mais la landing n’a pas été prévenue</strong>
+          <span className="text-ink-soft">
+            Cause : {syncWarning}. Les textes sont bien enregistrés ; la landing les affichera d’elle-même sous 5 minutes environ.
+            Corrige la configuration Vercel pour une mise à jour immédiate.
+          </span>
+        </div>
+      )}
 
       <div className="grid items-start gap-4 min-[1280px]:grid-cols-[210px_minmax(0,1fr)_minmax(0,380px)]">
         <nav aria-label="Sections de la page" className="flex flex-wrap gap-1.5 min-[1280px]:sticky min-[1280px]:top-[76px] min-[1280px]:flex-col min-[1280px]:gap-0.5 min-[1280px]:rounded-[14px] min-[1280px]:border min-[1280px]:border-hairline min-[1280px]:bg-surface min-[1280px]:p-2">
