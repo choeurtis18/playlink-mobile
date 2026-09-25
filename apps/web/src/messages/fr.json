@@ -163,5 +163,9 @@
     "save": "Enregistrer",
     "managePrefs": "Gérer les préférences",
     "hidePrefs": "Masquer"
+  },
+  "legal": {
+    "kicker": "Informations légales",
+    "back": "Retour à l’accueil"
   }
 }

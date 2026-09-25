@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/sections/HowItWorks";
 import { NotifSection } from "@/components/sections/NotifSection";
 import { SocialSection } from "@/components/sections/SocialSection";
 import { Hero } from "@/components/hero/Hero";
+import { StructuredData } from "@/components/StructuredData";
 import { GamesSection } from "@/components/games/GamesSection";
 import { Marquee } from "@/components/hero/Marquee";
 import { heroFanCards, marqueeItems } from "@/lib/hero-content";
@@ -31,6 +32,7 @@ export default async function HomePage({
 
   return (
     <div className="flex flex-col">
+      <StructuredData locale={locale} description={t["meta.description"]} />
       <Hero
         texts={t}
         locale={locale}

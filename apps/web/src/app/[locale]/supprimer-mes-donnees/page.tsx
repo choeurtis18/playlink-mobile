@@ -6,7 +6,10 @@ import { CONTACT_EMAIL } from "@/components/Footer";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "deleteData" });
-  return { title: t("metaTitle") };
+  return {
+    title: t("metaTitle"),
+    alternates: { canonical: `/${locale}/supprimer-mes-donnees`, languages: { fr: "/fr/supprimer-mes-donnees", en: "/en/supprimer-mes-donnees" } },
+  };
 }
 
 /** Droit à l'effacement (RGPD, art. 17). Demande par e-mail au

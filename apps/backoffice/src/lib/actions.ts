@@ -53,6 +53,7 @@ async function run(fn: (adminId: string) => Promise<void>, paths: string[]): Pro
     // l'oublier sur une action affiche un contenu périmé pendant une heure.
     revalidateTag("site-config");
     revalidateTag("preview-content");
+    revalidateTag("legal-content");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: humanize(e) };
