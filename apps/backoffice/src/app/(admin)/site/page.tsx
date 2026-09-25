@@ -19,7 +19,7 @@ export default async function Site() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold">Site (landing page)</h1>
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">Site (landing page)</h1>
         <p className="mt-1 text-sm text-neutral-faint">
           Contenu de la landing publique (apps/web). La structure de la page reste fixe — seul ce
           contenu est modifiable.

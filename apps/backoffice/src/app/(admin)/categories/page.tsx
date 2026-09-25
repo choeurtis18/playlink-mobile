@@ -42,7 +42,7 @@ export default async function Categories({
   return (
     <>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">
           Catégories <span className="text-neutral-faint">{categories.length}</span>
         </h1>
         <NewCategoryButton games={games} />
@@ -75,7 +75,7 @@ export default async function Categories({
               <th className="p-3">Cartes</th>
               <th className="p-3">Répartition 1→5</th>
               <th className="p-3">Ordre</th>
-              <th className="p-3"></th>
+              <th className="relative p-3"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>

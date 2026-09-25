@@ -53,7 +53,7 @@ export default async function Cartes({
   return (
     <>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Cartes <span className="text-neutral-faint">{total}</span></h1>
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">Cartes <span className="text-neutral-faint">{total}</span></h1>
         <div className="flex gap-2">
           <a href={`/api/export/cards${sp.jeu ? `?jeu=${sp.jeu}` : ""}`}
             className="rounded border border-hairline px-3 py-1.5 text-sm text-ink-soft hover:bg-surface">
@@ -78,7 +78,7 @@ export default async function Cartes({
               <th className="p-2">Texte</th><th className="p-2">Jeu</th>
               <th className="p-2">Catégorie</th><th className="p-2">Int.</th>
               <th className="p-2">Tags</th><th className="p-2">EN</th>
-              <th className="p-2">État</th><th className="p-2"></th>
+              <th className="p-2">État</th><th className="relative p-2"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>

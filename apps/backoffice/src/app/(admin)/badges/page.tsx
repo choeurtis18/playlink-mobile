@@ -28,7 +28,7 @@ export default async function Badges() {
   return (
     <>
       <div className="mb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Badges</h1>
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">Badges</h1>
         <NewBadgeButton />
       </div>
       <p className="mb-6 max-w-prose text-sm text-neutral-faint">

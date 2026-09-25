@@ -18,7 +18,7 @@ export default async function Jeux() {
   return (
     <>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Jeux</h1>
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">Jeux</h1>
         <div className="flex gap-2">
           <a href="/api/export/games" className="rounded border border-hairline px-3 py-1.5 text-sm text-ink-soft hover:bg-surface">
             Export CSV
