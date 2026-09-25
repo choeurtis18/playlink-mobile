@@ -514,6 +514,24 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
   une ligne qui défile ; rien ne dépasse sur le côté (390 px).
 - [ ] Au clavier : le premier Tab fait apparaître « Aller au contenu ».
 
+### 12.2 Tableau de bord (lot 10)
+- [ ] 6 compteurs (jeux, catégories, cartes actives, slides, badges,
+  version publiée) ; chacun ouvre l'écran correspondant.
+- [ ] « Landing — 7 derniers jours » : pré-inscriptions des 7 derniers
+  jours avec la variation par rapport aux 7 précédents, des dernières
+  24 h et sur 14 jours, courbe jour par jour. Vues et démos : annoncées
+  pour l'écran Stats (rien d'inventé).
+- [ ] « À traiter » : cartes sans traduction EN (→ Traductions),
+  modifications non publiées (→ Publication), textes EN du site à mettre
+  à jour (→ Contenu du site), nouvelles pré-inscriptions des dernières
+  24 h. Une ligne sans rien à faire passe au vert (« Rien à publier »…).
+- [ ] Texte EN du site : modifier un texte en FR seulement → la ligne
+  « N textes EN à mettre à jour » apparaît ; renseigner l'EN → elle
+  repasse au vert.
+- [ ] « Activité récente » : les 6 dernières modifications en clair
+  (« Carte modifiée — « … » »), avec l'éditeur et l'heure (« il y a
+  12 min », « hier · 22:40 »). Sur téléphone, l'heure passe sous le texte.
+
 ---
 
 ## Ce qui reste à développer
