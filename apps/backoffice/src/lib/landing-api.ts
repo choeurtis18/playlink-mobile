@@ -21,3 +21,12 @@ export function checkLandingSecret(req: Request): NextResponse | null {
   }
   return null;
 }
+
+/** En-tête des routes publiques lues par la landing. Pas de cache CDN :
+ * celui de Vercel est régional et ne se vide pas à la publication — la
+ * landing (servie depuis une autre région que l'éditeur) relisait une
+ * copie périmée jusqu'à une heure, voire 24 h avec stale-while-revalidate.
+ * Le cache utile est ailleurs : unstable_cache ici (vidé par
+ * revalidateTag) et le cache de fetch de la landing (vidé par
+ * /api/revalidate, 5 min au plus sinon). */
+export const PUBLIC_API_HEADERS = { "Cache-Control": "no-store" } as const;
