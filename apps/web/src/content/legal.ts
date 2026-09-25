@@ -5,13 +5,12 @@
 // Modèles rédigés d'après ce que fait réellement le site (données
 // collectées, prestataires, durées). À faire relire par un professionnel
 // avant la mise en ligne, et à mettre à jour à la création de la société
-// (raison sociale, SIRET, adresse). « [Prénom Nom] » est un texte
-// provisoire, à remplacer.
+// (raison sociale, SIRET, adresse).
 
 export type LegalKey = "legal" | "privacy" | "terms" | "cookies";
 export type LegalPage = { title: string; content: string };
 
-const EDITOR = "[Prénom Nom]";
+const EDITOR = "Choeurtis Tchounga";
 const EMAIL = "gamesplaylink@gmail.com";
 const UPDATED_FR = "25 septembre 2026";
 const UPDATED_EN = "September 25, 2026";

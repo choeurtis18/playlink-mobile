@@ -452,8 +452,8 @@ Tester dans une fenêtre privée, pour repartir sans choix enregistré.
 - [ ] Pied de page : Mentions légales, Politique de confidentialité,
   Conditions d'utilisation, Cookies → chaque page s'ouvre (plus d'erreur
   404), en FR et en EN.
-- [ ] Les textes contiennent encore « [Prénom Nom] » : à remplacer
-  (fichier `apps/web/src/content/legal.ts`) avant la mise en ligne.
+- [ ] Mentions légales : l'éditeur et le directeur de la publication
+  affichent « Choeurtis Tchounga ».
 - [ ] Les liens internes des pages (confidentialité, cookies, supprimer
   mes données, e-mail, CNIL) fonctionnent.
 - [ ] Partage d'un lien (WhatsApp, Slack, LinkedIn…) : aperçu avec
