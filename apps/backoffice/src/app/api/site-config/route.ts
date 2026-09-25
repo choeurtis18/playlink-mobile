@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { unstable_cache as cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_DEMO_SETTINGS } from "@playlink/content-schema/landing-keys.ts";
+import { PUBLIC_API_HEADERS } from "@/lib/landing-api";
 
 // Consommé par apps/web (jamais Neon en direct depuis le site — voir plan
 // landing §01). Contenu marketing, change rarement : cache long, invalidé
@@ -77,6 +78,6 @@ export async function GET() {
         ]),
       ),
     },
-    { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } },
+    { headers: PUBLIC_API_HEADERS },
   );
 }
