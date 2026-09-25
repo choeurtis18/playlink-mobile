@@ -135,6 +135,26 @@ export function resolveLandingTexts(
   ) as LandingTexts;
 }
 
+/** Textes que l'anglais n'a pas suivis : le FR a été personnalisé au
+ * back-office, mais l'EN est vide ou encore au texte par défaut. La
+ * landing EN affiche alors un texte qui ne correspond plus au FR.
+ * Renvoie la clé et sa section, dans l'ordre de la page. */
+export function landingEnGaps(
+  rows: readonly { locale: string; key: string; value: string }[],
+): { key: LandingKey; sectionId: string }[] {
+  const value = (locale: string, key: string) => rows.find((r) => r.locale === locale && r.key === key)?.value.trim() ?? '';
+  const gaps: { key: LandingKey; sectionId: string }[] = [];
+  for (const section of LANDING_SECTIONS) {
+    for (const field of section.fields) {
+      const fr = value('fr', field.key);
+      if (!fr || fr === field.fr.trim()) continue;
+      const en = value('en', field.key);
+      if (!en || en === field.en.trim()) gaps.push({ key: field.key as LandingKey, sectionId: section.id });
+    }
+  }
+  return gaps;
+}
+
 /** Une entrée éditée au back-office. Le texte peut être vide (EN pas encore
  * traduit) mais jamais plus long que la limite de sa clé. */
 export const LandingTextInputSchema = z

@@ -5,6 +5,7 @@ import {
   LANDING_KEYS,
   LandingTextInputSchema,
   defaultLandingTexts,
+  landingEnGaps,
   resolveLandingTexts,
 } from './landing-keys.ts';
 
@@ -35,4 +36,35 @@ test('validation : clé inconnue, texte trop long, FR vide', () => {
   assert.equal(LandingTextInputSchema.safeParse({ locale: 'fr', key: 'notif.button', value: 'x'.repeat(25) }).success, false);
   assert.equal(LandingTextInputSchema.safeParse({ locale: 'fr', key: 'hero.title', value: '   ' }).success, false);
   assert.equal(LandingTextInputSchema.safeParse({ locale: 'en', key: 'hero.title', value: '' }).success, true);
+});
+
+test('landingEnGaps : FR personnalisé sans EN à jour', () => {
+  const d = { fr: defaultLandingTexts('fr'), en: defaultLandingTexts('en') };
+  assert.deepEqual(landingEnGaps([]), [], 'rien de personnalisé');
+  assert.deepEqual(
+    landingEnGaps([{ locale: 'fr', key: 'hero.title', value: d.fr['hero.title'] }]),
+    [],
+    'FR identique au défaut : pas un écart',
+  );
+  assert.deepEqual(
+    landingEnGaps([{ locale: 'fr', key: 'hero.title', value: 'Playlink' }]),
+    [{ key: 'hero.title', sectionId: 'hero' }],
+    'FR modifié, EN absent',
+  );
+  assert.deepEqual(
+    landingEnGaps([
+      { locale: 'fr', key: 'hero.title', value: 'Playlink' },
+      { locale: 'en', key: 'hero.title', value: `  ${d.en['hero.title']} ` },
+    ]),
+    [{ key: 'hero.title', sectionId: 'hero' }],
+    'EN resté au texte par défaut',
+  );
+  assert.deepEqual(
+    landingEnGaps([
+      { locale: 'fr', key: 'hero.title', value: 'Playlink' },
+      { locale: 'en', key: 'hero.title', value: 'Playlink' },
+    ]),
+    [],
+    'EN renseigné',
+  );
 });
