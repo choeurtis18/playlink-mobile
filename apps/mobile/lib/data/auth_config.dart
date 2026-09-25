@@ -43,5 +43,17 @@ ClerkAuthConfig buildClerkConfig() {
     // Google pour l'OAuth tiers de toute façon (jamais d'in-app WebView).
     redirectionGenerator: (_, _) => oauthRedirectUri,
     deepLinkStream: _appLinks.uriLinkStream,
+    // Le mixin de télémétrie du SDK (0.0.18-beta, la dernière version
+    // publiée) plante à la fermeture de `ClerkSignedIn`/`ClerkSignedOut` —
+    // `dispose()` y relit `ClerkAuth.of(context)` pour construire le
+    // payload d'un événement « composant démonté », un lookup non permis
+    // sur un contexte déjà désactivé (`_ClerkSignedOutState.telemetryPayload`
+    // → `ClerkTelemetryStateMixin.dispose()`). Confirmé en usage réel : une
+    // simple navigation retour-accueil qui démonte un de ces widgets suffit
+    // à déclencher le crash. `telemetryPeriod: Duration.zero` désactive la
+    // télémétrie (`Telemetry.isEnabled`), ce qui coupe court à `dispose()`
+    // avant qu'il n'atteigne le code fautif — aucune perte fonctionnelle
+    // pour nous, la télémétrie ne concernait que du reporting interne au SDK.
+    telemetryPeriod: Duration.zero,
   );
 }
