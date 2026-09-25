@@ -14,7 +14,7 @@ const BADGES = [
   { key: 'party_legend',     name: 'Légende de soirée',   description: '20 points cumulés. La soirée se souvient de toi.',        icon: '👑' },
   { key: 'social_butterfly', name: 'Papillon social',     description: '5 parties jouées à 4 joueurs ou plus.',                   icon: '🦋' },
   { key: 'truth_seeker',     name: 'Chercheur de vérité', description: '10 cartes de vérité remportées.',                         icon: '🔍' },
-  { key: 'three_peat',       name: 'Triplé',              description: '3 parties gagnées d\'affilée dans une même session.',     icon: '🔥' },
+  { key: 'three_peat',       name: 'Triplé',              description: '3 parties gagnées d\'affilée.',                           icon: '🔥' },
   { key: 'explorer',         name: 'Explorateur',         description: 'Au moins une partie dans chacun des 8 jeux.',             icon: '🧭' },
   { key: 'night_owl',        name: 'Oiseau de nuit',      description: 'Une partie terminée entre 2 h et 5 h du matin.',          icon: '🦉' },
   { key: 'author',           name: 'Auteur',              description: '5 cartes personnalisées créées.',                        icon: '✍️' },

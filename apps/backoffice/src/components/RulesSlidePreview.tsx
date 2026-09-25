@@ -31,7 +31,7 @@ export function RulesSlidePreview({
 }
 
 /** `**gras**` uniquement — même contrat que `RichTextLite` côté mobile. */
-function renderMarkdownLite(text: string) {
+export function renderMarkdownLite(text: string) {
   const parts = text.split(/(\*\*.+?\*\*)/g);
   return parts.map((p, i) =>
     p.startsWith("**") && p.endsWith("**")

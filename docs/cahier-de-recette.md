@@ -594,6 +594,30 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
 - [ ] 390 px de large : rien ne dépasse sur le côté (les tableaux
   défilent horizontalement).
 
+### 12.5 Traductions, Règles, Badges, Publication (lot 12b)
+- [ ] Traductions : grande jauge de couverture anglaise ; à droite,
+  avancement par jeu (clic = filtre sur ce jeu, re-clic = retire le
+  filtre). Recherche FR ou EN, jeu et catégorie s'appliquent sans bouton.
+- [ ] Traduire une carte puis quitter le champ (Tab) → « Enregistré » à
+  côté et notification ; en mode « À traduire », la carte quitte la liste.
+  « Tout voir » montre aussi les cartes déjà traduites.
+- [ ] Règles : choisir un jeu ; cliquer une slide l'affiche dans le
+  téléphone à droite ; ‹ › et les points suivent ; le **gras** est rendu.
+  Réordonner par la poignée ou au clavier (↑ / ↓).
+- [ ] Badges : chaque carte indique la règle codée dans l'app (horloge
+  bleue = pas encore débloquable, triangle orange = clé inconnue de
+  l'app). Section « badges prévus absents » : « Créer » l'ajoute en un
+  clic avec son nom, sa description et son icône par défaut.
+- [ ] Badge « Triplé » : la description dit « 3 parties gagnées
+  d'affilée » (l'app compte toutes les sessions, pas une seule). Si
+  l'ancienne description « … dans une même session » est en base,
+  la corriger via Éditer.
+- [ ] Publication : version en ligne, récapitulatif des modifications
+  depuis (mêmes chiffres que l'encart de la sidebar, par type puis les
+  dernières en clair), historique des versions. « Publier la vN » →
+  « Confirmer la vN » + Annuler (plus de boîte du navigateur) → version
+  créée, notification.
+
 ---
 
 ## Ce qui reste à développer

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 import { MagnifyingGlassIcon, PencilSimpleIcon, PlusIcon, TranslateIcon, TrashIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { Button, ConfirmButton, Field, Input, Modal, Segmented, Select, Switch, Textarea, useToast } from "@/components/ui";
 import { CardPreview } from "@/components/CardPreview";
 import { deleteCard, saveCard, toggleCardActive } from "@/lib/actions";
+import { useUrlFilters } from "@/lib/use-url-filters";
 
 // Doit rester identique à `intensityLabels` (apps/mobile/lib/core/deck.dart).
 export const INTENSITY_LABELS: Record<number, string> = {
@@ -173,27 +173,10 @@ function CardFields({ card, games, categories }: { card?: EditableCard; games: G
 
 type Filters = { jeu?: string; categorie?: string; intensite?: string; q?: string; sansEn?: string; page?: string };
 
-const SEARCH_DELAY_MS = 300;
-
-/** Filtres appliqués en direct : chaque changement réécrit l'URL (lien
- * partageable, retour arrière du navigateur), la page serveur relit la
- * base. La recherche attend une courte pause dans la frappe. */
+/** Filtres appliqués en direct (voir useUrlFilters). */
 export function CardFilters({ games, categories, sp }: { games: Game[]; categories: Cat[]; sp: Filters }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [pending, start] = useTransition();
+  const { apply, applyLater, reset, pending } = useUrlFilters(sp);
   const [q, setQ] = useState(sp.q ?? "");
-  const timer = useRef<number | undefined>(undefined);
-
-  const apply = (over: Filters) => {
-    // Nouveau filtre = retour à la première page.
-    const next: Record<string, string | undefined> = { ...sp, ...over, page: undefined };
-    const params = new URLSearchParams();
-    for (const [k, v] of Object.entries(next)) if (v) params.set(k, v);
-    start(() => router.replace(`${pathname}${params.size ? `?${params}` : ""}`, { scroll: false }));
-  };
-
-  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const categoriesOfGame = sp.jeu ? categories.filter((c) => c.game.slug === sp.jeu) : categories;
   const active = !!(sp.q || sp.jeu || sp.categorie || sp.intensite || sp.sansEn);
@@ -207,12 +190,7 @@ export function CardFilters({ games, categories, sp }: { games: Game[]; categori
           value={q}
           aria-label="Rechercher dans le texte des cartes"
           placeholder="Rechercher…"
-          onChange={(e) => {
-            const v = e.target.value;
-            setQ(v);
-            window.clearTimeout(timer.current);
-            timer.current = window.setTimeout(() => apply({ q: v.trim() || undefined }), SEARCH_DELAY_MS);
-          }}
+          onChange={(e) => { setQ(e.target.value); applyLater({ q: e.target.value.trim() || undefined }); }}
           className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-neutral-faint focus-visible:outline-none"
         />
       </label>
@@ -242,7 +220,7 @@ export function CardFilters({ games, categories, sp }: { games: Game[]; categori
         <TranslateIcon aria-hidden /> Sans EN
       </button>
       {active && (
-        <button type="button" onClick={() => { setQ(""); start(() => router.replace(pathname, { scroll: false })); }}
+        <button type="button" onClick={() => { setQ(""); reset(); }}
           className="flex items-center gap-1 px-1 text-[13px] text-neutral-faint hover:text-ink">
           <XIcon aria-hidden /> Réinitialiser
         </button>

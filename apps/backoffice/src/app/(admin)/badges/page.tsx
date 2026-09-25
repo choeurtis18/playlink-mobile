@@ -1,78 +1,64 @@
+import { CheckCircleIcon, ClockIcon, WarningIcon } from "@phosphor-icons/react/dist/ssr";
 import { prisma } from "@/lib/prisma";
-import { DeleteBadgeButton, EditBadgeButton, NewBadgeButton } from "./BadgeEditor";
+import { PageHeader } from "@/components/ui";
+import { BADGE_RULES, badgeRule } from "@/lib/badge-rules";
+import { CreatePlannedBadge, DeleteBadgeButton, EditBadgeButton, NewBadgeButton } from "./BadgeEditor";
 
 export const dynamic = "force-dynamic";
 
-// La règle d'attribution est une fonction Dart identifiée par la clé du badge,
-// évaluée sur l'appareil en fin de partie (§01, décision tranchée). Le
-// back-office ne gère que les métadonnées — d'où ce rappel des règles prévues.
-const RULES: Record<string, string> = {
-  first_win: "1er point marqué, tous jeux confondus",
-  party_legend: "20 points cumulés au total",
-  centurion: "100 points cumulés au total",
-  social_butterfly: "5 parties à 4 joueurs ou plus",
-  truth_seeker: "10 cartes taguées vérité gagnées",
-  three_peat: "3 parties gagnées d'affilée dans une session",
-  explorer: "Au moins 1 partie dans chacun des 8 jeux",
-  night_owl: "Une partie terminée entre 2 h et 5 h",
-  polyglot: "Jouer en FR et en EN",
-  author: "Créer 5 cartes personnalisées",
-  curator: "Liker 20 cartes (compte requis)",
-  marathon: "50 parties terminées",
-};
-
 export default async function Badges() {
-  const badges = await prisma.badge.findMany({ orderBy: { order: "asc" } });
-  const missing = Object.keys(RULES).filter((k) => !badges.some((b) => b.key === k));
+  const badges = await prisma.badge.findMany({ orderBy: [{ order: "asc" }, { id: "asc" }] });
+  const missing = BADGE_RULES.filter((r) => !badges.some((b) => b.key === r.key));
+  const known = BADGE_RULES.map((r) => r.key);
 
   return (
     <>
-      <div className="mb-2 flex items-center justify-between">
-        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">Badges</h1>
-        <NewBadgeButton />
-      </div>
-      <p className="mb-6 max-w-prose text-sm text-neutral-faint">
-        Métadonnées uniquement. La règle d&apos;attribution vit dans le code de
-        l&apos;app et s&apos;évalue localement en fin de partie — la clé fait le lien.
-      </p>
+      <PageHeader
+        title={<>Badges <span className="font-sans text-lg font-medium tracking-normal text-neutral-faint">{badges.length}</span></>}
+        description="Métadonnées uniquement. La règle d’attribution vit dans le code de l’app et s’évalue localement en fin de partie — la clé fait le lien."
+        actions={<NewBadgeButton known={known} />}
+      />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {badges.map((b) => (
-          <div key={b.id} className="rounded-lg border border-hairline bg-surface p-4">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">{b.icon}</span>
-              <div className="min-w-0 flex-1">
-                <div className="font-medium">{b.name}</div>
-                <div className="text-sm text-ink-soft">{b.description}</div>
-                <code className="mt-1 block text-xs text-neutral-faint">{b.key}</code>
-                {RULES[b.key]
-                  ? <div className="mt-2 text-xs text-neutral-faint">Règle : {RULES[b.key]}</div>
-                  : <div className="mt-2 text-xs text-amber-500">Aucune règle Dart connue pour cette clé</div>}
+      <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] gap-3 p-0">
+        {badges.map((b) => {
+          const rule = badgeRule(b.key);
+          return (
+            <li key={b.id} className="flex items-start gap-3.5 rounded-[14px] border border-hairline bg-surface p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-hairline-firm">
+              <span aria-hidden className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-raised text-2xl">{b.icon}</span>
+              <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+                <h2 className="m-0 text-[15px] font-semibold">{b.name}</h2>
+                <p className="m-0 text-[13px] leading-[1.45] text-ink-soft">{b.description}</p>
+                <code className="font-mono text-[11px] text-neutral-faint">{b.key}</code>
+                <p className={`m-0 mt-1.5 flex items-start gap-1.5 text-xs ${!rule ? "text-warning" : rule.live ? "text-neutral-faint" : "text-blue"}`}>
+                  {!rule ? <WarningIcon aria-hidden className="mt-px shrink-0" /> : rule.live ? <CheckCircleIcon aria-hidden className="mt-px shrink-0" /> : <ClockIcon aria-hidden className="mt-px shrink-0" />}
+                  <span>{!rule ? "Aucune règle dans l’app pour cette clé : ce badge ne se débloque jamais." : `Règle : ${rule.rule}`}</span>
+                </p>
               </div>
-              <div className="flex shrink-0 flex-col gap-1">
-                <EditBadgeButton badge={b} />
+              <div className="flex flex-none flex-col items-center gap-1">
+                <EditBadgeButton badge={b} known={known} />
                 <DeleteBadgeButton id={b.id} name={b.name} />
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            </li>
+          );
+        })}
+      </ul>
 
       {missing.length > 0 && (
-        <div className="mt-6 rounded-lg border border-hairline bg-surface p-4">
-          <div className="mb-3 text-sm font-medium">
-            {missing.length} badges prévus au blueprint, absents de la base
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {missing.map((k) => (
-              <span key={k} className="inline-flex items-center gap-2 rounded border border-hairline bg-raised px-2 py-1 text-xs">
-                <code>{k}</code>
-                <span className="text-neutral-faint">{RULES[k]}</span>
-                <NewBadgeButton presetKey={k} label="+ créer" />
-              </span>
+        <section aria-labelledby="missing-badges" className="mt-5 flex flex-col gap-3 rounded-[14px] border border-dashed border-hairline-firm p-4">
+          <h2 id="missing-badges" className="m-0 text-sm font-semibold">
+            {missing.length} badge{missing.length > 1 ? "s" : ""} prévu{missing.length > 1 ? "s" : ""} dans l’app, absent{missing.length > 1 ? "s" : ""} de la base
+          </h2>
+          <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+            {missing.map((r) => (
+              <li key={r.key} className="inline-flex items-center gap-2 rounded-lg border border-hairline bg-surface px-2.5 py-1.5 text-xs">
+                <span aria-hidden>{r.defaults.icon}</span>
+                <code className="font-mono text-accent-deep">{r.key}</code>
+                <span className="text-ink-soft">{r.rule}</span>
+                <CreatePlannedBadge badgeKey={r.key} name={r.defaults.name} />
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </section>
       )}
     </>
   );
