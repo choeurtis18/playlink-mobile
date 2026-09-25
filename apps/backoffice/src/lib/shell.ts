@@ -1,9 +1,18 @@
 import { prisma } from "./prisma";
 
 /** Entités du contenu de l'app : ce que l'app voit après une publication. */
-const APP_ENTITIES = ["card", "category", "game", "slide", "badge"];
+export const APP_ENTITIES = ["card", "category", "game", "slide", "badge"];
 /** Actions sur ces entités qui ne concernent que la landing. */
 const SITE_ONLY_ACTIONS = ["toggled_preview_eligible"];
+
+/** Lignes du journal que l'app ne voit qu'après publication. */
+export function pendingWhere(since: Date | null | undefined) {
+  return {
+    entity: { in: APP_ENTITIES },
+    action: { notIn: SITE_ONLY_ACTIONS },
+    ...(since ? { createdAt: { gt: since } } : {}),
+  };
+}
 
 export type ShellCounts = {
   games: number;
@@ -24,13 +33,7 @@ export async function getShellCounts(): Promise<ShellCounts> {
   const [games, cards, pending, newSignups] = await Promise.all([
     prisma.game.count(),
     prisma.card.count({ where: { active: true } }),
-    prisma.auditLog.count({
-      where: {
-        entity: { in: APP_ENTITIES },
-        action: { notIn: SITE_ONLY_ACTIONS },
-        ...(release ? { createdAt: { gt: release.publishedAt } } : {}),
-      },
-    }),
+    prisma.auditLog.count({ where: pendingWhere(release?.publishedAt) }),
     prisma.landingPreRegistration.count({ where: { createdAt: { gte: since } } }),
   ]);
   return { games, cards, pending, version: release?.version ?? null, newSignups };

@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
 // Journal d'activité lisible : traduit les lignes brutes d'AuditLog
@@ -53,8 +54,8 @@ const quote = (s: string, max = 60) => `« ${s.length > max ? `${s.slice(0, max 
 
 /** Dernières lignes du journal, avec le nom de ce qu'elles touchent
  * (lu en base par lots : une requête par type d'entité, pas par ligne). */
-export async function recentActivity(take = 6): Promise<ActivityEntry[]> {
-  const logs = await prisma.auditLog.findMany({ orderBy: { createdAt: "desc" }, take });
+export async function recentActivity(take = 6, where?: Prisma.AuditLogWhereInput): Promise<ActivityEntry[]> {
+  const logs = await prisma.auditLog.findMany({ where, orderBy: { createdAt: "desc" }, take });
   const ids = (entity: string) =>
     [...new Set(logs.filter((l) => l.entity === entity && !["bulk", "default"].includes(l.entityId)).map((l) => l.entityId))];
 

@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "./prisma";
 import { requireEditor, logAction } from "./auth";
 import { notifySite, type NotifyResult } from "./notify-site";
+import { BADGE_RULES } from "./badge-rules";
 import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
 import { LandingTextInputSchema, DemoSettingsSchema } from "@playlink/content-schema/landing-keys.ts";
 import {
@@ -224,6 +225,17 @@ export async function deleteBadge(id: string): Promise<ActionResult> {
   return run(async (adminId) => {
     await prisma.badge.delete({ where: { id } });
     await logAction(adminId, "deleted_badge", "badge", id);
+  }, ["/badges", "/"]);
+}
+
+/** Crée en un clic un badge prévu (règle codée dans l'app) mais absent
+ * de la base, avec ses valeurs par défaut — à la place prévue dans l'ordre. */
+export async function createPlannedBadge(key: string): Promise<ActionResult> {
+  return run(async (adminId) => {
+    const index = BADGE_RULES.findIndex((r) => r.key === key);
+    if (index < 0) throw new Error("Badge inconnu.");
+    const b = await prisma.badge.create({ data: { key, ...BADGE_RULES[index].defaults, order: index } });
+    await logAction(adminId, "created_badge", "badge", b.id);
   }, ["/badges", "/"]);
 }
 
