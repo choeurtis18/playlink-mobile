@@ -1,7 +1,11 @@
 // Seul point de contact avec le contenu : apps/web ne parle jamais
-// directement à Neon (plan landing §01). Le back-office invalide son propre
-// cache à chaque modification ; ce site-ci garde sa copie au plus une heure
-// (revalidate: 3600) — un texte publié apparaît donc dans l'heure.
+// directement à Neon (plan landing §01).
+//
+// Fraîcheur : à chaque modification, le back-office appelle
+// POST /api/revalidate, qui invalide l'étiquette concernée — le site est à
+// jour en quelques secondes. Le délai de 5 min n'est qu'un filet : si cet
+// appel échoue, ou si le site a été construit pendant que le back-office
+// redémarrait (contenu de repli), la page se répare seule.
 
 import {
   DEFAULT_DEMO_SETTINGS,
@@ -56,9 +60,14 @@ export type PreviewCategory = {
 
 export type PreviewContent = { categories: PreviewCategory[] };
 
-async function fetchJson<T>(path: string, fallback: T): Promise<T> {
+/** Étiquettes de cache, invalidées par POST /api/revalidate. */
+export const CONTENT_TAGS = ["site-config", "preview-content", "legal-content"] as const;
+export type ContentTag = (typeof CONTENT_TAGS)[number];
+const SAFETY_REVALIDATE_S = 300;
+
+async function fetchJson<T>(path: string, fallback: T, tag: ContentTag): Promise<T> {
   try {
-    const res = await fetch(`${BACKOFFICE_URL}${path}`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${BACKOFFICE_URL}${path}`, { next: { revalidate: SAFETY_REVALIDATE_S, tags: [tag] } });
     if (!res.ok) {
       console.error(`[backoffice] ${path} → HTTP ${res.status}, contenu de repli utilisé`);
       return fallback;
@@ -89,7 +98,7 @@ const FALLBACK_SITE: SiteConfig = {
 };
 
 export async function getSiteConfig(): Promise<SiteConfig> {
-  const site = await fetchJson<Partial<SiteConfig>>("/api/site-config", FALLBACK_SITE);
+  const site = await fetchJson<Partial<SiteConfig>>("/api/site-config", FALLBACK_SITE, "site-config");
   // Un back-office encore à l'ancienne version renvoie un JSON sans ces
   // champs : on complète plutôt que de planter au rendu.
   return {
@@ -108,7 +117,7 @@ export function landingTexts(site: SiteConfig, locale: string): LandingTexts {
 }
 
 export function getPreviewContent() {
-  return fetchJson<PreviewContent>("/api/preview-content", { categories: [] });
+  return fetchJson<PreviewContent>("/api/preview-content", { categories: [] }, "preview-content");
 }
 
 /** Ancres de la landing, dans l'ordre de la page. */
@@ -157,5 +166,5 @@ export async function postBackoffice<T>(path: string, body: unknown): Promise<T 
 export type LegalRow = { key: string; locale: string; title: string; content: string; updatedAt: string };
 
 export function getLegalPages() {
-  return fetchJson<{ pages: LegalRow[] }>("/api/landing/legal", { pages: [] });
+  return fetchJson<{ pages: LegalRow[] }>("/api/landing/legal", { pages: [] }, "legal-content");
 }

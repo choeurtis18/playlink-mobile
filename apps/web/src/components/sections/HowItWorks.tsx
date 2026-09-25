@@ -39,7 +39,9 @@ export async function HowItWorks({ texts, stats, locale }: { texts: LandingTexts
         <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-x-10 p-0">
           {steps.map((s, i) => (
             <li key={s.n} data-reveal data-delay={String(i * 100)} className="flex flex-col gap-3.5 border-t border-hairline py-8">
-              <span aria-hidden className="font-display text-[56px] font-medium leading-none text-hairline-firm">{s.n}</span>
+              {/* #615c72 : le plus discret possible tout en gardant 3:1 sur le fond
+                  (seuil WCAG du grand texte) ; hairline-firm tombait à 1,7:1. */}
+              <span aria-hidden className="font-display text-[56px] font-medium leading-none text-[#615c72]">{s.n}</span>
               <h3 className="m-0 text-xl font-semibold">{frenchSpacing(s.title)}</h3>
               <p className="m-0 text-base leading-[1.55] text-ink-soft">{frenchSpacing(s.body)}</p>
             </li>

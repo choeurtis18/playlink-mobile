@@ -108,6 +108,11 @@ body {
   to { background-position: 200% 50%; }
 }
 
+@keyframes pl-rise {
+  from { transform: translateY(26px); }
+  to { transform: none; }
+}
+
 @keyframes pl-reveal {
   from { opacity: 0; transform: translateY(26px); }
   to { opacity: 1; transform: none; }

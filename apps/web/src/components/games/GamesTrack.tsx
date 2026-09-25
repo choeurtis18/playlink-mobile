@@ -24,7 +24,7 @@ const GAP_PX = 16;
  * position du slider. */
 export function GamesTrack({ games }: { games: GameTileData[] }) {
   const t = useTranslations("games");
-  const trackRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLUListElement>(null);
   const [index, setIndex] = useState(0);
   const last = games.length - 1;
 
@@ -72,18 +72,17 @@ export function GamesTrack({ games }: { games: GameTileData[] }) {
 
   return (
     <div className="flex flex-col gap-5 min-[900px]:gap-0">
-      <div
+      <ul
         ref={trackRef}
         data-track
         data-reveal
         aria-label={t("listLabel")}
-        role="list"
-        className="-mx-[clamp(20px,4vw,24px)] flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-[clamp(20px,4vw,24px)] pb-2 pt-1.5 [scroll-padding-inline:clamp(20px,4vw,24px)] min-[900px]:mx-0 min-[900px]:grid min-[900px]:snap-none min-[900px]:grid-cols-[repeat(auto-fill,minmax(min(100%,262px),1fr))] min-[900px]:overflow-visible min-[900px]:p-0"
+        className="-mx-[clamp(20px,4vw,24px)] flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-[clamp(20px,4vw,24px)] pb-2 pt-1.5 [scroll-padding-inline:clamp(20px,4vw,24px)] min-[900px]:mx-0 min-[900px]:grid min-[900px]:snap-none min-[900px]:grid-cols-[repeat(auto-fill,minmax(min(100%,262px),1fr))] min-[900px]:overflow-visible min-[900px]:p-0 my-0 list-none"
       >
         {games.map((g, i) => (
           <GameTile key={g.slug} game={g} num={pad(i + 1)} />
         ))}
-      </div>
+      </ul>
 
       {games.length > 1 && (
         <div className="flex items-center justify-between gap-4 min-[900px]:hidden">
@@ -91,7 +90,9 @@ export function GamesTrack({ games }: { games: GameTileData[] }) {
             <span aria-live="polite" className="font-mono text-xs tracking-[0.12em] text-ink-soft">
               {pad(index + 1)} / {pad(games.length)}
             </span>
-            <div className="flex gap-[5px]">
+            {/* Sous 400 px, les points (24 px chacun, cible tactile) ne tiennent
+                plus à côté du compteur et des flèches : on garde ces deux-là. */}
+            <div className="hidden min-[400px]:flex">
               {games.map((g, i) => (
                 <button
                   key={g.slug}
@@ -99,12 +100,17 @@ export function GamesTrack({ games }: { games: GameTileData[] }) {
                   onClick={() => slideTo(i)}
                   aria-label={t("goTo", { name: g.name })}
                   aria-current={i === index ? "true" : undefined}
-                  className="h-1.5 rounded-[3px] transition-[width,background] duration-[350ms] ease-[cubic-bezier(.2,.8,.2,1)]"
-                  style={{
-                    width: i === index ? 22 : 6,
-                    background: i === index ? `linear-gradient(135deg, ${g.colorMain}, ${g.colorSecondary})` : "var(--color-hairline-firm)",
-                  }}
-                />
+                  className="flex h-6 min-w-6 items-center justify-center px-[3px]"
+                >
+                  <span
+                    aria-hidden
+                    className="h-1.5 rounded-[3px] transition-[width,background] duration-[350ms] ease-[cubic-bezier(.2,.8,.2,1)]"
+                    style={{
+                      width: i === index ? 22 : 6,
+                      background: i === index ? `linear-gradient(135deg, ${g.colorMain}, ${g.colorSecondary})` : "var(--color-hairline-firm)",
+                    }}
+                  />
+                </button>
               ))}
             </div>
           </div>
@@ -162,8 +168,7 @@ function GameTile({ game, num }: { game: GameTileData; num: string }) {
   }
 
   return (
-    <article
-      role="listitem"
+    <li
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className="relative isolate flex min-h-[290px] shrink-0 grow-0 basis-[78%] snap-start flex-col gap-3.5 overflow-clip rounded-[22px] border border-hairline bg-surface p-6 transition-[transform,border-color] duration-[350ms] ease-[cubic-bezier(.2,.8,.2,1)] [transform-style:preserve-3d] min-[640px]:basis-[calc((100%-32px)/2.3)] min-[900px]:basis-auto"
@@ -199,6 +204,6 @@ function GameTile({ game, num }: { game: GameTileData; num: string }) {
           {t("play")} <span aria-hidden>→</span>
         </button>
       </div>
-    </article>
+    </li>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { getSiteConfig, landingTexts, landingSections } from "@/lib/backoffice";
 import { SITE_URL } from "@/lib/site-url";
@@ -21,7 +21,9 @@ const fraunces = Fraunces({
   display: "swap",
 });
 const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight", display: "swap" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
+// Mono : petites étiquettes seulement. Pas de préchargement, pour laisser
+// la bande passante du premier affichage au titre (Fraunces) et au texte.
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap", preload: false });
 import { notFound } from "next/navigation";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -82,16 +84,24 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   // next-intl 3.x n'hérite pas les messages automatiquement : sans cette
   // prop, tout `useTranslations` dans un Client Component lève MISSING_MESSAGE.
-  const [messages, site] = await Promise.all([getMessages(), getSiteConfig()]);
+  const [messages, site, tNav] = await Promise.all([getMessages(), getSiteConfig(), getTranslations("nav")]);
 
   return (
     <html lang={locale} className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-ground text-ink font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
+          {/* Premier élément atteint au clavier : saute l'en-tête. Invisible
+              tant qu'il n'a pas le focus. */}
+          <a
+            href="#top"
+            className="fixed left-4 top-3 z-[80] -translate-y-24 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-ground transition-transform focus:translate-y-0 focus:text-ground"
+          >
+            {tNav("skip")}
+          </a>
           <Header locale={locale} sections={landingSections(site)} />
           {/* Réserve la hauteur du header fixe. */}
           <div aria-hidden className="h-[72px]" />
-          <main id="top">{children}</main>
+          <main id="top" tabIndex={-1} className="outline-none">{children}</main>
           <Footer locale={locale} />
           <RevealRoot locale={locale} />
           <CookieBanner policyHref={`/${locale}/cookies`} />

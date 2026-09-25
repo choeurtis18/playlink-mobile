@@ -13,7 +13,8 @@
     "notify": "Me prévenir à la sortie",
     "soon": "Bientôt sur iOS & Android",
     "openMenu": "Ouvrir le menu",
-    "closeMenu": "Fermer le menu"
+    "closeMenu": "Fermer le menu",
+    "skip": "Aller au contenu"
   },
   "hero": {
     "eyebrowReleased": "Disponible sur iOS & Android",
