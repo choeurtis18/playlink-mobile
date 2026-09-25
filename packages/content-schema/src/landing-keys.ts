@@ -117,6 +117,16 @@ export function defaultLandingTexts(locale: 'fr' | 'en'): LandingTexts {
   return Object.fromEntries(LANDING_FIELDS.map((x) => [x.key, x[locale]])) as LandingTexts;
 }
 
+/** Champs où `*mot*` met en valeur (dégradé du héros, passage en retrait
+ * de « Comment ça marche »). Ailleurs, les étoiles s'afficheraient telles
+ * quelles : elles sont retirées au rendu. */
+export const EMPHASIS_KEYS: ReadonlySet<string> = new Set(['hero.title', 'about.title']);
+
+/** Retire les marques `*mot*` (garde le mot). Une étoile isolée reste. */
+export function stripEmphasis(text: string): string {
+  return text.replace(/\*([^*\n]+)\*/g, '$1');
+}
+
 /** Complète des textes partiels : valeur de la langue → valeur FR (langue
  * d'origine, CLAUDE.md) → texte par défaut. Une chaîne vide compte comme
  * absente, pour qu'un champ EN laissé vide au back-office ne produise pas
@@ -131,7 +141,10 @@ export function resolveLandingTexts(
   };
   const fallback = defaultLandingTexts(locale === 'en' ? 'en' : 'fr');
   return Object.fromEntries(
-    LANDING_KEYS.map((key) => [key, pick(locale, key) ?? pick('fr', key) ?? fallback[key]]),
+    LANDING_KEYS.map((key) => {
+      const text = pick(locale, key) ?? pick('fr', key) ?? fallback[key];
+      return [key, EMPHASIS_KEYS.has(key) ? text : stripEmphasis(text)];
+    }),
   ) as LandingTexts;
 }
 

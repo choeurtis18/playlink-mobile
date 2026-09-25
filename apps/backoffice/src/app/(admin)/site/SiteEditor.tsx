@@ -7,7 +7,7 @@ import {
   MagnifyingGlassIcon, PlayCircleIcon, RedditLogoIcon, RocketLaunchIcon, ShareNetworkIcon, SparkleIcon,
   TiktokLogoIcon,
 } from "@phosphor-icons/react/dist/ssr";
-import { DEMO_DECK_SIZES, LANDING_SECTIONS, type LandingKey } from "@playlink/content-schema/landing-keys.ts";
+import { DEMO_DECK_SIZES, EMPHASIS_KEYS, LANDING_SECTIONS, type LandingKey } from "@playlink/content-schema/landing-keys.ts";
 import { Button, Card, Input, PageHeader, Segmented, Switch, Textarea, useToast } from "@/components/ui";
 import { publishSite } from "@/lib/actions";
 import {
@@ -34,6 +34,8 @@ const STATUS: Record<SectionStatus, { dot: string; label: string }> = {
 
 const INTENSITY_LABELS = ["Tranquille", "Léger", "Normal", "Épicé", "Sans filtre"];
 const MAX_FEATURED = 8;
+/** `*mot*` dans un champ qui ne l'interprète pas. */
+const STARS = /\*[^*\n]+\*/;
 
 type Action =
   | { type: "text"; key: LandingKey; locale: "fr" | "en"; value: string }
@@ -235,6 +237,11 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
                       )}
                     </div>
                   </div>
+                  {!EMPHASIS_KEYS.has(key) && (STARS.test(value.fr) || STARS.test(value.en)) && (
+                    <span className="text-[11px] text-warning">
+                      Les *étoiles* ne mettent un mot en valeur que dans les titres : ici, elles seront retirées sur la landing.
+                    </span>
+                  )}
                 </div>
               );
             })}

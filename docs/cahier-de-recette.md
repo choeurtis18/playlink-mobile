@@ -563,6 +563,36 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
   description à 160) et de la carte de partage.
 - [ ] Tableau de bord → « N textes EN à mettre à jour » ouvre directement
   la bonne section.
+- [ ] Taper `*mot*` dans l'accroche (ou tout champ autre que les deux
+  titres) → alerte sous le champ ; sur la landing, les étoiles
+  disparaissent (le mot reste).
+
+### 12.4 Jeux, Cartes, Catégories (lot 12a)
+- [ ] Jeux : lignes avec bande et pastille aux couleurs du jeu, chiffres
+  (catégories, cartes → Cartes filtrées, slides → Règles). Réordonner à
+  la souris par la poignée, ou au clavier : Tab jusqu'à la poignée, puis
+  ↑ / ↓ (le focus reste sur la poignée). Un jeu inactif porte
+  l'étiquette « inactif » ; ses couleurs s'éteignent, pas son texte.
+- [ ] Pastilles de catégories : clic → Cartes filtrées sur la catégorie ;
+  crayon → édition ; croix (catégorie vide seulement) → suppression en
+  deux clics.
+- [ ] Création d'un jeu ou d'une catégorie : le slug se remplit depuis le
+  nom (« Vérités très légères ! » → `verites-tres-legeres`) tant qu'on ne
+  le modifie pas à la main ; en édition, il ne bouge pas.
+- [ ] Cartes : les filtres s'appliquent sans bouton (recherche après une
+  courte pause, jeu, catégorie, intensité Toutes/1–5, « Sans EN ») et se
+  retrouvent dans l'URL ; « Réinitialiser » les retire tous. Changer un
+  filtre revient en page 1.
+- [ ] Cartes : jauge d'intensité, colonne EN (✓ = traduite en anglais),
+  interrupteur « Active » dans la ligne (notification ; la ligne ne
+  change pas de place), crayon → édition avec intensité en boutons 1–5 et
+  aperçu, corbeille → suppression en deux clics.
+- [ ] Catégories : filtres par jeu avec le nombre de catégories ; barres
+  de répartition 1→5 qui se remplissent à l'affichage ; nombre de cartes
+  → Cartes filtrées ; cadenas (avec explication au survol) à la place de
+  la suppression tant que la catégorie a des cartes.
+- [ ] 390 px de large : rien ne dépasse sur le côté (les tableaux
+  défilent horizontalement).
 
 ---
 
