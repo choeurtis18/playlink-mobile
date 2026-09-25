@@ -638,11 +638,13 @@ const CONFIRM_WINDOW_MS = 4000;
  * le second exécute. Plus de `window.confirm`, bloquant et hors charte.
  * `confirm` décrit l'action ; il est annoncé aux lecteurs d'écran quand
  * le bouton s'arme. */
-export function ConfirmButton({ label, confirm, action, children, doneMessage }: {
+export function ConfirmButton({ label, confirm, action, children, doneMessage, size = "md" }: {
   label: string; confirm: string;
   action: () => Promise<ActionResult>;
   children?: React.ReactNode;
   doneMessage?: string;
+  /** `xs` : pastille ronde (icône seule), dans une puce ou une ligne dense. */
+  size?: "md" | "xs";
 }) {
   const toast = useToast();
   const [armed, setArmed] = useState(false);
@@ -662,7 +664,7 @@ export function ConfirmButton({ label, confirm, action, children, doneMessage }:
       <button
         type="button"
         disabled={pending}
-        aria-label={armed ? `${confirm} Clique à nouveau pour confirmer.` : undefined}
+        aria-label={armed ? `${confirm} Clique à nouveau pour confirmer.` : label}
         title={armed ? confirm : label}
         onBlur={disarm}
         onKeyDown={(e) => e.key === "Escape" && disarm()}
@@ -681,8 +683,13 @@ export function ConfirmButton({ label, confirm, action, children, doneMessage }:
           });
         }}
         className={cx(
-          "inline-flex items-center justify-center gap-1.5 rounded-lg border px-3.5 py-2 text-[13px] font-medium transition-colors disabled:opacity-50",
-          armed ? "border-danger bg-danger text-ground-deep" : "border-hairline text-danger hover:border-danger/50 hover:bg-danger/10",
+          "inline-flex items-center justify-center gap-1.5 border font-medium transition-colors disabled:opacity-50",
+          size === "xs" ? "h-6 min-w-6 rounded-full px-1.5 text-[11px]" : "rounded-lg px-3.5 py-2 text-[13px]",
+          armed
+            ? "border-danger bg-danger text-ground-deep"
+            : size === "xs"
+              ? "border-transparent text-neutral-faint hover:bg-danger/15 hover:text-danger"
+              : "border-hairline text-danger hover:border-danger/50 hover:bg-danger/10",
         )}
       >
         {pending ? "…" : armed ? "Confirmer ?" : (children ?? label)}

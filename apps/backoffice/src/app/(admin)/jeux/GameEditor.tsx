@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button, ConfirmButton, Field, IconPicker, Input, Modal, Textarea } from "@/components/ui";
+import { PencilSimpleIcon, PlusIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
+import { Button, ConfirmButton, Field, IconPicker, Input, Modal, Switch, Textarea } from "@/components/ui";
 import { GameTilePreview } from "@/components/GameTilePreview";
+import { NameSlugFields } from "@/components/NameSlugFields";
 import { deleteCategory, saveCategory, saveGame } from "@/lib/actions";
 
 type Game = {
@@ -22,8 +24,7 @@ function GameFields({ game, categoryCount = 0 }: { game?: Game; categoryCount?: 
   return (
     <div className="grid grid-cols-1 gap-5 md:grid-cols-[1fr_auto]">
       <div className="flex flex-col gap-3">
-        <Field label="Nom"><Input name="name" value={name} onChange={(e) => setName(e.target.value)} required /></Field>
-        <Field label="Slug"><Input name="slug" defaultValue={game?.slug} required pattern="[a-z0-9-]+" placeholder="mon-jeu" /></Field>
+        <NameSlugFields name={game?.name} slug={game?.slug} onNameChange={setName} placeholder="mon-jeu" />
         <Field label="Description"><Textarea name="description" rows={3} defaultValue={game?.description ?? ""} /></Field>
         <Field label="Icône"><IconPicker name="icon" defaultValue={game?.icon} onChange={setIcon} /></Field>
         <div className="grid grid-cols-2 gap-3">
@@ -35,9 +36,10 @@ function GameFields({ game, categoryCount = 0 }: { game?: Game; categoryCount?: 
           </Field>
         </div>
         <Field label="Ordre"><Input type="number" name="order" defaultValue={game?.order ?? 0} min={0} /></Field>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="active" defaultChecked={game?.active ?? true} /> Jeu actif
-        </label>
+        <div className="flex items-center gap-2.5 text-sm">
+          <Switch name="active" label="Jeu actif" defaultChecked={game?.active ?? true} size="sm" />
+          Jeu actif <span className="text-xs text-neutral-faint">(inactif = masqué dans l’app et sur la landing)</span>
+        </div>
       </div>
       <div className="flex min-w-0 flex-col items-center gap-2">
         <span className="text-xs text-neutral-faint">Aperçu dans l&apos;app</span>
@@ -54,7 +56,10 @@ export function EditGameButton({ game, categoryCount }: { game: Game; categoryCo
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="ghost" onClick={() => setOpen(true)}>Éditer</Button>
+      <button type="button" onClick={() => setOpen(true)} aria-label={`Éditer ${game.name}`}
+        className="flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-hairline text-ink-soft transition-colors hover:bg-raised hover:text-ink">
+        <PencilSimpleIcon aria-hidden className="text-base" />
+      </button>
       <Modal title={`Modifier « ${game.name} »`} open={open} onClose={() => setOpen(false)} wide
         action={(fd) => saveGame(game.id, fd)}>
         <GameFields game={game} categoryCount={categoryCount} />
@@ -67,12 +72,14 @@ export function CategoryButtons({ cat }: { cat: Cat }) {
   const [open, setOpen] = useState(false);
   return (
     <span className="inline-flex items-center gap-1">
-      <button onClick={() => setOpen(true)} className="text-neutral-faint hover:text-ink" title="Éditer">✎</button>
+      <button type="button" onClick={() => setOpen(true)} aria-label={`Éditer la catégorie ${cat.name}`}
+        className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-faint hover:bg-hairline hover:text-ink">
+        <PencilSimpleIcon aria-hidden className="text-xs" />
+      </button>
       <Modal title={`Modifier « ${cat.name} »`} open={open} onClose={() => setOpen(false)}
         action={(fd) => saveCategory(cat.id, fd)}>
         <input type="hidden" name="gameId" value={cat.gameId} />
-        <Field label="Nom"><Input name="name" defaultValue={cat.name} required /></Field>
-        <Field label="Slug"><Input name="slug" defaultValue={cat.slug} required pattern="[a-z0-9-]+" /></Field>
+        <NameSlugFields name={cat.name} slug={cat.slug} hint="Minuscules, chiffres et tirets. Unique au sein du jeu." />
         <Field label="Description"><Textarea name="description" rows={2} defaultValue={cat.description ?? ""} /></Field>
         <Field label="Icône"><IconPicker name="icon" defaultValue={cat.icon} /></Field>
         <Field label="Ordre"><Input type="number" name="order" defaultValue={cat.order} min={0} /></Field>
@@ -85,15 +92,14 @@ export function NewCategoryButton({ gameId, gameName }: { gameId: string; gameNa
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)}
-        className="rounded border border-dashed border-hairline px-2 py-1 text-xs text-neutral-faint hover:text-ink">
-        + catégorie
+      <button type="button" onClick={() => setOpen(true)} aria-label={`Ajouter une catégorie à ${gameName}`}
+        className="inline-flex items-center gap-1 rounded-full border border-dashed border-hairline-firm px-2.5 py-1 text-xs text-neutral-faint transition-colors hover:text-ink">
+        <PlusIcon aria-hidden /> catégorie
       </button>
       <Modal title={`Nouvelle catégorie — ${gameName}`} open={open} onClose={() => setOpen(false)}
         action={(fd) => saveCategory(null, fd)}>
         <input type="hidden" name="gameId" value={gameId} />
-        <Field label="Nom"><Input name="name" required /></Field>
-        <Field label="Slug"><Input name="slug" required pattern="[a-z0-9-]+" placeholder="ma-categorie" /></Field>
+        <NameSlugFields placeholder="ma-categorie" hint="Minuscules, chiffres et tirets. Unique au sein du jeu." />
         <Field label="Description"><Textarea name="description" rows={2} /></Field>
         <Field label="Icône"><IconPicker name="icon" /></Field>
         <Field label="Ordre"><Input type="number" name="order" defaultValue={0} min={0} /></Field>
@@ -103,16 +109,19 @@ export function NewCategoryButton({ gameId, gameName }: { gameId: string; gameNa
 }
 
 export function DeleteCategoryButton({ id, name }: { id: string; name: string }) {
-  return <ConfirmButton label="×" confirm={`Supprimer la catégorie « ${name} » ?`} action={() => deleteCategory(id)}>
-    <span className="px-1">×</span>
-  </ConfirmButton>;
+  return (
+    <ConfirmButton size="xs" label={`Supprimer la catégorie ${name}`} confirm={`Supprimer la catégorie « ${name} » ?`}
+      action={() => deleteCategory(id)} doneMessage="Catégorie supprimée">
+      <XIcon aria-hidden />
+    </ConfirmButton>
+  );
 }
 
-export function NewGameButton() {
+export function NewGameButton({ icon }: { icon?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Nouveau jeu</Button>
+      <Button icon={icon} onClick={() => setOpen(true)}>Nouveau jeu</Button>
       <Modal title="Nouveau jeu" open={open} onClose={() => setOpen(false)} wide action={(fd) => saveGame(null, fd)}>
         <GameFields />
       </Modal>
