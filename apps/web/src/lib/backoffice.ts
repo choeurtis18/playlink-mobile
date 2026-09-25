@@ -153,3 +153,9 @@ export async function postBackoffice<T>(path: string, body: unknown): Promise<T 
     return null;
   }
 }
+
+export type LegalRow = { key: string; locale: string; title: string; content: string; updatedAt: string };
+
+export function getLegalPages() {
+  return fetchJson<{ pages: LegalRow[] }>("/api/landing/legal", { pages: [] });
+}

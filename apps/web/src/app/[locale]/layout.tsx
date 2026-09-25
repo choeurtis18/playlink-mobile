@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { getSiteConfig, landingTexts, landingSections } from "@/lib/backoffice";
+import { SITE_URL } from "@/lib/site-url";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RevealRoot } from "@/components/RevealRoot";
@@ -40,16 +41,23 @@ export async function generateMetadata({
   const description = texts["meta.description"];
 
   return {
+    // Rend absolues toutes les URL relatives ci-dessous (canonical, image
+    // de partage) : les réseaux sociaux ignorent une image en chemin relatif.
+    metadataBase: new URL(SITE_URL),
     title,
     description,
+    applicationName: "Playlink",
     alternates: {
       canonical: `/${locale}`,
-      languages: { fr: "/fr", en: "/en" },
+      languages: { fr: "/fr", en: "/en", "x-default": "/fr" },
     },
     openGraph: {
       title,
       description,
-      locale,
+      url: `/${locale}`,
+      siteName: "Playlink",
+      locale: locale === "en" ? "en_US" : "fr_FR",
+      alternateLocale: locale === "en" ? "fr_FR" : "en_US",
       type: "website",
     },
     twitter: {

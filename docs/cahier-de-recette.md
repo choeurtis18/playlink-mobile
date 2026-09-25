@@ -448,6 +448,24 @@ Tester dans une fenêtre privée, pour repartir sans choix enregistré.
   seulement la langue, le jeu, la catégorie, l'intensité, le numéro de
   carte et le vote.
 
+### 11.8 Pages légales et SEO (lot 7)
+- [ ] Pied de page : Mentions légales, Politique de confidentialité,
+  Conditions d'utilisation, Cookies → chaque page s'ouvre (plus d'erreur
+  404), en FR et en EN.
+- [ ] Les textes contiennent encore « [Prénom Nom] » : à remplacer
+  (fichier `apps/web/src/content/legal.ts`) avant la mise en ligne.
+- [ ] Les liens internes des pages (confidentialité, cookies, supprimer
+  mes données, e-mail, CNIL) fonctionnent.
+- [ ] Partage d'un lien (WhatsApp, Slack, LinkedIn…) : aperçu avec
+  l'éventail de cartes, le titre du héros (mot mis en valeur en rose) et
+  « Bientôt sur iOS & Android ». Test : opengraph.xyz.
+- [ ] `/robots.txt` et `/sitemap.xml` répondent ; le sitemap liste
+  l'accueil et les pages légales, en FR et EN.
+- [ ] Test des résultats enrichis Google (search.google.com/test/rich-results)
+  sur l'accueil : Organization et SoftwareApplication détectés, sans
+  erreur.
+- [ ] Google Search Console : domaine vérifié, sitemap soumis.
+
 ---
 
 ## Ce qui reste à développer

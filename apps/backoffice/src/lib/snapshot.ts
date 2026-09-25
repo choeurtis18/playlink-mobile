@@ -25,7 +25,8 @@ export async function buildSnapshot(version: number): Promise<Snapshot> {
     },
   });
   const badges = await prisma.badge.findMany({ orderBy: { order: "asc" }, include: { translations: true } });
-  const legal = await prisma.legalContent.findMany();
+  // Les pages légales du site (clés `site.*`) ne concernent pas l'app.
+  const legal = await prisma.legalContent.findMany({ where: { NOT: { key: { startsWith: "site." } } } });
 
   // Lus en base : le back-office déployé n'a pas accès au dossier apps/mobile.
   const assetRows = await prisma.contentAsset.findMany({ orderBy: { ref: "asc" } });

@@ -163,5 +163,9 @@
     "save": "Save",
     "managePrefs": "Manage preferences",
     "hidePrefs": "Hide"
+  },
+  "legal": {
+    "kicker": "Legal information",
+    "back": "Back to home"
   }
 }
