@@ -20,19 +20,19 @@ export function TranslationFilters({
   return (
     <form className="mb-4 flex flex-wrap items-center gap-2 text-sm">
       {sp.tout && <input type="hidden" name="tout" value={sp.tout} />}
-      <input name="q" defaultValue={sp.q} placeholder="Rechercher une carte…"
+      <input name="q" aria-label="Rechercher" defaultValue={sp.q} placeholder="Rechercher une carte…"
         className="rounded border border-hairline bg-surface px-3 py-1.5" />
-      <select name="jeu" value={jeu} onChange={(e) => setJeu(e.target.value)}
+      <select name="jeu" aria-label="Jeu" value={jeu} onChange={(e) => setJeu(e.target.value)}
         className="rounded border border-hairline bg-surface px-3 py-1.5">
         <option value="">Tous les jeux</option>
         {games.map((g) => <option key={g.slug} value={g.slug}>{g.icon} {g.name}</option>)}
       </select>
-      <select name="categorie" defaultValue={categorieDefault} key={jeu}
+      <select name="categorie" aria-label="Catégorie" defaultValue={categorieDefault} key={jeu}
         className="rounded border border-hairline bg-surface px-3 py-1.5">
         <option value="">Toutes catégories</option>
         {filtered.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
       </select>
-      <button className="rounded bg-accent px-3 py-1.5 font-medium text-white">Filtrer</button>
+      <button className="rounded bg-accent px-3 py-1.5 font-semibold text-ground-deep hover:bg-accent-deep">Filtrer</button>
       {(sp.q || sp.jeu || sp.categorie) && (
         <a href={sp.tout ? "/traductions?tout=1" : "/traductions"} className="text-neutral-faint hover:text-ink">
           réinitialiser

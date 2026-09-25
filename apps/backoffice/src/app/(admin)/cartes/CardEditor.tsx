@@ -144,19 +144,19 @@ export function CardFilters({
 
   return (
     <form className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-      <input name="q" defaultValue={sp.q} placeholder="Rechercher…"
+      <input name="q" aria-label="Rechercher" defaultValue={sp.q} placeholder="Rechercher…"
         className="rounded border border-hairline bg-surface px-3 py-1.5" />
-      <select name="jeu" value={jeu} onChange={(e) => setJeu(e.target.value)}
+      <select name="jeu" aria-label="Jeu" value={jeu} onChange={(e) => setJeu(e.target.value)}
         className="rounded border border-hairline bg-surface px-3 py-1.5">
         <option value="">Tous les jeux</option>
         {games.map((g) => <option key={g.slug} value={g.slug}>{g.name}</option>)}
       </select>
-      <select name="categorie" defaultValue={categorieDefault} key={jeu}
+      <select name="categorie" aria-label="Catégorie" defaultValue={categorieDefault} key={jeu}
         className="rounded border border-hairline bg-surface px-3 py-1.5">
         <option value="">Toutes catégories</option>
         {filtered.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
       </select>
-      <select name="intensite" defaultValue={sp.intensite ?? ""} className="rounded border border-hairline bg-surface px-3 py-1.5">
+      <select name="intensite" aria-label="Intensité" defaultValue={sp.intensite ?? ""} className="rounded border border-hairline bg-surface px-3 py-1.5">
         <option value="">Toutes intensités</option>
         {[1, 2, 3, 4, 5].map((i) => <option key={i} value={i}>Intensité {i}</option>)}
       </select>
@@ -164,7 +164,7 @@ export function CardFilters({
         <input type="checkbox" name="sansEn" value="1" defaultChecked={!!sp.sansEn} />
         sans traduction EN
       </label>
-      <button className="rounded bg-accent px-3 py-1.5 font-medium text-white">Filtrer</button>
+      <button className="rounded bg-accent px-3 py-1.5 font-semibold text-ground-deep hover:bg-accent-deep">Filtrer</button>
       {(sp.q || sp.jeu || sp.categorie || sp.intensite || sp.sansEn) && (
         <a href="/cartes" className="text-neutral-faint hover:text-ink">réinitialiser</a>
       )}

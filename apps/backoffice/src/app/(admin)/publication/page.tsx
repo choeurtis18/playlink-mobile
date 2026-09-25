@@ -18,7 +18,7 @@ export default async function Publication() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-semibold">Publication</h1>
+      <h1 className="mb-2 font-display text-[32px] font-semibold tracking-[-0.025em]">Publication</h1>
       <p className="mb-6 max-w-prose text-sm text-neutral-faint">
         L&apos;app ne consomme jamais le contenu live : elle télécharge une release
         figée. Rien n&apos;est servi tant qu&apos;une version n&apos;est pas publiée.

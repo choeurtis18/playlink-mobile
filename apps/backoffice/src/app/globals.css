@@ -1,24 +1,72 @@
 @import "tailwindcss";
 
-/* Le back-office suit la direction sombre de l'app (§10) : même univers
-   visuel, mais outil de travail — densité d'information avant tout.
-   `neutral-faint` éclairci (#5c5770 → #918ca6) : le ton d'origine tombait
-   à ~2.6:1 sur `ground`/`surface`/`raised`, bien en dessous du minimum
-   WCAG AA (4.5:1 texte normal) — illisible en usage réel. La nouvelle
-   valeur reste clairement "en retrait" par rapport à `ink-soft` tout en
-   passant 5:1+ sur les trois fonds. */
+/* Mêmes tokens que la landing (apps/web) : un seul univers visuel, sombre
+   teinté indigo. Le back-office reste un outil de travail — densité
+   d'information avant tout.
+   `neutral-faint` (#918ca6) garde 5:1+ sur ground/surface/raised : le ton
+   d'origine du blueprint (#5c5770) tombait à ~2,6:1, illisible. */
 @theme {
   --color-ground: #0b0a0f;
+  --color-ground-deep: #060509;
   --color-surface: #17151d;
   --color-raised: #1f1c27;
+  --color-sunk: #0f0d13;
   --color-hairline: #2a2733;
+  --color-hairline-firm: #3a3548;
   --color-ink: #f3f1ec;
   --color-ink-soft: #c7c2d1;
   --color-neutral-faint: #918ca6;
   --color-accent: #f23a6b;
+  --color-accent-deep: #ff6b93;
+  --color-accent-wash: #2b121c;
+  --color-blue: #4fa0f5;
+  --color-blue-wash: #101e30;
+  --color-success: #4fce87;
+  --color-warning: #f5a94e;
+  --color-danger: #ff6259;
+
+  /* Familles chargées par next/font (layout racine), auto-hébergées. */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 body {
   background: var(--color-ground);
   color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ground-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@keyframes bo-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Entrée des modales et de la palette de recherche. */
+@keyframes bo-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes bo-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

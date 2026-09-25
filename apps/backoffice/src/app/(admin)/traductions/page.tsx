@@ -75,7 +75,7 @@ export default async function Traductions({
   return (
     <>
       <div className="mb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Traductions</h1>
+        <h1 className="font-display text-[32px] font-semibold tracking-[-0.025em]">Traductions</h1>
         <a href="/api/export/cards" className="rounded border border-hairline px-3 py-1.5 text-sm text-ink-soft hover:bg-surface">
           Export CSV
         </a>

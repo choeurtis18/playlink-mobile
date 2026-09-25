@@ -484,6 +484,38 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
 
 ---
 
+## 12. Back-office v2 — refonte en cours
+
+### 12.1 Structure générale et composants (lot 9)
+- [ ] Sidebar en 4 groupes (Général, Contenu de l'app, Landing,
+  Diffusion) avec icônes ; l'écran ouvert est surligné, avec une barre
+  rose à gauche. « Stats » et « Pré-inscriptions » sont grisés
+  (« bientôt ») et ne sont pas cliquables.
+- [ ] Compteurs : Jeux = nombre de jeux, Cartes = cartes actives.
+- [ ] Encart en bas de la sidebar : « N modifications à publier » (point
+  rose qui pulse) après avoir modifié une carte, une catégorie, un jeu,
+  une slide ou un badge ; « Tout est publié » juste après une
+  publication. Cocher « jouable dans la démo » sur une catégorie ne
+  compte pas (ça ne concerne que la landing). Clic → Publication.
+- [ ] Barre du haut : fil d'Ariane (groupe › écran), « Voir le site »
+  ouvre la landing dans un nouvel onglet.
+- [ ] Recherche : ⌘K (Mac) ou Ctrl+K (Windows), ou clic sur le champ de
+  la barre du haut. Taper « vér » → jeux et catégories correspondants ;
+  flèches ↑ ↓ puis Entrée → l'écran s'ouvre déjà filtré. Taper le nom
+  d'un écran (« trad ») le propose aussi. Échap ferme.
+- [ ] Fenêtres (Nouvelle carte, Éditer…) : le curseur est dans le premier
+  champ ; Tab reste dans la fenêtre ; Échap ou clic sur le fond ferme et
+  rend le focus au bouton d'origine. Après « Enregistrer », une
+  notification « Modifications enregistrées » apparaît en bas à droite.
+- [ ] Supprimer : un premier clic transforme le bouton en « Confirmer ? »
+  (rouge plein) ; sans second clic dans les 4 s, il revient à
+  « Supprimer ». Plus de boîte de dialogue du navigateur.
+- [ ] Sous 900 px de large : logo et compte en haut, entrées du menu sur
+  une ligne qui défile ; rien ne dépasse sur le côté (390 px).
+- [ ] Au clavier : le premier Tab fait apparaître « Aller au contenu ».
+
+---
+
 ## Ce qui reste à développer
 
 Rien de ce qui suit n'est testable aujourd'hui — c'est normal de tomber sur

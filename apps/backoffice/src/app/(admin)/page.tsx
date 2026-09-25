@@ -24,7 +24,7 @@ export default async function Home() {
 
   return (
     <>
-      <h1 className="mb-6 text-2xl font-semibold">Tableau de bord</h1>
+      <h1 className="mb-6 font-display text-[32px] font-semibold tracking-[-0.025em]">Tableau de bord</h1>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {stats.map((s) => (
           <div key={s.label} className="rounded-lg border border-hairline bg-surface p-4">

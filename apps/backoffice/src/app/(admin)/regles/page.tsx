@@ -22,7 +22,7 @@ export default async function Regles({ searchParams }: { searchParams: Promise<{
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-semibold">Règles du jeu</h1>
+      <h1 className="mb-2 font-display text-[32px] font-semibold tracking-[-0.025em]">Règles du jeu</h1>
       <p className="mb-6 max-w-prose text-sm text-neutral-faint">
         Les règles sont présentées à l&apos;écran sous forme de slides illustrées.
         Les images sont des références locales (<code>asset://</code>) résolues
