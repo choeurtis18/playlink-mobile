@@ -6,6 +6,7 @@ import {
   LandingTextInputSchema,
   defaultLandingTexts,
   landingEnGaps,
+  stripEmphasis,
   resolveLandingTexts,
 } from './landing-keys.ts';
 
@@ -67,4 +68,12 @@ test('landingEnGaps : FR personnalisé sans EN à jour', () => {
     [],
     'EN renseigné',
   );
+});
+
+test('étoiles : gardées dans les titres, retirées ailleurs', () => {
+  assert.equal(stripEmphasis('Les jeux qui ont *brisé* des amitiés'), 'Les jeux qui ont brisé des amitiés');
+  assert.equal(stripEmphasis('Note * isolée'), 'Note * isolée');
+  const t = resolveLandingTexts({ fr: { 'hero.title': 'Le *jeu*', 'hero.lede': 'Qui a *brisé* tout' } }, 'fr');
+  assert.equal(t['hero.title'], 'Le *jeu*');
+  assert.equal(t['hero.lede'], 'Qui a brisé tout');
 });
