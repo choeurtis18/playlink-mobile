@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { ManageCookiesButton } from "./ManageCookiesButton";
 
 /** Adresse de contact et de responsable de traitement (RGPD), en attendant
  * une adresse sur le domaine. Également citée dans les pages légales. */
@@ -33,6 +34,7 @@ export async function Footer({ locale }: { locale: string }) {
                 {l.label}
               </a>
             ))}
+            <ManageCookiesButton label={t("manageCookies")} />
           </nav>
         </div>
         {/* Filigrane : le mot-marque en très grand, qui s'efface vers le bas. */}

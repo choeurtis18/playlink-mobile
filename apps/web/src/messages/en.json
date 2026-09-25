@@ -102,7 +102,8 @@
     "cookies": "Cookies",
     "controller": "Data controller:",
     "nav": "Legal links",
-    "deleteData": "Delete my data"
+    "deleteData": "Delete my data",
+    "manageCookies": "Manage cookies"
   },
   "about": {
     "kicker": "03 — How it works",
@@ -146,5 +147,21 @@
     "mailBody": "Hello,\n\nPlease delete my Playlink early sign-up (the address this email is sent from).\n",
     "delay": "We reply within 30 days at most, as required by the GDPR. Address: {email}.",
     "back": "Back to home"
+  },
+  "cookies": {
+    "label": "Cookie preferences",
+    "title": "Cookies.",
+    "body": "We use functional cookies (required) and, with your consent, anonymous audience measurement. No advertising cookies.",
+    "policy": "Learn more",
+    "functional": "Functional",
+    "functionalHint": "— language, security",
+    "always": "Always on",
+    "analytics": "Audience measurement",
+    "analyticsHint": "— PostHog, hosted in the EU",
+    "acceptAll": "Accept all",
+    "functionalOnly": "Functional only",
+    "save": "Save",
+    "managePrefs": "Manage preferences",
+    "hidePrefs": "Hide"
   }
 }

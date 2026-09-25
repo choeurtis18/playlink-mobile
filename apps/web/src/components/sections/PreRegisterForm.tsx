@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { preRegister, type PreRegisterState } from "@/app/[locale]/actions";
+import { capture } from "@/lib/analytics";
 
 const CONFETTI_COLORS = [
   ["#7C3AED", "#EC4899"], ["#0EA5E9", "#06B6D4"], ["#DC2626", "#F97316"], ["#059669", "#10B981"],
@@ -25,8 +26,10 @@ export function PreRegisterForm({ locale, texts, privacyHref }: {
   useEffect(() => setStartedAt(Date.now()), []);
 
   useEffect(() => {
-    if (state.status === "done") burst(confettiRef.current);
-  }, [state]);
+    if (state.status !== "done") return;
+    burst(confettiRef.current);
+    capture("preregister_submitted", { locale, pending: state.pending });
+  }, [state, locale]);
 
   const error = clientError ?? (state.status === "error" ? state.reason : null);
 

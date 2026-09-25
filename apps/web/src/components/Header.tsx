@@ -136,6 +136,8 @@ export function Header({ locale, sections }: { locale: string; sections: Landing
 
             {hasNotif && <a
               href={anchor("notif")}
+              data-analytics="cta_clicked"
+              data-analytics-cta="header_notify"
               className="hidden items-center gap-2 rounded-full border border-accent px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-accent-wash hover:text-ink min-[640px]:flex"
             >
               <span className="h-[7px] w-[7px] rounded-full bg-accent motion-safe:animate-[pl-pulse_2.2s_infinite]" />
@@ -200,6 +202,8 @@ export function Header({ locale, sections }: { locale: string; sections: Landing
             <a
               href={anchor("notif")}
               onClick={() => setMenuOpen(false)}
+              data-analytics="cta_clicked"
+              data-analytics-cta="menu_notify"
               className="flex items-center justify-center rounded-full px-6 py-4 text-base font-bold text-ground-deep hover:text-ground-deep"
               style={{ background: "var(--gradient-accent)" }}
             >
