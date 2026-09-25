@@ -349,6 +349,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get createAccount => 'Créer un compte';
 
   @override
+  String get profileSignedInTitle => 'Compte connecté';
+
+  @override
+  String get profileSignedInFallback => 'Connecté';
+
+  @override
+  String get signOut => 'Se déconnecter';
+
+  @override
   String get myCards => 'Mes cartes';
 
   @override
@@ -465,6 +474,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get signIn => 'Se connecter';
 
   @override
+  String get signInSuccess => 'Connexion réussie — redirection…';
+
+  @override
+  String get signInUnavailable =>
+      'La connexion n\'est pas encore disponible sur cette version. Tout continue de fonctionner hors-ligne, sans compte.';
+
+  @override
   String get goPremium => 'Devenir premium';
 
   @override
@@ -484,4 +500,62 @@ class AppLocalizationsFr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get forgottenPasswordTitle => 'Mot de passe oublié';
+
+  @override
+  String get forgotPasswordIntro =>
+      'Entre ton email, on t\'envoie un code pour choisir un nouveau mot de passe.';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get forgotPasswordSendCode => 'Envoyer le code';
+
+  @override
+  String get forgotPasswordRequestFailed =>
+      'Impossible d\'envoyer le code. Vérifie l\'adresse et réessaie.';
+
+  @override
+  String forgotPasswordCodeSentTo(String email) {
+    return 'Code envoyé à $email';
+  }
+
+  @override
+  String get forgotPasswordCodeLabel => 'Code reçu par email';
+
+  @override
+  String get forgotPasswordCodeLength => 'Le code fait 6 chiffres.';
+
+  @override
+  String get forgotPasswordMismatch =>
+      'Les deux mots de passe ne correspondent pas.';
+
+  @override
+  String forgotPasswordLengthRangeHint(int min, int max) {
+    return 'Entre $min et $max caractères';
+  }
+
+  @override
+  String forgotPasswordMinLengthHint(int min) {
+    return '$min caractères minimum';
+  }
+
+  @override
+  String get forgotPasswordResetFailed =>
+      'La réinitialisation a échoué. Vérifie le code et réessaie.';
+
+  @override
+  String get forgotPasswordDidntReceiveCode => 'Je n\'ai pas reçu le code';
+
+  @override
+  String get newPassword => 'Nouveau mot de passe';
+
+  @override
+  String get newPasswordConfirmation => 'Confirmer le nouveau mot de passe';
+
+  @override
+  String get resetPassword => 'Réinitialiser le mot de passe';
 }

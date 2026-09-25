@@ -347,6 +347,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAccount => 'Create an account';
 
   @override
+  String get profileSignedInTitle => 'Account connected';
+
+  @override
+  String get profileSignedInFallback => 'Signed in';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
   String get myCards => 'My cards';
 
   @override
@@ -462,6 +471,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signIn => 'Sign in';
 
   @override
+  String get signInSuccess => 'Signed in — redirecting…';
+
+  @override
+  String get signInUnavailable =>
+      'Sign-in isn\'t available on this build yet. Everything keeps working offline, without an account.';
+
+  @override
   String get goPremium => 'Go premium';
 
   @override
@@ -481,4 +497,61 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get forgottenPasswordTitle => 'Forgotten password';
+
+  @override
+  String get forgotPasswordIntro =>
+      'Enter your email and we\'ll send you a code to choose a new password.';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get forgotPasswordSendCode => 'Send code';
+
+  @override
+  String get forgotPasswordRequestFailed =>
+      'Couldn\'t send the code. Check the address and try again.';
+
+  @override
+  String forgotPasswordCodeSentTo(String email) {
+    return 'Code sent to $email';
+  }
+
+  @override
+  String get forgotPasswordCodeLabel => 'Code received by email';
+
+  @override
+  String get forgotPasswordCodeLength => 'The code is 6 digits.';
+
+  @override
+  String get forgotPasswordMismatch => 'The two passwords don\'t match.';
+
+  @override
+  String forgotPasswordLengthRangeHint(int min, int max) {
+    return 'Between $min and $max characters';
+  }
+
+  @override
+  String forgotPasswordMinLengthHint(int min) {
+    return '$min characters minimum';
+  }
+
+  @override
+  String get forgotPasswordResetFailed =>
+      'The reset failed. Check the code and try again.';
+
+  @override
+  String get forgotPasswordDidntReceiveCode => 'I didn\'t receive the code';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get newPasswordConfirmation => 'Confirm new password';
+
+  @override
+  String get resetPassword => 'Reset password';
 }

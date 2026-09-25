@@ -49,3 +49,7 @@ app.*.map.json
 
 # Captures générées par le test d'intégration (flutter drive)
 integration_shots/
+
+# Clés d'environnement (Clerk joueurs, etc.) — jamais commitées, voir
+# dart_define.example.json pour le modèle.
+dart_define.json

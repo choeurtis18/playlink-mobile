@@ -1,8 +1,10 @@
+import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/auth_config.dart';
 import '../data/content_repository.dart';
 import '../data/providers.dart';
 import '../theme/theme.dart';
@@ -52,7 +54,14 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     const _BrandMark(),
                     const Spacer(),
-                    _AccountButton(state: ref.watch(prefsProvider).accountState),
+                    // Connexion Clerk réelle si l'instance joueurs est
+                    // configurée (phase 4), sinon la façade de démo garde
+                    // son comportement d'avant (aucune clé fournie au
+                    // build — dev en cours de configuration côté Clerk).
+                    if (clerkConfigured)
+                      const ClerkSignedOut(child: _AccountButton(state: AccountState.guest))
+                    else
+                      _AccountButton(state: ref.watch(prefsProvider).accountState),
                   ],
                 ),
               ),
@@ -173,8 +182,12 @@ class _AccountButton extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(PlRadius.pill),
         onTap: () {
-          final next = state == AccountState.guest ? AccountState.free : AccountState.premium;
-          ref.read(prefsProvider.notifier).set(PrefKeys.accountState, next.name);
+          if (state == AccountState.guest) {
+            // Connexion réelle (phase 4) — la façade « Devenir premium »
+            // reste un cycle de démo distinct, pas encore branché.
+            context.push('/sign-in');
+            return;
+          }
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(content: Text(t.comingSoon)));

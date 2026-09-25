@@ -614,6 +614,24 @@ abstract class AppLocalizations {
   /// **'Créer un compte'**
   String get createAccount;
 
+  /// No description provided for @profileSignedInTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte connecté'**
+  String get profileSignedInTitle;
+
+  /// No description provided for @profileSignedInFallback.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecté'**
+  String get profileSignedInFallback;
+
+  /// No description provided for @signOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se déconnecter'**
+  String get signOut;
+
   /// No description provided for @myCards.
   ///
   /// In fr, this message translates to:
@@ -836,6 +854,18 @@ abstract class AppLocalizations {
   /// **'Se connecter'**
   String get signIn;
 
+  /// No description provided for @signInSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion réussie — redirection…'**
+  String get signInSuccess;
+
+  /// No description provided for @signInUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'La connexion n\'est pas encore disponible sur cette version. Tout continue de fonctionner hors-ligne, sans compte.'**
+  String get signInUnavailable;
+
   /// No description provided for @goPremium.
   ///
   /// In fr, this message translates to:
@@ -859,6 +889,102 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{count, plural, =0{0 partie} =1{1 partie} other{{count} parties}}'**
   String gamesCount(int count);
+
+  /// No description provided for @forgottenPasswordTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe oublié'**
+  String get forgottenPasswordTitle;
+
+  /// No description provided for @forgotPasswordIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entre ton email, on t\'envoie un code pour choisir un nouveau mot de passe.'**
+  String get forgotPasswordIntro;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @forgotPasswordSendCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer le code'**
+  String get forgotPasswordSendCode;
+
+  /// No description provided for @forgotPasswordRequestFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'envoyer le code. Vérifie l\'adresse et réessaie.'**
+  String get forgotPasswordRequestFailed;
+
+  /// No description provided for @forgotPasswordCodeSentTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code envoyé à {email}'**
+  String forgotPasswordCodeSentTo(String email);
+
+  /// No description provided for @forgotPasswordCodeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code reçu par email'**
+  String get forgotPasswordCodeLabel;
+
+  /// No description provided for @forgotPasswordCodeLength.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le code fait 6 chiffres.'**
+  String get forgotPasswordCodeLength;
+
+  /// No description provided for @forgotPasswordMismatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les deux mots de passe ne correspondent pas.'**
+  String get forgotPasswordMismatch;
+
+  /// No description provided for @forgotPasswordLengthRangeHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entre {min} et {max} caractères'**
+  String forgotPasswordLengthRangeHint(int min, int max);
+
+  /// No description provided for @forgotPasswordMinLengthHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'{min} caractères minimum'**
+  String forgotPasswordMinLengthHint(int min);
+
+  /// No description provided for @forgotPasswordResetFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'La réinitialisation a échoué. Vérifie le code et réessaie.'**
+  String get forgotPasswordResetFailed;
+
+  /// No description provided for @forgotPasswordDidntReceiveCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je n\'ai pas reçu le code'**
+  String get forgotPasswordDidntReceiveCode;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau mot de passe'**
+  String get newPassword;
+
+  /// No description provided for @newPasswordConfirmation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer le nouveau mot de passe'**
+  String get newPasswordConfirmation;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser le mot de passe'**
+  String get resetPassword;
 }
 
 class _AppLocalizationsDelegate

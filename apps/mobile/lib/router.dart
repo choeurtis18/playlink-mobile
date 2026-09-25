@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'data/auth_config.dart';
 import 'screens/badges_screen.dart';
 import 'screens/config_screen.dart';
+import 'screens/forgot_password_screen.dart';
 import 'screens/my_cards_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/game_screen.dart';
@@ -12,6 +14,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/play_screen.dart';
 import 'screens/players_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/sign_in_screen.dart';
 import 'screens/splash_screen.dart';
 import 'widgets/app_shell.dart';
 
@@ -59,6 +62,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/badges', builder: (_, _) => const BadgesScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/my-cards', builder: (_, _) => const MyCardsScreen()),
+      GoRoute(
+        path: '/sign-in',
+        builder: (_, _) => clerkConfigured ? const SignInScreen() : const SignInUnavailableScreen(),
+        routes: [
+          GoRoute(
+            path: 'forgot-password',
+            builder: (_, _) => const ForgotPasswordScreen(),
+          ),
+        ],
+      ),
     ],
   );
 });

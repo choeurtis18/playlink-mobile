@@ -1,7 +1,9 @@
+import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/auth_config.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
@@ -25,42 +27,11 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(t.profileLocalMode, style: TextStyle(color: soft, fontSize: 13)),
             const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(PlRadius.card),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(t.profileLocalCardTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                  const SizedBox(height: 6),
-                  Text(t.profileLocalCardBody, style: TextStyle(color: soft, fontSize: 13.5, height: 1.4)),
-                  const SizedBox(height: 14),
-                  // Même style dégradé que le CTA "Se connecter" de l'accueil
-                  // (`_AccountButton`) — un seul traitement visuel pour
-                  // l'action compte dans toute l'app.
-                  DecoratedBox(
-                    decoration: BoxDecoration(gradient: accentGradient, borderRadius: BorderRadius.circular(PlRadius.pill)),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        onPressed: null,
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size.fromHeight(54),
-                          foregroundColor: Colors.white,
-                          disabledForegroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.pill)),
-                        ),
-                        child: Text(t.createAccount, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            if (clerkConfigured) ...[
+              const ClerkSignedOut(child: _LocalModeCard()),
+              const ClerkSignedIn(child: _SignedInCard()),
+            ] else
+              const _LocalModeCard(),
             const SizedBox(height: 20),
             // Badges et cartes perso fonctionnent 100 % en local (D4, C1-C3)
             // — contrairement aux likes, qui exigent un compte (E1, phase 5).
@@ -73,6 +44,98 @@ class ProfileScreen extends ConsumerWidget {
             _Row(icon: Icons.settings_rounded, label: t.settings, sublabel: t.settingsSubtitle, onTap: () => context.push('/settings')),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Contenu affiché tant qu'aucun compte Clerk n'est connecté — CTA vers
+/// l'écran de connexion réelle (§04) ou, si l'instance joueurs n'est pas
+/// encore configurée côté build, la façade de démo d'avant (bouton inerte).
+class _LocalModeCard extends StatelessWidget {
+  const _LocalModeCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(PlRadius.card),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(t.profileLocalCardTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+          const SizedBox(height: 6),
+          Text(t.profileLocalCardBody, style: TextStyle(color: soft, fontSize: 13.5, height: 1.4)),
+          const SizedBox(height: 14),
+          // Même style dégradé que le CTA "Se connecter" de l'accueil
+          // (`_AccountButton`) — un seul traitement visuel pour l'action
+          // compte dans toute l'app.
+          DecoratedBox(
+            decoration: BoxDecoration(gradient: accentGradient, borderRadius: BorderRadius.circular(PlRadius.pill)),
+            child: SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => context.push('/sign-in'),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size.fromHeight(54),
+                  foregroundColor: Colors.white,
+                  disabledForegroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.pill)),
+                ),
+                child: Text(t.createAccount, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Contenu affiché une fois un compte Clerk connecté — remplace la carte
+/// « Tout marche sans compte » (§04). La fusion locale → cloud des
+/// données (parties, badges, cartes perso) n'est pas encore construite :
+/// cette carte ne fait que confirmer la connexion et offrir la
+/// déconnexion, rien de plus pour l'instant.
+class _SignedInCard extends StatelessWidget {
+  const _SignedInCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final soft = Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface;
+    final authState = ClerkAuth.of(context);
+    final email = authState.user?.email;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(PlRadius.card),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(t.profileSignedInTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+          const SizedBox(height: 6),
+          Text(email ?? t.profileSignedInFallback, style: TextStyle(color: soft, fontSize: 13.5, height: 1.4)),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => authState.signOut(),
+              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(54)),
+              child: Text(t.signOut),
+            ),
+          ),
+        ],
       ),
     );
   }

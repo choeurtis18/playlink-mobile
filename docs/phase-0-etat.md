@@ -76,7 +76,7 @@ Tous rattachés à **gamesplaylink@gmail.com**, sauf GitHub (compte perso).
 | Service | État | À fournir |
 |---------|------|-----------|
 | Neon | ✅ créé — projet `empty-mode-79328479`, branche `production` | `DATABASE_URL`, `DIRECT_URL` |
-| Clerk | ✅ créé | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` |
+| Clerk | ✅ créé | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_EDITORS`, `CLERK_SECRET_KEY_EDITORS` |
 | PostHog EU | ✅ créé | `NEXT_PUBLIC_POSTHOG_KEY` |
 | Vercel + Blob | ❌ **pas créé** | à ouvrir sur gamesplaylink@gmail.com |
 | Apple Developer | ⏸️ reporté en phase 6 | — |
