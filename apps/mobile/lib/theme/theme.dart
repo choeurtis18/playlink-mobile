@@ -1,3 +1,4 @@
+import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/material.dart';
 
 /// Tokens de la direction visuelle (§10) alignés sur le wireframe : un noir
@@ -157,6 +158,24 @@ ThemeData _base(ColorScheme scheme, Color ground, Color hairline, Color soft) {
     dialogTheme: DialogThemeData(
       backgroundColor: scheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.sheet)),
+    ),
+    // L'UI de connexion Clerk (écran joueur, phase 4) suit les mêmes tokens
+    // que le reste de l'app plutôt que son violet/blanc générique par défaut.
+    extensions: [_clerkTheme(scheme, ground, hairline, soft)],
+  );
+}
+
+ClerkThemeExtension _clerkTheme(ColorScheme scheme, Color ground, Color hairline, Color soft) {
+  return ClerkThemeExtension(
+    colors: ClerkThemeColors(
+      background: scheme.surface,
+      altBackground: ground,
+      borderSide: hairline,
+      text: scheme.onSurface,
+      icon: soft,
+      lightweightText: soft,
+      error: PlColors.danger,
+      accent: PlColors.accent,
     ),
   );
 }
