@@ -110,3 +110,46 @@ export function landingTexts(site: SiteConfig, locale: string): LandingTexts {
 export function getPreviewContent() {
   return fetchJson<PreviewContent>("/api/preview-content", { categories: [] });
 }
+
+/** Ancres de la landing, dans l'ordre de la page. */
+export type LandingSectionId = "jeux" | "demo" | "apropos" | "notif" | "reseaux";
+
+/** Sections réellement rendues, pour que le header ne propose jamais un
+ * lien vers une section absente (réseaux sans lien, jeux non choisis…).
+ * Calculé côté serveur : pas de lien qui apparaît ou disparaît après
+ * hydratation. */
+export function landingSections(site: SiteConfig): LandingSectionId[] {
+  const hasSocial = Boolean(site.social.instagram || site.social.tiktok || site.social.reddit);
+  return [
+    site.featuredGames.length > 0 && "jeux",
+    "demo",
+    "apropos",
+    "notif",
+    hasSocial && "reseaux",
+  ].filter((s): s is LandingSectionId => Boolean(s));
+}
+
+/** Écriture vers le back-office (pré-inscription…), serveur à serveur
+ * uniquement : le secret ne quitte jamais le serveur du site. `null` si le
+ * back-office est injoignable ou refuse — l'appelant affiche une erreur. */
+export async function postBackoffice<T>(path: string, body: unknown): Promise<T | null> {
+  try {
+    const res = await fetch(`${BACKOFFICE_URL}${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.LANDING_API_SECRET ?? ""}`,
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error(`[backoffice] POST ${path} → HTTP ${res.status}`);
+      return null;
+    }
+    return (await res.json()) as T;
+  } catch (e) {
+    console.error(`[backoffice] POST ${path} injoignable (${BACKOFFICE_URL})`, e);
+    return null;
+  }
+}

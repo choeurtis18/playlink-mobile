@@ -35,9 +35,10 @@ const f = (key: string, label: string, max: number, multiline: boolean, fr: stri
 export const LANDING_SECTIONS = [
   { id: 'hero', label: 'Héros', anchor: '', fields: [
     f('hero.eyebrow', 'Sur-titre', 40, false, 'Bientôt sur iOS & Android', 'Coming soon to iOS & Android'),
-    f('hero.title', 'Titre', 120, false,
-      'Le jeu qui a brisé plus d’amitiés que les groupes WhatsApp.',
-      'The game that has ended more friendships than WhatsApp groups.'),
+    // *mot* : mis en valeur par le dégradé animé du héros.
+    f('hero.title', 'Titre (*mot* = mis en valeur)', 120, false,
+      'Le jeu qui a *brisé* plus d’amitiés que les groupes WhatsApp.',
+      'The game that has *ended* more friendships than WhatsApp groups.'),
     f('hero.lede', 'Accroche', 220, true,
       '8 jeux de soirée, jouables entre amis sur un seul téléphone. Hors-ligne, sans compte — on se le passe, les scores se cumulent.',
       '8 party games, played with friends on a single phone. Offline, no account — pass it around, scores add up.'),
@@ -58,7 +59,7 @@ export const LANDING_SECTIONS = [
       'Pick a game, a category, an intensity — and play a real three-player round, just like in the app.'),
   ] },
   { id: 'about', label: 'Comment ça marche', anchor: '#apropos', fields: [
-    f('about.title', 'Titre', 80, false, 'Un téléphone. Tout le monde autour.', 'One phone. Everyone around it.'),
+    f('about.title', 'Titre (*passage* = en retrait)', 80, false, 'Un téléphone. *Tout le monde autour.*', 'One phone. *Everyone around it.*'),
     f('about.step1', 'Étape 1 — titre', 60, false, 'Choisis le jeu et l’intensité', 'Pick the game and intensity'),
     f('about.step1Body', 'Étape 1 — texte', 160, true,
       'De « Soft » à « Trash » : c’est vous qui décidez jusqu’où la soirée peut aller.',

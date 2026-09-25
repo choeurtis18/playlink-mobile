@@ -290,6 +290,141 @@ débloquer le badge Explorateur, voir §6).
 
 ---
 
+## 11. Landing (`apps/web`) — refonte en cours
+
+Refonte par lots (voir le plan d'implémentation). Tester à 390 px (mobile),
+820 px (tablette) et 1280 px (ordinateur). En local : `pnpm backoffice:dev`,
+puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 3001`.
+
+### 11.1 Contenu depuis le back-office (lot 0)
+- [ ] Modifier le titre du héros dans `/site` et enregistrer → le nouveau
+  titre apparaît sur la landing **dans l'heure** (le site garde sa copie
+  1 h) ; en local, redémarrer le site pour le voir tout de suite.
+- [ ] Vider le titre EN au back-office → la version EN affiche le titre FR.
+- [ ] Couper le back-office → la landing s'affiche quand même, avec les
+  textes par défaut et le bon titre d'onglet.
+- [ ] Une catégorie cochée « jouable » dont toutes les cartes dépassent
+  l'intensité max (3 par défaut) n'apparaît pas dans la démo.
+
+### 11.2 En-tête, menu et pied de page (lot 1)
+- [ ] L'en-tête reste en haut en défilant ; une fine bordure apparaît dès
+  qu'on quitte le haut de page ; la barre dégradée sous l'en-tête suit la
+  progression du scroll.
+- [ ] Clic sur « Jeux » / « Démo » → défilement doux, le titre de la
+  section arrive juste sous l'en-tête (pas caché dessous).
+- [ ] Sans lien Instagram/TikTok/Reddit au back-office → pas de lien
+  « Réseaux » dans le menu.
+- [ ] FR ↔ EN → l'adresse passe de `/fr` à `/en`, tous les textes changent.
+- [ ] Sous 900 px : burger à droite ; ouverture → menu plein écran, les
+  liens arrivent un à un, la page derrière ne défile plus. Échap ou clic
+  sur un lien → le menu se ferme (et le lien amène à sa section).
+- [ ] Le bouton « Bientôt sur les stores » et le lien « À propos »
+  n'apparaissent pas encore : ils arrivent avec leurs sections (lot 5).
+- [ ] Au clavier seul (Tab) : chaque lien et bouton de l'en-tête reçoit un
+  contour rose visible.
+- [ ] Réglage système « réduire les animations » activé → aucune
+  apparition animée, tout est affiché d'emblée.
+- [ ] Pied de page : adresse de contact cliquable (ouvre la messagerie),
+  grand « Playlink » en filigrane. Les liens légaux mènent encore à une
+  page introuvable (lot 7).
+
+### 11.3 Héros et bandeaux (lot 2)
+- [ ] Au chargement, sur-titre, titre, accroche, bouton et chiffres
+  apparaissent l'un après l'autre ; le mot entre astérisques du titre
+  (« *brisé* » par défaut) est en italique, avec un dégradé qui ondule.
+- [ ] Au back-office, retirer les astérisques du titre → plus de mot mis
+  en valeur, aucun astérisque visible.
+- [ ] Éventail : une carte par jeu mis en avant, avec une vraie carte du
+  jeu ; il tourne toutes les 2,5 s ; survol → il s'arrête ; points sous
+  l'éventail → affichent le jeu choisi.
+- [ ] Clic sur la carte du dessus → la page descend à la démo, sur une
+  catégorie de ce jeu.
+- [ ] Sur ordinateur, un halo rose suit la souris dans le héros.
+- [ ] Chiffres « N jeux / N cartes / 0 connexion » : nombre de cartes
+  arrondi à la centaine inférieure avec un « + » (1 521 → « 1 500+ »).
+- [ ] Bandeaux : deux rangées de vraies cartes douces qui défilent en sens
+  opposés, sans saut visible à la fin de la boucle ; survol → la rangée
+  s'arrête.
+- [ ] Un « ? » ou un « : » n'est jamais rejeté seul en début de ligne.
+- [ ] « Réduire les animations » → l'éventail ne tourne plus, les
+  bandeaux sont immobiles, pas de halo.
+
+### 11.4 Section « 01 — Les jeux » (lot 3)
+- [ ] Sur-titre, titre et texte viennent du back-office (section Jeux).
+- [ ] Tuiles dans l'ordre des jeux choisis au back-office, avec icône,
+  numéro, nom, description et « N catégories » (« 1 catégorie » au
+  singulier).
+- [ ] Ordinateur (≥ 900 px) : grille ; au survol, la tuile s'incline vers
+  la souris et une lueur à la couleur du jeu la suit ; en sortant, elle se
+  remet à plat.
+- [ ] Tablette : slider, un peu plus de 2 tuiles visibles ; mobile : une
+  tuile et le bord de la suivante. Le glisser s'arrête toujours sur une
+  tuile.
+- [ ] Sous le slider : compteur « 01 / 08 » qui suit le défilement, points
+  cliquables, flèches ← → désactivées en début et en fin de liste ; depuis
+  la fin, ← recule bien.
+- [ ] Bouton « Jouer » d'une tuile → la page descend à la démo, sur ce jeu.
+
+### 11.5 Démo jouable (lot 4)
+Même déroulé que dans l'app, avec 3 joueurs fixes : Alex, Sam, Léa.
+- [ ] Seuls les jeux ayant une catégorie cochée « jouable » au back-office
+  sont proposés ; changer de jeu met à jour les catégories et le halo de
+  couleur de la section.
+- [ ] Intensités au-delà du maximum réglé au back-office (3 par défaut) :
+  cadenas, non cliquables, avec la mention « dans l'app ».
+- [ ] « Lancer la partie » → carte face cachée + « C'est au tour d'Alex »
+  → « Voir la carte » (ou clic sur la carte) → la carte se retourne →
+  « Voter » (ou glisser la carte) → « Est-ce qu'Alex mérite un point ? »
+  → Oui / Non → carte face cachée + « C'est au tour de Sam »… jusqu'à la
+  dernière carte.
+- [ ] Nombre de cartes = réglage du back-office (5 par défaut), ou moins si
+  la catégorie en a moins ; compteur « 2 / 5 » et barres en haut à droite.
+- [ ] Fin de partie : podium 🥇🥈🥉 avec les points, « X remporte la
+  manche » ou « Égalité en tête ! », rappel de l'app, boutons « Bientôt
+  sur App Store / Google Play », « Rejouer » (nouveau tirage) et
+  « Changer de jeu ».
+- [ ] Devine le mot : « 3 indices restants » ; « Indice utilisé » décompte
+  jusqu'à « Plus d'indice » (bouton alors désactivé) ; remis à 3 à la
+  carte suivante.
+- [ ] Changer de jeu, de catégorie ou d'intensité en cours de partie →
+  retour à l'écran de départ.
+- [ ] Clavier seul : Entrée enchaîne les étapes, P = point, N = pas de
+  point ; le contour rose suit le bouton de chaque étape.
+- [ ] Mobile : les rangées « jeu » et « catégorie » tiennent sur une ligne
+  qui défile, avec un fondu à droite ; l'option choisie se recentre ;
+  « Lancer la partie » fait descendre jusqu'à la carte.
+- [ ] Deux parties de suite ne tirent pas forcément les mêmes cartes, et
+  les cartes proches de l'intensité choisie sont les plus fréquentes.
+
+### 11.6 Comment ça marche, pré-inscription, réseaux (lot 5)
+Prérequis : `LANDING_API_SECRET` identique sur le site et le back-office ;
+pour le double opt-in, `RESEND_API_KEY` et le domaine vérifié dans Resend.
+- [ ] En-tête : les liens « À propos » et « Réseaux » et le bouton
+  « Bientôt sur les stores » sont là et mènent à leur section ; le
+  deuxième bouton du héros mène au formulaire.
+- [ ] « Comment ça marche » : 3 étapes éditables ; les chiffres (jeux,
+  catégories, cartes arrondies, 100 %) comptent depuis 0 en apparaissant.
+- [ ] Formulaire : envoyer vide ou avec une adresse invalide → « Cette
+  adresse e-mail ne semble pas valide. » ; sans cocher la case → « Coche
+  la case… » ; les messages sont en texte, sous le formulaire.
+- [ ] Inscription valide → message de succès et pluie de mini-cartes ;
+  l'inscrit apparaît en base (adresse en minuscules).
+- [ ] Se réinscrire avec la même adresse (même en changeant la casse) →
+  même message, aucun doublon.
+- [ ] Double opt-in activé : message « Plus qu'une étape », e-mail reçu
+  (expéditeur no-reply@playlink-game.fr, réponse vers
+  gamesplaylink@gmail.com) ; le lien affiche « C'est confirmé ! », un
+  second clic « Ce lien ne fonctionne plus ».
+- [ ] Back-office coupé → « L'inscription n'a pas pu être enregistrée… ».
+- [ ] Réseaux : un réseau sans lien au back-office n'apparaît pas ; aucun
+  lien → ni section ni entrée « Réseaux » dans le menu.
+- [ ] Pied de page → « Supprimer mes données » : page explicative, le
+  bouton ouvre la messagerie avec un e-mail pré-rempli vers
+  gamesplaylink@gmail.com.
+- [ ] Au clavier dans le formulaire, rien ne glisse ni ne se décale.
+
+---
+
 ## Ce qui reste à développer
 
 Rien de ce qui suit n'est testable aujourd'hui — c'est normal de tomber sur

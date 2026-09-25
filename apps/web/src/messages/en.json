@@ -1,24 +1,150 @@
 {
+  "nav": {
+    "home": "Playlink — home",
+    "main": "Main navigation",
+    "mobile": "Mobile navigation",
+    "menu": "Menu",
+    "games": "Games",
+    "demo": "Demo",
+    "about": "About",
+    "social": "Socials",
+    "language": "Language",
+    "cta": "Coming soon to the stores",
+    "notify": "Notify me at launch",
+    "soon": "Coming soon to iOS & Android",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
   "hero": {
-    "eyebrow": "Coming soon",
-    "eyebrowReleased": "Available now"
+    "eyebrowReleased": "Available on iOS & Android",
+    "statGames": "{n} games",
+    "statCards": "{n}{plus} cards",
+    "statOffline": "0 connection",
+    "fanLabel": "Game preview",
+    "playDemo": "Play the demo →",
+    "tryGame": "{name} — try the demo",
+    "showGame": "Show {name}",
+    "marqueeLabel": "Sample cards"
+  },
+  "games": {
+    "listLabel": "The games",
+    "categoryCount": "{n, plural, =0 {No category} one {# category} other {# categories}}",
+    "play": "Play",
+    "playAria": "Play {name} in the demo",
+    "goTo": "Go to {name}",
+    "prev": "Previous game",
+    "next": "Next game"
   },
   "demo": {
-    "categoryLabel": "Choose a category",
-    "prev": "Previous card",
-    "next": "Next card",
-    "cardOf": "Card {n} of {total}",
-    "comingSoon": "The playable preview is coming very soon."
+    "kicker": "02 — Playable demo",
+    "comingSoon": "The playable demo is coming very soon.",
+    "pickGame": "Pick a game",
+    "pickCategory": "Category",
+    "pickIntensity": "Intensity",
+    "gameLabel": "Game",
+    "categoryLabel": "Category",
+    "intensityLabel": "Intensity from 1 to 5",
+    "levels": {
+      "1": "Soft",
+      "2": "Light",
+      "3": "Normal",
+      "4": "Hot",
+      "5": "Trash"
+    },
+    "levelLocked": "{n} — {label}, available in the app",
+    "levelLockedHint": "The spiciest levels are waiting for you in the app.",
+    "start": "Start the game",
+    "restart": "New game",
+    "keyboard": "Keyboard: <kbd>Enter</kbd> next · <kbd>P</kbd> point · <kbd>N</kbd> no point",
+    "stageLabel": "Demo game",
+    "cardOf": "{n} / {total}",
+    "cardsCount": "{n, plural, one {# card} other {# cards}}",
+    "setupHint": "Three players — Alex, Sam and Léa — pass the phone around. Pick your game, then start.",
+    "turnOf": "It's {name}'s turn",
+    "turnOfRich": "It's <b>{name}</b>'s turn",
+    "tapToReveal": "Tap to reveal",
+    "seeCard": "Reveal the card",
+    "dontPeek": "Don't look at the screen until it's your turn.",
+    "passPhoneTo": "Pass the phone to {name}.",
+    "hintsLeft": "{n, plural, =0 {No hints left} one {1 hint left} other {# hints left}}",
+    "useHint": "Hint used",
+    "vote": "Vote",
+    "swipeHint": "Or swipe the card.",
+    "deservesPoint": "Does {name} deserve a point?",
+    "yes": "Yes",
+    "no": "No",
+    "voteIsMandatory": "Voting is mandatory — it's what moves the game forward.",
+    "gameOver": "Game over",
+    "winnerAnnounce": "{name} wins the round",
+    "tie": "It's a tie at the top!",
+    "points": "{n, plural, one {# pt} other {# pts}}",
+    "appPitch": "That was just the warm-up. In the app: every card, scores that add up from one game to the next, and badges.",
+    "soonOn": "Coming soon to",
+    "replay": "Play again",
+    "changeGame": "Change game"
   },
   "social": {
     "instagram": "Instagram",
     "tiktok": "TikTok",
-    "reddit": "Reddit"
+    "reddit": "Reddit",
+    "kicker": "05 — Meanwhile",
+    "newTab": "(new tab)",
+    "notes": {
+      "instagram": "Weekly challenges",
+      "tiktok": "Games on camera",
+      "reddit": "Suggest cards"
+    }
   },
   "footer": {
     "legal": "Legal notice",
     "privacy": "Privacy policy",
     "terms": "Terms of use",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "controller": "Data controller:",
+    "nav": "Legal links",
+    "deleteData": "Delete my data"
+  },
+  "about": {
+    "kicker": "03 — How it works",
+    "games": "{n, plural, one {game} other {games}}",
+    "categories": "{n, plural, one {category} other {categories}}",
+    "cards": "{n, plural, one {card} other {cards}}",
+    "percentSuffix": "%",
+    "offline": "offline, no account"
+  },
+  "notif": {
+    "kicker": "04 — Early sign-up",
+    "emailLabel": "Email address",
+    "placeholder": "you@example.com",
+    "sending": "Sending…",
+    "privacy": "See the <link>privacy policy</link>.",
+    "errors": {
+      "email": "This email address doesn’t look valid.",
+      "consent": "Tick the box so we can let you know.",
+      "server": "We couldn’t save your sign-up. Please try again in a moment."
+    },
+    "doneBody": "Signed up with {email}",
+    "pendingTitle": "One more step: confirm your address.",
+    "pendingBody": "We just sent a link to {email}. Check your spam folder too."
+  },
+  "confirmation": {
+    "kicker": "Early sign-up",
+    "okTitle": "You’re confirmed!",
+    "okBody": "You’ll get one email the day Playlink hits the stores. Just one, promise.",
+    "koTitle": "This link no longer works.",
+    "koBody": "It may have been used already, or it expired. You can sign up again from the home page.",
+    "back": "Back to home"
+  },
+  "deleteData": {
+    "metaTitle": "Delete my data — Playlink",
+    "kicker": "Your data",
+    "title": "Delete my data",
+    "intro": "If you signed up early, Playlink only keeps your email address, your language and the sign-up date — to tell you when the app launches, nothing else.",
+    "how": "To delete them, email us from that address: we’ll erase your sign-up and confirm it.",
+    "cta": "Request deletion",
+    "mailSubject": "Delete my Playlink data",
+    "mailBody": "Hello,\n\nPlease delete my Playlink early sign-up (the address this email is sent from).\n",
+    "delay": "We reply within 30 days at most, as required by the GDPR. Address: {email}.",
+    "back": "Back to home"
   }
 }

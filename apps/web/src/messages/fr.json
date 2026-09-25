@@ -1,24 +1,150 @@
 {
+  "nav": {
+    "home": "Playlink — accueil",
+    "main": "Navigation principale",
+    "mobile": "Navigation mobile",
+    "menu": "Menu",
+    "games": "Jeux",
+    "demo": "Démo",
+    "about": "À propos",
+    "social": "Réseaux",
+    "language": "Langue",
+    "cta": "Bientôt sur les stores",
+    "notify": "Me prévenir à la sortie",
+    "soon": "Bientôt sur iOS & Android",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
   "hero": {
-    "eyebrow": "Bientôt disponible",
-    "eyebrowReleased": "Disponible"
+    "eyebrowReleased": "Disponible sur iOS & Android",
+    "statGames": "{n} jeux",
+    "statCards": "{n}{plus} cartes",
+    "statOffline": "0 connexion",
+    "fanLabel": "Aperçu des jeux",
+    "playDemo": "Jouer à la démo →",
+    "tryGame": "{name} — essayer la démo",
+    "showGame": "Afficher {name}",
+    "marqueeLabel": "Exemples de cartes"
+  },
+  "games": {
+    "listLabel": "Les jeux",
+    "categoryCount": "{n, plural, =0 {Aucune catégorie} one {# catégorie} other {# catégories}}",
+    "play": "Jouer",
+    "playAria": "Jouer à {name} dans la démo",
+    "goTo": "Aller à {name}",
+    "prev": "Jeu précédent",
+    "next": "Jeu suivant"
   },
   "demo": {
-    "categoryLabel": "Choisir une catégorie",
-    "prev": "Carte précédente",
-    "next": "Carte suivante",
-    "cardOf": "Carte {n} sur {total}",
-    "comingSoon": "L'aperçu jouable arrive très bientôt."
+    "kicker": "02 — Démo jouable",
+    "comingSoon": "La démo jouable arrive très bientôt.",
+    "pickGame": "Choisis un jeu",
+    "pickCategory": "Catégorie",
+    "pickIntensity": "Intensité",
+    "gameLabel": "Jeu",
+    "categoryLabel": "Catégorie",
+    "intensityLabel": "Intensité de 1 à 5",
+    "levels": {
+      "1": "Soft",
+      "2": "Léger",
+      "3": "Normal",
+      "4": "Chaud",
+      "5": "Trash"
+    },
+    "levelLocked": "{n} — {label}, disponible dans l’app",
+    "levelLockedHint": "Les niveaux les plus corsés t’attendent dans l’app.",
+    "start": "Lancer la partie",
+    "restart": "Nouvelle partie",
+    "keyboard": "Clavier : <kbd>Entrée</kbd> avance · <kbd>P</kbd> point · <kbd>N</kbd> pas de point",
+    "stageLabel": "Partie de démo",
+    "cardOf": "{n} / {total}",
+    "cardsCount": "{n, plural, one {# carte} other {# cartes}}",
+    "setupHint": "Trois joueurs — Alex, Sam et Léa — se passent le téléphone. Choisis ton jeu, puis lance la partie.",
+    "turnOf": "C’est au tour {elide, select, yes {d’} other {de }}{name}",
+    "turnOfRich": "C’est au tour {elide, select, yes {d’} other {de }}<b>{name}</b>",
+    "tapToReveal": "Touche pour révéler",
+    "seeCard": "Voir la carte",
+    "dontPeek": "Ne regarde pas l’écran tant que ce n’est pas ton tour.",
+    "passPhoneTo": "Passe le téléphone à {name}.",
+    "hintsLeft": "{n, plural, =0 {Plus d’indice} one {1 indice restant} other {# indices restants}}",
+    "useHint": "Indice utilisé",
+    "vote": "Voter",
+    "swipeHint": "Ou glisse la carte.",
+    "deservesPoint": "Est-ce {elide, select, yes {qu’} other {que }}{name} mérite un point ?",
+    "yes": "Oui",
+    "no": "Non",
+    "voteIsMandatory": "Le vote est obligatoire — c’est lui qui fait avancer la partie.",
+    "gameOver": "Partie terminée",
+    "winnerAnnounce": "{name} remporte la manche",
+    "tie": "Égalité en tête !",
+    "points": "{n, plural, one {# pt} other {# pts}}",
+    "appPitch": "Ça, c’était l’échauffement. Dans l’app : toutes les cartes, les scores qui se cumulent d’une partie à l’autre, et les badges.",
+    "soonOn": "Bientôt sur",
+    "replay": "Rejouer",
+    "changeGame": "Changer de jeu"
   },
   "social": {
     "instagram": "Instagram",
     "tiktok": "TikTok",
-    "reddit": "Reddit"
+    "reddit": "Reddit",
+    "kicker": "05 — En attendant",
+    "newTab": "(nouvel onglet)",
+    "notes": {
+      "instagram": "Défis de la semaine",
+      "tiktok": "Parties filmées",
+      "reddit": "Proposer des cartes"
+    }
   },
   "footer": {
     "legal": "Mentions légales",
     "privacy": "Politique de confidentialité",
-    "terms": "Conditions d'utilisation",
-    "cookies": "Cookies"
+    "terms": "Conditions d’utilisation",
+    "cookies": "Cookies",
+    "controller": "Responsable de traitement :",
+    "nav": "Liens légaux",
+    "deleteData": "Supprimer mes données"
+  },
+  "about": {
+    "kicker": "03 — Comment ça marche",
+    "games": "{n, plural, one {jeu} other {jeux}}",
+    "categories": "{n, plural, one {catégorie} other {catégories}}",
+    "cards": "{n, plural, one {carte} other {cartes}}",
+    "percentSuffix": " %",
+    "offline": "hors-ligne, sans compte"
+  },
+  "notif": {
+    "kicker": "04 — Pré-inscription",
+    "emailLabel": "Adresse e-mail",
+    "placeholder": "toi@exemple.fr",
+    "sending": "Envoi…",
+    "privacy": "Voir la <link>politique de confidentialité</link>.",
+    "errors": {
+      "email": "Cette adresse e-mail ne semble pas valide.",
+      "consent": "Coche la case pour qu’on puisse te prévenir.",
+      "server": "L’inscription n’a pas pu être enregistrée. Réessaie dans un instant."
+    },
+    "doneBody": "Inscrit·e avec {email}",
+    "pendingTitle": "Plus qu’une étape : confirme ton adresse.",
+    "pendingBody": "On vient d’envoyer un lien à {email}. Pense à regarder dans les indésirables."
+  },
+  "confirmation": {
+    "kicker": "Pré-inscription",
+    "okTitle": "C’est confirmé !",
+    "okBody": "Tu recevras un e-mail le jour où Playlink arrive sur les stores. Un seul, promis.",
+    "koTitle": "Ce lien ne fonctionne plus.",
+    "koBody": "Il a peut-être déjà servi, ou il a expiré. Tu peux te réinscrire depuis la page d’accueil.",
+    "back": "Retour à l’accueil"
+  },
+  "deleteData": {
+    "metaTitle": "Supprimer mes données — Playlink",
+    "kicker": "Tes données",
+    "title": "Supprimer mes données",
+    "intro": "Si tu t’es pré-inscrit·e, Playlink conserve seulement ton adresse e-mail, ta langue et la date d’inscription — pour te prévenir de la sortie de l’app, rien d’autre.",
+    "how": "Pour les supprimer, écris-nous depuis l’adresse concernée : on efface ton inscription et on te le confirme.",
+    "cta": "Demander la suppression",
+    "mailSubject": "Supprimer mes données Playlink",
+    "mailBody": "Bonjour,\n\nMerci de supprimer ma pré-inscription à Playlink (adresse de cet e-mail).\n",
+    "delay": "Réponse sous 30 jours au plus tard, comme le prévoit le RGPD. Adresse : {email}.",
+    "back": "Retour à l’accueil"
   }
 }
