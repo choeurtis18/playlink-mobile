@@ -74,12 +74,27 @@ Future<void> _pullGameData(AppDatabase db, Map<String, String> headers) async {
     for (final p in existingPlayers)
       if (p.remoteId != null) p.remoteId!: p,
   };
+  // Filet de sécurité quand ni l'id local ni le remoteId ne correspondent
+  // déjà : un joueur du même nom joué séparément sur cet appareil ET sur le
+  // compte (avant toute connexion, ou sur un autre appareil) est la même
+  // personne dans le contexte de l'app (jeu de soirée, pas de comptes
+  // distincts par joueur) — on fusionne sous le profil local existant
+  // plutôt que de créer un doublon visible à l'écran joueurs. Normalisé
+  // (casse, espaces) pour matcher la règle d'unicité déjà appliquée à la
+  // création d'un profil (voir `PlayersNotifier.create`).
+  final byNormalizedName = {
+    for (final p in existingPlayers) p.name.trim().toLowerCase(): p,
+  };
+  // Un même profil local peut absorber plusieurs profils distants fusionnés
+  // par nom au fil de cette passe — jamais réinséré une deuxième fois.
+  final claimedLocalIds = <String>{};
 
   // Un profil distant peut n'exister ici ni par localId (jamais vu sur cet
   // appareil) ni par remoteId (déjà vu mais sous un autre localId, ex.
-  // après une réinstallation) — dans les deux cas, il faut une ligne locale
-  // avant de pouvoir y rattacher des parties. `remoteToLocalPlayerId`
-  // couvre les deux origines pour le reste de la fusion (sessions).
+  // après une réinstallation) ni par nom (aucun homonyme local) — dans ce
+  // seul cas il faut une nouvelle ligne locale avant de pouvoir y rattacher
+  // des parties. `remoteToLocalPlayerId` couvre toutes les origines pour le
+  // reste de la fusion (sessions).
   final remoteToLocalPlayerId = <String, String>{};
   final newPlayers = <LocalPlayersCompanion>[];
   final playerRemoteIdUpdates = <String, String>{};
@@ -87,21 +102,33 @@ Future<void> _pullGameData(AppDatabase db, Map<String, String> headers) async {
   for (final rp in remoteProfiles) {
     final localId = rp['localId'] as String;
     final remoteId = rp['remoteId'] as String;
+    final name = rp['name'] as String;
+    final normalizedName = name.trim().toLowerCase();
+
     if (byLocalId.containsKey(localId)) {
       remoteToLocalPlayerId[remoteId] = localId;
+      claimedLocalIds.add(localId);
       if (byLocalId[localId]!.remoteId != remoteId) playerRemoteIdUpdates[localId] = remoteId;
     } else if (byRemoteId.containsKey(remoteId)) {
-      remoteToLocalPlayerId[remoteId] = byRemoteId[remoteId]!.id;
+      final matchId = byRemoteId[remoteId]!.id;
+      remoteToLocalPlayerId[remoteId] = matchId;
+      claimedLocalIds.add(matchId);
+    } else if (byNormalizedName[normalizedName] case final match?
+        when !claimedLocalIds.contains(match.id)) {
+      remoteToLocalPlayerId[remoteId] = match.id;
+      claimedLocalIds.add(match.id);
+      if (match.remoteId != remoteId) playerRemoteIdUpdates[match.id] = remoteId;
     } else {
       newPlayers.add(LocalPlayersCompanion.insert(
         id: localId,
-        name: rp['name'] as String,
+        name: name,
         avatar: (rp['avatar'] as String?) ?? '👤',
         createdAt: DateTime.now(),
         inSession: const Value(false),
         remoteId: Value(remoteId),
       ));
       remoteToLocalPlayerId[remoteId] = localId;
+      claimedLocalIds.add(localId);
     }
   }
 
