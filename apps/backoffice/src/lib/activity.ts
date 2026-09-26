@@ -55,7 +55,8 @@ const quote = (s: string, max = 60) => `« ${s.length > max ? `${s.slice(0, max 
 /** Dernières lignes du journal, avec le nom de ce qu'elles touchent
  * (lu en base par lots : une requête par type d'entité, pas par ligne). */
 export async function recentActivity(take = 6, where?: Prisma.AuditLogWhereInput): Promise<ActivityEntry[]> {
-  const logs = await prisma.auditLog.findMany({ where, orderBy: { createdAt: "desc" }, take });
+  // Par défaut, sans les synchros automatiques des stats (une par nuit).
+  const logs = await prisma.auditLog.findMany({ where: where ?? { entity: { not: "stats" } }, orderBy: { createdAt: "desc" }, take });
   const ids = (entity: string) =>
     [...new Set(logs.filter((l) => l.entity === entity && !["bulk", "default"].includes(l.entityId)).map((l) => l.entityId))];
 

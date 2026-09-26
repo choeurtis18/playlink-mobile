@@ -19,7 +19,7 @@ const nf = new Intl.NumberFormat("fr-FR");
 
 export default async function Home() {
   const now = new Date();
-  const [shell, categories, slides, badges, totalCards, untranslated, landingRows, signups, activity, contentMissing] = await Promise.all([
+  const [shell, categories, slides, badges, totalCards, untranslated, landingRows, signups, activity, contentMissing, statRows] = await Promise.all([
     getShellCounts(),
     prisma.category.count(),
     prisma.gameRuleSlide.count(),
@@ -35,6 +35,11 @@ export default async function Home() {
     }),
     recentActivity(6),
     missingByKind(),
+    // Vues et démos : agrégats quotidiens synchronisés depuis PostHog.
+    prisma.dailyStat.findMany({
+      where: { day: { gte: new Date(now.getTime() - (SPARK_DAYS + 1) * DAY) }, metric: { in: ["landing.views", "landing.demo_started"] } },
+      select: { day: true, metric: true, value: true },
+    }),
   ]);
 
   const stats: { label: string; value: string; icon: Icon; href: string }[] = [
@@ -52,6 +57,13 @@ export default async function Home() {
   const perDay = days.map((d) => signups.filter((s) => parisDay(s.createdAt) === d).length);
   const last7 = perDay.slice(7).reduce((a, b) => a + b, 0);
   const prev7 = perDay.slice(0, 7).reduce((a, b) => a + b, 0);
+  const statPerDay = (metric: string) => days.map((d) => statRows.filter((r) => r.metric === metric && r.day.toISOString().slice(0, 10) === d).reduce((s, r) => s + r.value, 0));
+  const viewsPerDay = statPerDay("landing.views");
+  const demosPerDay = statPerDay("landing.demo_started");
+  const week = (v: number[]) => [v.slice(7).reduce((a, b) => a + b, 0), v.slice(0, 7).reduce((a, b) => a + b, 0)] as const;
+  const [views7, viewsPrev7] = week(viewsPerDay);
+  const [demos7, demosPrev7] = week(demosPerDay);
+  const hasViews = viewsPerDay.some((v) => v > 0);
 
   const gaps = landingEnGaps(landingRows);
   const coverage = totalCards ? Math.round(((totalCards - untranslated) / totalCards) * 100) : 100;
@@ -98,18 +110,24 @@ export default async function Home() {
 
       <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] gap-4">
         <Card className="flex flex-col gap-4">
-          <h2 className="m-0 flex items-center gap-2 text-[15px] font-semibold">
-            <span aria-hidden className="h-[7px] w-[7px] rounded-full bg-success motion-safe:animate-[bo-pulse_2s_infinite]" />
-            Landing — 7 derniers jours
-          </h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="m-0 flex items-center gap-2 text-[15px] font-semibold">
+              <span aria-hidden className="h-[7px] w-[7px] rounded-full bg-success motion-safe:animate-[bo-pulse_2s_infinite]" />
+              Landing — 7 derniers jours
+            </h2>
+            <a href="/stats" className="flex items-center gap-1 text-[13px] text-accent-deep hover:text-ink">Stats détaillées <CaretRightIcon aria-hidden /></a>
+          </div>
           <dl className="m-0 grid grid-cols-[repeat(auto-fit,minmax(110px,1fr))] gap-3">
+            {hasViews && <Kpi label="Vues" value={nf.format(views7)} delta={delta(views7, viewsPrev7)} />}
+            {hasViews && <Kpi label="Démos lancées" value={nf.format(demos7)} delta={delta(demos7, demosPrev7)} />}
             <Kpi label="Pré-inscriptions" value={nf.format(last7)} delta={delta(last7, prev7)} />
             <Kpi label="Dernières 24 h" value={nf.format(shell.newSignups)} />
-            <Kpi label="Sur 14 jours" value={nf.format(last7 + prev7)} />
           </dl>
-          <Sparkline values={perDay} label={`Pré-inscriptions par jour sur ${SPARK_DAYS} jours : ${perDay.join(", ")}`} />
+          {hasViews
+            ? <Sparkline values={viewsPerDay} label={`Vues par jour sur ${SPARK_DAYS} jours : ${viewsPerDay.join(", ")}`} />
+            : <Sparkline values={perDay} label={`Pré-inscriptions par jour sur ${SPARK_DAYS} jours : ${perDay.join(", ")}`} />}
           <p className="m-0 text-xs text-neutral-faint">
-            Vues, démos jouées et taux de conversion arriveront avec l’écran Stats.
+            {hasViews ? "Courbe : vues par jour sur 14 jours (synchronisées chaque nuit depuis PostHog)." : "Courbe : pré-inscriptions par jour. Les vues et les démos apparaîtront après la première synchro de l’écran Stats."}
           </p>
         </Card>
 

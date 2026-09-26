@@ -276,6 +276,23 @@ export async function createPlannedBadge(key: string): Promise<ActionResult> {
   }, ["/badges", "/"]);
 }
 
+// ── Stats de la landing ───────────────────────────────────────────────
+
+/** Synchro manuelle des stats (écran Stats) : même calcul que le cron de
+ * la nuit, sur `days` jours. Ne touche pas au contenu : pas de `run()`. */
+export async function syncLandingStatsNow(days: number): Promise<ActionResult & { rows?: number }> {
+  try {
+    await requireEditor();
+    const { syncLandingStats } = await import("./landing-stats");
+    const r = await syncLandingStats(days);
+    revalidatePath("/stats");
+    revalidatePath("/");
+    return { ok: true, rows: r.rows };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Synchronisation impossible" };
+  }
+}
+
 // ── Landing : éditeur « Contenu du site » ─────────────────────────────
 
 export type SitePublishPayload = {
