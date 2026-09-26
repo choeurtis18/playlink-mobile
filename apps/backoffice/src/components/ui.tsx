@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { CheckCircleIcon, WarningCircleIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import type { ActionResult } from "@/lib/actions";
 
@@ -422,7 +423,10 @@ export function Dialog({ open, onClose, labelledBy, className, children, placeme
   }, [open]);
 
   if (!open) return null;
-  return (
+  // Rendue dans <body> (portail) : un ancêtre transformé (carte qui se
+  // soulève au survol…) deviendrait sinon le repère du `position: fixed`
+  // et enfermerait la fenêtre dans la carte.
+  return createPortal(
     <div
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
       className={cx(
@@ -443,7 +447,8 @@ export function Dialog({ open, onClose, labelledBy, className, children, placeme
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
