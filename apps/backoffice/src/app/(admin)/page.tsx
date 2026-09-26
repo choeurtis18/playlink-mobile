@@ -94,7 +94,7 @@ export default async function Home() {
       icon: EnvelopeSimpleIcon, tone: "success",
       title: shell.newSignups > 0 ? `${shell.newSignups} nouvelle${shell.newSignups > 1 ? "s" : ""} pré-inscription${shell.newSignups > 1 ? "s" : ""}` : "Aucune nouvelle pré-inscription",
       sub: "Dernières 24 h",
-      href: null,
+      href: "/inscriptions",
     },
   ];
 

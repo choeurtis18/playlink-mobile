@@ -137,6 +137,20 @@
     "koBody": "It may have been used already, or it expired. You can sign up again from the home page.",
     "back": "Back to home"
   },
+  "unsubscribe": {
+    "kicker": "Early sign-up",
+    "title": "Unsubscribe?",
+    "body": "You won’t receive any more emails from Playlink, and your address will be deleted from our list.",
+    "cta": "Unsubscribe me",
+    "stay": "Actually, keep me on the list",
+    "okTitle": "Done.",
+    "okBody": "Your address is deleted: you won’t get any more emails from Playlink. You can sign up again anytime from the home page.",
+    "koTitle": "This link doesn’t work.",
+    "koBody": "It’s incomplete, or the address was already unsubscribed.",
+    "help": "Still signed up?",
+    "helpLink": "Ask for deletion by email.",
+    "back": "Back to home"
+  },
   "deleteData": {
     "metaTitle": "Delete my data — Playlink",
     "kicker": "Your data",

@@ -35,6 +35,9 @@ const ACTIONS: Record<string, { label: string; icon: ActivityIcon }> = {
   updated_landing_settings: { label: "Réglages du site mis à jour", icon: "site" },
   published_site: { label: "Site publié", icon: "site" },
   published_release: { label: "Version publiée", icon: "publish" },
+  deleted_preregistration: { label: "Pré-inscription supprimée", icon: "delete" },
+  unsubscribed_preregistration: { label: "Désinscription", icon: "delete" },
+  exported_preregistrations: { label: "Pré-inscriptions exportées", icon: "import" },
 };
 
 export type ActivityEntry = {
@@ -97,6 +100,9 @@ function detailOf(action: string, entityId: string, meta: Meta, name: Map<string
   const count = typeof meta?.count === "number" ? meta.count : null;
   if (entityId === "bulk" && count !== null) return `${count} élément${count > 1 ? "s" : ""}`;
   if (action === "published_release") return `v${entityId}`;
+  // Jamais l'adresse (effacée) : la langue suffit à situer la ligne.
+  if (action === "unsubscribed_preregistration") return `Lien de l’e-mail${str(meta?.locale) ? ` · ${str(meta?.locale)!.toUpperCase()}` : ""}`;
+  if (action === "deleted_preregistration") return `Adresse effacée (RGPD)${str(meta?.locale) ? ` · ${str(meta?.locale)!.toUpperCase()}` : ""}`;
   if (action === "toggled_preview_eligible") {
     const label = name.get(entityId) ?? "Catégorie supprimée";
     return `${label} → ${meta?.previewEligible ? "jouable" : "retirée"}`;

@@ -653,6 +653,60 @@ Prérequis : `POSTHOG_PERSONAL_API_KEY` (Query : Read), `POSTHOG_PROJECT_ID`,
 - [ ] Sécurité : ouvrir `/api/cron/landing-stats` dans le navigateur →
   `unauthorized` (401).
 
+### 12.7 Pré-inscriptions (lot 14)
+- [ ] Sidebar → Pré-inscriptions est cliquable (badge « +N » s'il y a des
+  inscriptions des dernières 24 h). Au tableau de bord, la ligne
+  « N nouvelles pré-inscriptions » ouvre l'écran.
+- [ ] 4 indicateurs : total (+N en 24 h), % consentement newsletter,
+  % d'adresses confirmées (nombre en attente de clic), désinscriptions
+  des 30 derniers jours.
+- [ ] Recherche d'un e-mail (en direct), filtres Langue (FR/EN) et
+  Statut (Confirmées / En attente) : l'URL change, le lien est partageable,
+  « Réinitialiser » vide tout. 50 lignes par page, Précédent / Suivant.
+- [ ] Export CSV : reprend les filtres affichés (le bouton indique le
+  nombre), s'ouvre correctement dans Excel (accents). Une adresse qui
+  commence par `=` apparaît précédée d'une apostrophe (pas de formule).
+  Le journal du tableau de bord affiche « Pré-inscriptions exportées ».
+- [ ] Suppression : icône corbeille → « Confirmer ? » (4 s) → la ligne
+  s'efface en fondu, notification « Pré-inscription supprimée », le
+  compteur de désinscriptions augmente. Le journal affiche « Adresse
+  effacée (RGPD) » **sans** l'e-mail.
+- [ ] Échap ou clic ailleurs pendant « Confirmer ? » : rien n'est supprimé.
+- [ ] Aucune pré-inscription : message vide explicite, pas de bouton
+  d'export.
+
+### 12.8 E-mails d'inscription
+Prérequis : `RESEND_API_KEY` sur le projet Vercel du back-office, domaine
+`playlink-game.fr` « Verified » dans Resend.
+- [ ] Double opt-in désactivé : s'inscrire sur la landing avec une vraie
+  adresse → e-mail « C'est noté… » (FR) ou « You're on the list… » (EN)
+  selon la langue du site : logo, bouton « Essayer la démo », liens
+  Instagram/TikTok s'ils sont renseignés, lien « Te désinscrire ».
+- [ ] En même temps, gamesplaylink@gmail.com reçoit « Nouvelle
+  pré-inscription · adresse » (total, langue, dernières 24 h, bouton vers
+  l'écran Pré-inscriptions). « Répondre » écrit à l'inscrit.
+- [ ] Même adresse une seconde fois : aucun nouvel e-mail.
+- [ ] Double opt-in activé : d'abord l'e-mail de confirmation (même
+  design) ; bienvenue et alerte seulement après le clic, une seule fois.
+- [ ] Gmail web et mobile, Outlook : fond sombre, bouton lisible, pas de
+  défilement horizontal sur téléphone.
+- [ ] `ADMIN_NOTIFY_EMAIL=off` puis redéploiement : plus d'alerte, la
+  bienvenue part toujours.
+- [ ] L'alerte admin ne contient l'adresse ni dans l'objet ni en
+  « Répondre à » (elle est cliquable dans le corps). Si elle arrive en
+  spam : « Non spam » + filtre Gmail `from:no-reply@playlink-game.fr` →
+  « Ne jamais envoyer dans le spam ».
+- [ ] Désinscription par le lien : e-mail de bienvenue → « Te désinscrire »
+  → page « Te désinscrire ? » (rien n'est effacé tant qu'on ne clique pas)
+  → « Me désinscrire » → « C'est fait. ». L'adresse disparaît de l'écran
+  Pré-inscriptions, « Désinscriptions · 30 j » augmente, le journal
+  affiche « Désinscription · Lien de l'e-mail ».
+- [ ] Même lien une seconde fois : « C'est fait. » (rien à effacer). Lien
+  modifié à la main : « Ce lien ne fonctionne pas. ».
+- [ ] Gmail : bouton « Se désabonner » à côté de l'expéditeur sur l'e-mail
+  de bienvenue (peut n'apparaître qu'après quelques envois) → l'adresse
+  est effacée de la même façon.
+
 ---
 
 ## Ce qui reste à développer
