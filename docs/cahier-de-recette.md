@@ -618,6 +618,29 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
   « Confirmer la vN » + Annuler (plus de boîte du navigateur) → version
   créée, notification.
 
+### 12.6 Stats landing (lot 13)
+Prérequis : `POSTHOG_PERSONAL_API_KEY` (Query : Read), `POSTHOG_PROJECT_ID`,
+`POSTHOG_API_HOST` et `CRON_SECRET` sur le projet Vercel du back-office.
+- [ ] Première visite de Stats : « Récupérer les 90 derniers jours » →
+  notification « Stats synchronisées », puis les chiffres apparaissent.
+  Sans configuration : message expliquant les variables à ajouter.
+- [ ] Période 7 / 30 / 90 j (dans l'URL). 5 indicateurs (vues, visiteurs,
+  démos lancées, pré-inscriptions, conversion) avec la variation par
+  rapport à la période précédente.
+- [ ] Graphique : vues en haut, pré-inscriptions en dessous, même axe
+  du temps. Survol → ligne verticale et infobulle ; au clavier, Tab
+  jusqu'au graphique puis ← / →. « Voir les données en tableau ».
+- [ ] Démo : jeux les plus testés (part + abandon), catégories favorites,
+  sources de trafic, sites d'origine, pays, langues.
+- [ ] « Synchronisé il y a … » ; le lendemain matin, la date a changé
+  toute seule (cron de la nuit, 03:17 UTC). Vercel → projet back-office
+  → Settings → Cron Jobs : la tâche `/api/cron/landing-stats` apparaît.
+- [ ] Tableau de bord : l'encart Landing affiche vues et démos des
+  7 derniers jours et la courbe des vues ; « Stats détaillées » ouvre
+  l'écran.
+- [ ] Sécurité : ouvrir `/api/cron/landing-stats` dans le navigateur →
+  `unauthorized` (401).
+
 ---
 
 ## Ce qui reste à développer
