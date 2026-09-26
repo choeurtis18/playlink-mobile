@@ -4,20 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { SyncPayload } from "@/lib/validation-sync";
 
 /**
- * Merge local → cloud de l'historique d'un joueur (§05, phase 4) — appelée
- * juste après la connexion, avec TOUT l'historique local d'un coup (pas de
- * delta). Idempotent partout :
- * - profils : upsert sur (accountId, localId)
- * - parties : upsert sur (accountId, clientSessionId)
- * - badges  : upsert sur (accountId, badgeKey)
- * - cartes  : upsert sur (accountId, localId côté client → remoteId stocké
- *   après coup ; pas de contrainte unique dédiée, cf. note plus bas)
- *
- * Aucune ligne dont le gameId/categoryId ne correspond plus au contenu
- * back-office n'est rejetée en bloc : elle est simplement ignorée (l'app
- * peut tourner sur un snapshot de contenu plus vieux que la prod).
- */
-/**
  * Descend tout l'historique du compte (§05, phase 4) — appelée juste après
  * la connexion, avant l'envoi (POST) du côté local : sans ceci, un joueur
  * qui se connecte sur un appareil qui n'a jamais eu ses profils/parties en
@@ -83,6 +69,20 @@ export async function GET(request: Request) {
   });
 }
 
+/**
+ * Merge local → cloud de l'historique d'un joueur (§05, phase 4) — appelée
+ * juste après la connexion, avec TOUT l'historique local d'un coup (pas de
+ * delta). Idempotent partout :
+ * - profils : par localId si connu, sinon par nom (fusion — voir plus bas),
+ *   sinon création
+ * - parties : upsert sur (accountId, clientSessionId)
+ * - badges  : upsert sur (accountId, badgeKey)
+ * - cartes  : toujours une création (voir note plus bas)
+ *
+ * Aucune ligne dont le gameId/categoryId ne correspond plus au contenu
+ * back-office n'est rejetée en bloc : elle est simplement ignorée (l'app
+ * peut tourner sur un snapshot de contenu plus vieux que la prod).
+ */
 export async function POST(request: Request) {
   let account;
   try {
@@ -110,14 +110,39 @@ export async function POST(request: Request) {
   const profileRemoteIds: Record<string, string> = {};
   const cardRemoteIds: Record<string, string> = {};
 
+  // Profils déjà connus du compte, pour la fusion par nom ci-dessous — un
+  // localId neuf (appareil réinstallé, ou second appareil) ne doit jamais
+  // créer un doublon d'un profil déjà existant sous un autre localId.
+  const existingProfiles = await prisma.profile.findMany({ where: { accountId: account.id } });
+  const byLocalId = new Map(existingProfiles.map((p) => [p.localId, p]));
+  const byNormalizedName = new Map(existingProfiles.map((p) => [p.name.trim().toLowerCase(), p]));
+  // Un même profil déjà en base peut absorber plusieurs entrées du payload
+  // fusionnées par nom (rare, mais deux localId différents du même appareil
+  // pointant au même nom) — jamais réattribué une seconde fois.
+  const claimedProfileIds = new Set<string>();
+
   await prisma.$transaction(async (tx) => {
     // Profils — condition d'existence de tout le reste (parties, badges).
+    // Trouvé par localId (déjà connu) → mis à jour en place. Sinon, par
+    // nom (même joueur créé séparément, cf. auth-players.ts) → fusionné
+    // sous le profil existant, jamais dupliqué. Sinon seulement, créé.
     for (const p of profiles) {
-      const row = await tx.profile.upsert({
-        where: { accountId_localId: { accountId: account.id, localId: p.localId } },
-        create: { accountId: account.id, localId: p.localId, name: p.name, avatar: p.avatar, tagScores: p.tagScores },
-        update: { name: p.name, avatar: p.avatar, tagScores: p.tagScores },
-      });
+      const normalizedName = p.name.trim().toLowerCase();
+      const existing = byLocalId.get(p.localId) ??
+        (claimedProfileIds.has(byNormalizedName.get(normalizedName)?.id ?? "")
+          ? undefined
+          : byNormalizedName.get(normalizedName));
+
+      const row = existing
+        ? await tx.profile.update({
+            where: { id: existing.id },
+            data: { name: p.name, avatar: p.avatar, tagScores: p.tagScores },
+          })
+        : await tx.profile.create({
+            data: { accountId: account.id, localId: p.localId, name: p.name, avatar: p.avatar, tagScores: p.tagScores },
+          });
+
+      claimedProfileIds.add(row.id);
       profileRemoteIds[p.localId] = row.id;
     }
 
