@@ -5,6 +5,7 @@ import 'l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'data/auth_config.dart';
+import 'data/clerk_error_handler.dart';
 import 'data/providers.dart';
 import 'router.dart';
 import 'theme/theme.dart';
@@ -36,8 +37,14 @@ class PlaylinkApp extends ConsumerWidget {
         // l'instance, ou build hors-ligne pur) : pas de `builder`, l'app
         // reste utilisable normalement — seule la connexion réelle
         // (§ compte, phase 4) reste indisponible, jamais un crash.
+        // Équivalent de `ClerkAuth.materialAppBuilder`, au `handler` près :
+        // celui-ci neutralise les messages d'erreur qui révèleraient
+        // l'existence d'un compte (voir clerk_error_handler.dart).
         builder: clerkConfigured
-            ? ClerkAuth.materialAppBuilder(config: buildClerkConfig())
+            ? (context, child) => ClerkAuth(
+                  config: buildClerkConfig(),
+                  child: ClerkErrorListener(handler: handleClerkError, child: child!),
+                )
             : null,
       ),
     );

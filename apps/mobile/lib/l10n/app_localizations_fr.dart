@@ -490,6 +490,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'La connexion n\'est pas encore disponible sur cette version. Tout continue de fonctionner hors-ligne, sans compte.';
 
   @override
+  String get signInInvalidCredentials => 'Identifiant ou mot de passe invalide';
+
+  @override
   String get goPremium => 'Devenir premium';
 
   @override

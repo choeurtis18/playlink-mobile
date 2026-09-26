@@ -884,6 +884,12 @@ abstract class AppLocalizations {
   /// **'La connexion n\'est pas encore disponible sur cette version. Tout continue de fonctionner hors-ligne, sans compte.'**
   String get signInUnavailable;
 
+  /// No description provided for @signInInvalidCredentials.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant ou mot de passe invalide'**
+  String get signInInvalidCredentials;
+
   /// No description provided for @goPremium.
   ///
   /// In fr, this message translates to:

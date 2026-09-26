@@ -151,6 +151,7 @@
   "signIn": "Sign in",
   "signInSuccess": "Signed in — redirecting…",
   "signInUnavailable": "Sign-in isn't available on this build yet. Everything keeps working offline, without an account.",
+  "signInInvalidCredentials": "Invalid credentials",
   "goPremium": "Go premium",
   "comingSoon": "Coming soon",
   "playersEdit": "Edit",
