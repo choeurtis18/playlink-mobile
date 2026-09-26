@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
-import { adminNotifyEmail, adminSignupEmail, sendEmail, welcomeEmail } from "./email";
+import { adminNotifyEmail, adminSignupEmail, sendEmail, unsubscribeLinks, welcomeEmail } from "./email";
+import { unsubscribeToken } from "./unsubscribe-token";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -7,7 +8,7 @@ const DAY = 24 * 60 * 60 * 1000;
  * cliqué) : e-mail de bienvenue à l'inscrit et alerte à l'admin, en
  * parallèle. Appelé une seule fois par adresse. Ne lève jamais : un
  * e-mail raté est journalisé par `sendEmail`. */
-export async function announceRegistration(email: string, locale: string, doubleOptIn: boolean) {
+export async function announceRegistration(id: string, email: string, locale: string, doubleOptIn: boolean) {
   try {
     const admin = adminNotifyEmail();
     const [site, total, last24h] = await Promise.all([
@@ -16,7 +17,7 @@ export async function announceRegistration(email: string, locale: string, double
       admin ? prisma.landingPreRegistration.count({ where: { createdAt: { gte: new Date(Date.now() - DAY) } } }) : 0,
     ]);
     await Promise.all([
-      sendEmail(welcomeEmail(email, locale, site ?? {})),
+      sendEmail(welcomeEmail(email, locale, unsubscribeLinks(locale, id, unsubscribeToken(id)), site ?? {})),
       admin && sendEmail(adminSignupEmail(admin, { email, locale, total, last24h, doubleOptIn })),
     ]);
   } catch (e) {

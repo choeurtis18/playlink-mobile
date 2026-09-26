@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ ok: false }, { status: 400 });
 
   const token = parsed.data.token;
-  const reg = await prisma.landingPreRegistration.findUnique({ where: { confirmToken: token }, select: { email: true, locale: true } });
+  const reg = await prisma.landingPreRegistration.findUnique({ where: { confirmToken: token }, select: { id: true, email: true, locale: true } });
   if (!reg) return NextResponse.json({ ok: false });
   // `updateMany` sur le jeton : deux clics simultanés ne confirment (et
   // n'annoncent) qu'une fois.
@@ -24,6 +24,6 @@ export async function POST(req: Request) {
     where: { confirmToken: token },
     data: { confirmToken: null, confirmedAt: new Date() },
   });
-  if (count > 0) after(() => announceRegistration(reg.email, reg.locale, true));
+  if (count > 0) after(() => announceRegistration(reg.id, reg.email, reg.locale, true));
   return NextResponse.json({ ok: count > 0 });
 }

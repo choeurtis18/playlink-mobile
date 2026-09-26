@@ -692,6 +692,20 @@ Prérequis : `RESEND_API_KEY` sur le projet Vercel du back-office, domaine
   défilement horizontal sur téléphone.
 - [ ] `ADMIN_NOTIFY_EMAIL=off` puis redéploiement : plus d'alerte, la
   bienvenue part toujours.
+- [ ] L'alerte admin ne contient l'adresse ni dans l'objet ni en
+  « Répondre à » (elle est cliquable dans le corps). Si elle arrive en
+  spam : « Non spam » + filtre Gmail `from:no-reply@playlink-game.fr` →
+  « Ne jamais envoyer dans le spam ».
+- [ ] Désinscription par le lien : e-mail de bienvenue → « Te désinscrire »
+  → page « Te désinscrire ? » (rien n'est effacé tant qu'on ne clique pas)
+  → « Me désinscrire » → « C'est fait. ». L'adresse disparaît de l'écran
+  Pré-inscriptions, « Désinscriptions · 30 j » augmente, le journal
+  affiche « Désinscription · Lien de l'e-mail ».
+- [ ] Même lien une seconde fois : « C'est fait. » (rien à effacer). Lien
+  modifié à la main : « Ce lien ne fonctionne pas. ».
+- [ ] Gmail : bouton « Se désabonner » à côté de l'expéditeur sur l'e-mail
+  de bienvenue (peut n'apparaître qu'après quelques envois) → l'adresse
+  est effacée de la même façon.
 
 ---
 
