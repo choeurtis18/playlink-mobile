@@ -37,10 +37,13 @@ export async function Footer({ locale }: { locale: string }) {
             <ManageCookiesButton label={t("manageCookies")} />
           </nav>
         </div>
-        {/* Filigrane : le mot-marque en très grand, qui s'efface vers le bas. */}
+        {/* Filigrane : le mot-marque en très grand, qui s'efface vers le bas.
+            `pointer-events-none` : ses lettres débordent d'une cinquantaine de
+            pixels au-dessus de sa boîte (interligne 0,8) et captaient les
+            clics des liens quand ils passent sur deux lignes (FR, ordinateur). */}
         <div
           aria-hidden
-          className="-mb-[0.12em] select-none font-display text-[clamp(90px,21vw,300px)] font-semibold leading-[0.8] tracking-[-0.05em] text-transparent"
+          className="pointer-events-none -mb-[0.12em] select-none font-display text-[clamp(90px,21vw,300px)] font-semibold leading-[0.8] tracking-[-0.05em] text-transparent"
           style={{ background: "linear-gradient(180deg, #2a2733 0%, #060509 92%)", WebkitBackgroundClip: "text", backgroundClip: "text" }}
         >
           Playlink

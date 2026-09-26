@@ -326,8 +326,10 @@ puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 30
 - [ ] Réglage système « réduire les animations » activé → aucune
   apparition animée, tout est affiché d'emblée.
 - [ ] Pied de page : adresse de contact cliquable (ouvre la messagerie),
-  grand « Playlink » en filigrane. Les liens légaux mènent encore à une
-  page introuvable (lot 7).
+  grand « Playlink » en filigrane. Chaque lien (Mentions légales,
+  Confidentialité, CGU, Cookies, Supprimer mes données, Gérer les cookies)
+  s'ouvre au clic, en **FR et en EN**, sur ordinateur (les liens FR passent
+  sur une seconde ligne, juste au-dessus du filigrane) et sur mobile.
 
 ### 11.3 Héros et bandeaux (lot 2)
 - [ ] Au chargement, sur-titre, titre, accroche, bouton et chiffres
