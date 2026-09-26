@@ -33,7 +33,7 @@ export const NAV: NavGroup[] = [
     items: [
       { key: "site", href: "/site", label: "Contenu du site" },
       { key: "stats", href: "/stats", label: "Stats" },
-      { key: "inscriptions", href: "/inscriptions", label: "Pré-inscriptions", soon: true },
+      { key: "inscriptions", href: "/inscriptions", label: "Pré-inscriptions" },
     ],
   },
   { label: "Diffusion", items: [{ key: "publication", href: "/publication", label: "Publication" }] },

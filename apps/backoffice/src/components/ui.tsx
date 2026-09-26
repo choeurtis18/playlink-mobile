@@ -643,9 +643,13 @@ const CONFIRM_WINDOW_MS = 4000;
  * le second exécute. Plus de `window.confirm`, bloquant et hors charte.
  * `confirm` décrit l'action ; il est annoncé aux lecteurs d'écran quand
  * le bouton s'arme. */
-export function ConfirmButton({ label, confirm, action, children, doneMessage, size = "md" }: {
+export function ConfirmButton({ label, confirm, action, onConfirm, children, doneMessage, size = "md" }: {
   label: string; confirm: string;
   action: () => Promise<ActionResult>;
+  /** Appelé au second clic, hors transition : un changement d'état fait
+   * ici s'affiche tout de suite (fondu de sortie d'une ligne…), alors
+   * que dans `action` il attendrait la fin de l'appel serveur. */
+  onConfirm?: () => void;
   children?: React.ReactNode;
   doneMessage?: string;
   /** `xs` : pastille ronde (icône seule), dans une puce ou une ligne dense. */
@@ -681,6 +685,7 @@ export function ConfirmButton({ label, confirm, action, children, doneMessage, s
             return;
           }
           disarm();
+          onConfirm?.();
           start(async () => {
             const r = await action();
             if (!r.ok) setError(r.error);
