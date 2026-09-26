@@ -158,11 +158,14 @@ export function Header({ locale, sections }: { locale: string; sections: Landing
             </button>
           </div>
         </div>
+        {/* Échelle de départ dans `style`, pas en classe : `scale-x-0` de
+            Tailwind v4 pose la propriété CSS `scale`, qui se multiplie avec le
+            `transform` écrit au scroll — la barre restait à 0 de large. */}
         <div
           ref={progressRef}
           aria-hidden
-          className="absolute -bottom-px left-0 h-0.5 w-full origin-left scale-x-0"
-          style={{ background: "linear-gradient(90deg, #7C3AED, #f23a6b, #ff6b93)" }}
+          className="absolute -bottom-px left-0 h-0.5 w-full origin-left"
+          style={{ transform: "scaleX(0)", background: "linear-gradient(90deg, #7C3AED, #f23a6b, #ff6b93)" }}
         />
       </header>
 
