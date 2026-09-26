@@ -23,7 +23,11 @@ export function backofficeUrl(): string {
   return vercel ? `https://${vercel}` : "http://localhost:3000";
 }
 
-export type Email = { to: string; subject: string; html: string; text: string; replyTo?: string };
+export type Email = {
+  to: string; subject: string; html: string; text: string; replyTo?: string;
+  /** En-têtes SMTP en plus (List-Unsubscribe…), transmis tels quels à Resend. */
+  headers?: Record<string, string>;
+};
 
 /** `true` si l'e-mail est parti. Ne lève jamais : un e-mail raté ne doit
  * pas faire échouer l'inscription, il est journalisé pour être relancé. */
@@ -167,11 +171,19 @@ const WELCOME = {
 } as const;
 
 export type Socials = { instagramUrl?: string | null; tiktokUrl?: string | null };
+export type UnsubscribeLinks = { page: string; oneClick: string };
 
-export function welcomeEmail(to: string, locale: string, socials: Socials = {}): Email {
+/** Liens de désinscription d'une inscription : la page du site (bouton à
+ * cliquer) et l'adresse « un clic » (RFC 8058) appelée par la messagerie. */
+export function unsubscribeLinks(locale: string, id: string, token: string): UnsubscribeLinks {
+  const q = `id=${encodeURIComponent(id)}&t=${encodeURIComponent(token)}`;
+  return { page: `${SITE_URL}/${loc(locale)}/desinscription?${q}`, oneClick: `${SITE_URL}/api/unsubscribe?${q}` };
+}
+
+export function welcomeEmail(to: string, locale: string, unsubscribe: UnsubscribeLinks, socials: Socials = {}): Email {
   const l = loc(locale), c = WELCOME[l];
   const demo = `${SITE_URL}/${l}#demo`;
-  const leave = `${SITE_URL}/${l}/supprimer-mes-donnees`;
+  const leave = unsubscribe.page;
   const social = [
     socials.instagramUrl && { href: socials.instagramUrl, label: "Instagram" },
     socials.tiktokUrl && { href: socials.tiktokUrl, label: "TikTok" },
@@ -194,7 +206,13 @@ export function welcomeEmail(to: string, locale: string, socials: Socials = {}):
     ...(social.length ? ["", `${c.follow} ${social.map((s) => `${s.label} ${s.href}`).join(" · ")}`] : []),
     "", "—", c.why, `${c.leave} : ${leave} (${c.leaveHint})`,
   ].join("\n");
-  return { to, subject: c.subject, html, text };
+  // Bouton « Se désabonner » de Gmail / Apple Mail, et signal de
+  // délivrabilité (Gmail et Yahoo l'attendent des expéditeurs).
+  const headers = {
+    "List-Unsubscribe": `<${unsubscribe.oneClick}>, <mailto:${CONTACT_EMAIL}?subject=unsubscribe>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
+  return { to, subject: c.subject, html, text, headers };
 }
 
 // ── Alerte admin ──────────────────────────────────────────────────────
@@ -204,7 +222,9 @@ export type SignupAlert = {
 };
 
 /** Alerte interne (en français) : une nouvelle adresse vient d'être
- * enregistrée. « Répondre » écrit directement à l'inscrit. */
+ * enregistrée. Ni l'adresse dans l'objet, ni en « Répondre à » : une
+ * adresse jetable (yopmail…) à ces endroits fait classer l'alerte en
+ * spam. Elle reste cliquable dans le corps. */
 export function adminSignupEmail(to: string, a: SignupAlert): Email {
   const nf = new Intl.NumberFormat("fr-FR");
   const list = `${backofficeUrl()}/inscriptions`;
@@ -216,20 +236,23 @@ export function adminSignupEmail(to: string, a: SignupAlert): Email {
   ];
   const cell = (i: number) => (i ? `border-top:1px solid ${C.hairline};` : "");
   const table = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background:${C.raised};border-radius:14px">${rows
-    .map(([k, v], i) => `<tr><td style="padding:12px 16px;${cell(i)}font-size:13px;color:${C.faint};white-space:nowrap">${esc(k)}</td><td style="padding:12px 16px;${cell(i)}font-size:14px;color:${C.ink};word-break:break-all">${esc(v)}</td></tr>`)
+    .map(([k, v], i) => {
+      const value = i === 0 ? `<a href="mailto:${esc(v)}" style="color:${C.ink};text-decoration:none">${esc(v)}</a>` : esc(v);
+      return `<tr><td style="padding:12px 16px;${cell(i)}font-size:13px;color:${C.faint};white-space:nowrap">${esc(k)}</td><td style="padding:12px 16px;${cell(i)}font-size:14px;color:${C.ink};word-break:break-all">${value}</td></tr>`;
+    })
     .join("")}</table>`;
 
   const html = layout({
     lang: "fr",
-    preheader: `${a.email} — ${nf.format(a.total)} pré-inscriptions au total.`,
+    preheader: `${nf.format(a.last24h)} sur les dernières 24 h.`,
     kicker: "Back-office · Pré-inscriptions",
     title: `Nouvelle pré-inscription, ${nf.format(a.total)} au total.`,
     body: `${p("Quelqu’un vient de laisser son adresse sur la landing pour être prévenu de la sortie.")}${table}<p style="margin:0">${button(list, "Voir les pré-inscriptions")}</p>`,
-    footer: "Alerte envoyée à chaque nouvelle inscription. Pour la couper : variable ADMIN_NOTIFY_EMAIL=off sur le projet Vercel du back-office. Répondre à cet e-mail écrit à l’inscrit.",
+    footer: "Alerte envoyée à chaque nouvelle inscription. Pour la couper : variable ADMIN_NOTIFY_EMAIL=off sur le projet Vercel du back-office.",
   });
   const text = [
     `Nouvelle pré-inscription, ${nf.format(a.total)} au total.`, "",
     ...rows.map(([k, v]) => `${k} : ${v}`), "", `Voir les pré-inscriptions : ${list}`,
   ].join("\n");
-  return { to, subject: `Nouvelle pré-inscription · ${a.email}`, html, text, replyTo: a.email };
+  return { to, subject: `Nouvelle pré-inscription sur Playlink (${nf.format(a.total)} au total)`, html, text };
 }

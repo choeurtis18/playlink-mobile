@@ -42,15 +42,16 @@ export async function POST(req: Request) {
   const existing = await prisma.landingPreRegistration.findUnique({ where: { email } });
 
   if (!doubleOptIn) {
-    await prisma.landingPreRegistration.upsert({
+    const reg = await prisma.landingPreRegistration.upsert({
       where: { email },
       create: { email, locale, consentNewsletter: true, confirmedAt: new Date() },
       update: { locale, consentNewsletter: true, confirmToken: null, confirmedAt: existing?.confirmedAt ?? new Date() },
+      select: { id: true },
     });
     // Bienvenue + alerte admin une seule fois par adresse : une seconde
     // saisie de la même adresse ne renvoie rien. Après la réponse (`after`,
     // tenu en vie par Vercel) : le formulaire n'attend pas Resend.
-    if (!existing?.confirmedAt) after(() => announceRegistration(email, locale, false));
+    if (!existing?.confirmedAt) after(() => announceRegistration(reg.id, email, locale, false));
     return NextResponse.json({ ok: true, pending: false });
   }
 

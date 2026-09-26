@@ -28,7 +28,7 @@ export default async function Inscriptions({ searchParams }: { searchParams: Pro
     prisma.landingPreRegistration.count({ where: { createdAt: { gte: new Date(now.getTime() - DAY) } } }),
     prisma.landingPreRegistration.count({ where: { consentNewsletter: true } }),
     prisma.landingPreRegistration.count({ where: { confirmedAt: { not: null } } }),
-    prisma.auditLog.count({ where: { action: "deleted_preregistration", createdAt: { gte: new Date(now.getTime() - 30 * DAY) } } }),
+    prisma.auditLog.count({ where: { action: { in: ["deleted_preregistration", "unsubscribed_preregistration"] }, createdAt: { gte: new Date(now.getTime() - 30 * DAY) } } }),
     prisma.landingPreRegistration.count({ where }),
     prisma.landingPreRegistration.findMany({
       where,
@@ -45,7 +45,7 @@ export default async function Inscriptions({ searchParams }: { searchParams: Pro
     { label: "Pré-inscriptions", value: nf.format(all), sub: last24h ? `+${nf.format(last24h)} en 24 h` : "Aucune en 24 h", icon: UsersIcon },
     { label: "Consentement newsletter", value: rate(newsletter), sub: `${nf.format(newsletter)} adresse${newsletter > 1 ? "s" : ""}`, icon: NewspaperIcon },
     { label: "Adresse confirmée", value: rate(confirmed), sub: all - confirmed ? `${nf.format(all - confirmed)} en attente de clic` : "Aucune en attente", icon: CheckCircleIcon },
-    { label: "Désinscriptions · 30 j", value: nf.format(removed30d), sub: "Effacements faits ici (RGPD)", icon: UserMinusIcon },
+    { label: "Désinscriptions · 30 j", value: nf.format(removed30d), sub: "Lien de l’e-mail ou effacement ici", icon: UserMinusIcon },
   ];
 
   const pages = Math.max(1, Math.ceil(total / PER_PAGE));

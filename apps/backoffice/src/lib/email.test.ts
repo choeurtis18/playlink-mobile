@@ -1,34 +1,46 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { adminNotifyEmail, adminSignupEmail, confirmationEmail, esc, welcomeEmail } from "./email.ts";
+import { adminNotifyEmail, adminSignupEmail, confirmationEmail, esc, unsubscribeLinks, welcomeEmail } from "./email.ts";
+
+const U = unsubscribeLinks("fr", "reg1", "tok_1");
 
 test("esc : caractères HTML", () => {
   assert.equal(esc(`<a href="x">'&'</a>`), "&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;");
 });
 
-test("welcomeEmail : langue, liens démo et désinscription, réseaux", () => {
-  const fr = welcomeEmail("a@b.fr", "fr", { instagramUrl: "https://instagram.com/playlink" });
+test("welcomeEmail : langue, démo, désinscription, réseaux, en-têtes", () => {
+  const fr = welcomeEmail("a@b.fr", "fr", U, { instagramUrl: "https://instagram.com/playlink" });
   assert.match(fr.subject, /prévenu·e/);
   assert.match(fr.html, /lang="fr"/);
   assert.match(fr.html, /\/fr#demo/);
-  assert.match(fr.html, /\/fr\/supprimer-mes-donnees/);
+  assert.match(fr.html, /\/fr\/desinscription\?id=reg1&amp;t=tok_1/);
   assert.match(fr.html, /Instagram/);
   assert.doesNotMatch(fr.html, /TikTok/);
-  assert.match(fr.text, /Te désinscrire : https:\/\/.+\/fr\/supprimer-mes-donnees/);
-  const en = welcomeEmail("a@b.fr", "en");
+  assert.match(fr.text, /Te désinscrire : https:\/\/.+\/fr\/desinscription\?id=reg1&t=tok_1/);
+  assert.match(fr.headers!["List-Unsubscribe"], /^<https:\/\/.+\/api\/unsubscribe\?id=reg1&t=tok_1>, <mailto:/);
+  assert.equal(fr.headers!["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
+  const en = welcomeEmail("a@b.fr", "en", unsubscribeLinks("en", "reg1", "tok_1"));
   assert.match(en.html, /lang="en"/);
-  assert.match(en.html, /\/en#demo/);
+  assert.match(en.html, /\/en\/desinscription/);
   assert.doesNotMatch(en.html, /Follow Playlink/);
-  assert.equal(welcomeEmail("a@b.fr", "de").html.includes('lang="fr"'), true);
+  assert.equal(welcomeEmail("a@b.fr", "de", U).html.includes('lang="fr"'), true);
 });
 
-test("adminSignupEmail : adresse échappée, répondre à l'inscrit", () => {
+test("unsubscribeLinks : langue inconnue → fr, paramètres encodés", () => {
+  const l = unsubscribeLinks("de", "a b", "x/y");
+  assert.match(l.page, /\/fr\/desinscription\?id=a%20b&t=x%2Fy$/);
+  assert.match(l.oneClick, /\/api\/unsubscribe\?id=a%20b&t=x%2Fy$/);
+});
+
+test("adminSignupEmail : adresse échappée, ni dans l'objet ni en réponse", () => {
   const evil = `"<script>"@x.fr`;
   const m = adminSignupEmail("admin@x.fr", { email: evil, locale: "en", total: 1234, last24h: 3, doubleOptIn: true });
   assert.equal(m.to, "admin@x.fr");
-  assert.equal(m.replyTo, evil);
+  assert.equal(m.replyTo, undefined);
+  assert.doesNotMatch(m.subject, /x\.fr/);
   assert.doesNotMatch(m.html, /<script>/);
-  assert.match(m.html, /1 234 au total|1 234 au total/);
+  assert.match(m.html, /mailto:&quot;&lt;script&gt;/);
+  assert.match(m.html, /1\u202f234 au total|1 234 au total/);
   assert.match(m.html, /Anglais \(EN\)/);
   assert.match(m.html, /\/inscriptions/);
 });

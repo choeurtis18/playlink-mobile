@@ -137,6 +137,20 @@
     "koBody": "Il a peut-être déjà servi, ou il a expiré. Tu peux te réinscrire depuis la page d’accueil.",
     "back": "Retour à l’accueil"
   },
+  "unsubscribe": {
+    "kicker": "Pré-inscription",
+    "title": "Te désinscrire ?",
+    "body": "Tu ne recevras plus aucun e-mail de Playlink, et ton adresse sera effacée de notre liste.",
+    "cta": "Me désinscrire",
+    "stay": "Finalement, rester inscrit·e",
+    "okTitle": "C’est fait.",
+    "okBody": "Ton adresse est effacée : tu ne recevras plus d’e-mail de Playlink. Tu peux te réinscrire à tout moment depuis la page d’accueil.",
+    "koTitle": "Ce lien ne fonctionne pas.",
+    "koBody": "Il est incomplet, ou l’adresse a déjà été désinscrite.",
+    "help": "Toujours inscrit·e ?",
+    "helpLink": "Demande la suppression par e-mail.",
+    "back": "Retour à l’accueil"
+  },
   "deleteData": {
     "metaTitle": "Supprimer mes données — Playlink",
     "kicker": "Tes données",
