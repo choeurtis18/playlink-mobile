@@ -151,6 +151,7 @@
   "signIn": "Se connecter",
   "signInSuccess": "Connexion réussie — redirection…",
   "signInUnavailable": "La connexion n'est pas encore disponible sur cette version. Tout continue de fonctionner hors-ligne, sans compte.",
+  "signInInvalidCredentials": "Identifiant ou mot de passe invalide",
   "goPremium": "Devenir premium",
   "comingSoon": "Bientôt disponible",
   "playersEdit": "Modifier",

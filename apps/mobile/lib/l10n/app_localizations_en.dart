@@ -487,6 +487,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sign-in isn\'t available on this build yet. Everything keeps working offline, without an account.';
 
   @override
+  String get signInInvalidCredentials => 'Invalid credentials';
+
+  @override
   String get goPremium => 'Go premium';
 
   @override
