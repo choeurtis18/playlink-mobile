@@ -4,9 +4,20 @@ export function csvCell(v: unknown): string {
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-export function toCsv(rows: Record<string, unknown>[], columns: string[]): string {
-  const head = columns.map(csvCell).join(",");
-  const body = rows.map((r) => columns.map((c) => csvCell(r[c])).join(",")).join("\n");
+/** Neutralise une valeur qu'un tableur prendrait pour une formule
+ * (`=HYPERLINK(…)`, `+`, `-`, `@`, tabulation, retour chariot) : une
+ * apostrophe devant la fait lire comme du texte (OWASP, « CSV injection »).
+ * Pour les exports de données saisies par des inconnus (e-mails de la
+ * landing) ; pas pour les exports réimportables (cartes), où l'apostrophe
+ * s'ajouterait au texte. */
+export function formulaSafe(v: unknown): unknown {
+  return typeof v === "string" && /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
+}
+
+export function toCsv(rows: Record<string, unknown>[], columns: string[], { safe = false }: { safe?: boolean } = {}): string {
+  const cell = (v: unknown) => csvCell(safe ? formulaSafe(v) : v);
+  const head = columns.map(cell).join(",");
+  const body = rows.map((r) => columns.map((c) => cell(r[c])).join(",")).join("\n");
   return `${head}\n${body}\n`;
 }
 

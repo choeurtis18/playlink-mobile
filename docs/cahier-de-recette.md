@@ -653,6 +653,28 @@ Prérequis : `POSTHOG_PERSONAL_API_KEY` (Query : Read), `POSTHOG_PROJECT_ID`,
 - [ ] Sécurité : ouvrir `/api/cron/landing-stats` dans le navigateur →
   `unauthorized` (401).
 
+### 12.7 Pré-inscriptions (lot 14)
+- [ ] Sidebar → Pré-inscriptions est cliquable (badge « +N » s'il y a des
+  inscriptions des dernières 24 h). Au tableau de bord, la ligne
+  « N nouvelles pré-inscriptions » ouvre l'écran.
+- [ ] 4 indicateurs : total (+N en 24 h), % consentement newsletter,
+  % d'adresses confirmées (nombre en attente de clic), désinscriptions
+  des 30 derniers jours.
+- [ ] Recherche d'un e-mail (en direct), filtres Langue (FR/EN) et
+  Statut (Confirmées / En attente) : l'URL change, le lien est partageable,
+  « Réinitialiser » vide tout. 50 lignes par page, Précédent / Suivant.
+- [ ] Export CSV : reprend les filtres affichés (le bouton indique le
+  nombre), s'ouvre correctement dans Excel (accents). Une adresse qui
+  commence par `=` apparaît précédée d'une apostrophe (pas de formule).
+  Le journal du tableau de bord affiche « Pré-inscriptions exportées ».
+- [ ] Suppression : icône corbeille → « Confirmer ? » (4 s) → la ligne
+  s'efface en fondu, notification « Pré-inscription supprimée », le
+  compteur de désinscriptions augmente. Le journal affiche « Adresse
+  effacée (RGPD) » **sans** l'e-mail.
+- [ ] Échap ou clic ailleurs pendant « Confirmer ? » : rien n'est supprimé.
+- [ ] Aucune pré-inscription : message vide explicite, pas de bouton
+  d'export.
+
 ---
 
 ## Ce qui reste à développer

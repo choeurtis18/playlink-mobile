@@ -602,3 +602,21 @@ export async function publishRelease(changelog: string): Promise<ActionResult & 
     return { ok: false, error: humanize(e) };
   }
 }
+
+// ── Pré-inscriptions ──────────────────────────────────────────────────
+
+/** Effacement RGPD d'une pré-inscription. Le journal garde la trace de
+ * l'effacement (qui, quand), jamais l'adresse elle-même : la garder ici
+ * annulerait la suppression. Hors `run()` : la landing n'est pas concernée. */
+export async function deletePreRegistration(id: string): Promise<ActionResult> {
+  try {
+    const editor = await requireEditor();
+    const reg = await prisma.landingPreRegistration.delete({ where: { id }, select: { locale: true, confirmedAt: true } });
+    await logAction(editor.id, "deleted_preregistration", "preregistration", id, { locale: reg.locale, confirmed: !!reg.confirmedAt });
+    revalidatePath("/inscriptions");
+    revalidatePath("/");
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: humanize(e) };
+  }
+}
