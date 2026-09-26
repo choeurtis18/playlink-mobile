@@ -308,8 +308,9 @@ puis `BACKOFFICE_URL=http://localhost:3000 pnpm --filter @playlink/web dev -p 30
 
 ### 11.2 En-tête, menu et pied de page (lot 1)
 - [ ] L'en-tête reste en haut en défilant ; une fine bordure apparaît dès
-  qu'on quitte le haut de page ; la barre dégradée sous l'en-tête suit la
-  progression du scroll.
+  qu'on quitte le haut de page ; la barre dégradée (violet → rose) sous
+  l'en-tête suit la progression du scroll : vide en haut, à moitié au
+  milieu de la page, pleine largeur tout en bas (ordinateur et mobile).
 - [ ] Clic sur « Jeux » / « Démo » → défilement doux, le titre de la
   section arrive juste sous l'en-tête (pas caché dessous).
 - [ ] Sans lien Instagram/TikTok/Reddit au back-office → pas de lien
