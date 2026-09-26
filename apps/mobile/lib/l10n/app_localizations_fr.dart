@@ -355,6 +355,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileSignedInFallback => 'Connecté';
 
   @override
+  String get syncNow => 'Synchroniser les données';
+
+  @override
+  String get syncSuccess => 'Données synchronisées';
+
+  @override
+  String get syncFailed => 'Synchronisation impossible — réessaie plus tard';
+
+  @override
   String get signOut => 'Se déconnecter';
 
   @override

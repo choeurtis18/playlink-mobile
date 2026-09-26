@@ -353,6 +353,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSignedInFallback => 'Signed in';
 
   @override
+  String get syncNow => 'Sync my data';
+
+  @override
+  String get syncSuccess => 'Data synced';
+
+  @override
+  String get syncFailed => 'Couldn\'t sync — try again later';
+
+  @override
   String get signOut => 'Sign out';
 
   @override

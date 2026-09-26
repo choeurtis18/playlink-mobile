@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/account_sync.dart';
 import '../data/auth_config.dart';
+import '../data/providers.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
+import 'badges_screen.dart' show badgesListProvider;
+import 'my_cards_screen.dart' show myCardsListProvider;
 
 /// D1 : profil du compte — en V1 sans compte, l'écran explique le mode local
 /// et donne accès à ce qui n'a besoin de rien d'autre (§00). Les cartes
@@ -99,12 +103,43 @@ class _LocalModeCard extends StatelessWidget {
 }
 
 /// Contenu affiché une fois un compte Clerk connecté — remplace la carte
-/// « Tout marche sans compte » (§04). La fusion locale → cloud des
-/// données (parties, badges, cartes perso) n'est pas encore construite :
-/// cette carte ne fait que confirmer la connexion et offrir la
-/// déconnexion, rien de plus pour l'instant.
-class _SignedInCard extends StatelessWidget {
+/// « Tout marche sans compte » (§04). La synchro tourne déjà toute seule à
+/// la connexion ; le bouton ici est un recours manuel, utile quand elle a
+/// échoué silencieusement (hors-ligne au moment de se connecter, back-office
+/// injoignable) — il dit explicitement si elle a abouti, contrairement à
+/// l'appel automatique qui reste muet par design (§01, offline-first).
+class _SignedInCard extends ConsumerStatefulWidget {
   const _SignedInCard();
+
+  @override
+  ConsumerState<_SignedInCard> createState() => _SignedInCardState();
+}
+
+class _SignedInCardState extends ConsumerState<_SignedInCard> {
+  bool _syncing = false;
+
+  Future<void> _sync() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final authState = ClerkAuth.of(context, listen: false);
+
+    setState(() => _syncing = true);
+    final ok = await syncAccount(authState, ref.read(databaseProvider));
+    if (!mounted) return;
+    setState(() => _syncing = false);
+
+    // Les écrans qui lisent ces données (joueurs, cartes, badges) ne se
+    // rafraîchissent pas tout seuls après une écriture faite hors de leur
+    // notifier — sans ceci, la synchro réussit mais l'UI reste figée.
+    if (ok) await ref.read(playersProvider.notifier).load();
+    if (!mounted) return;
+    ref.invalidate(myCardsListProvider);
+    ref.invalidate(badgesListProvider);
+
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(ok ? t.syncSuccess : t.syncFailed)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,10 +162,33 @@ class _SignedInCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(email ?? t.profileSignedInFallback, style: TextStyle(color: soft, fontSize: 13.5, height: 1.4)),
           const SizedBox(height: 14),
+          DecoratedBox(
+            decoration: BoxDecoration(gradient: accentGradient, borderRadius: BorderRadius.circular(PlRadius.pill)),
+            child: SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: _syncing ? null : _sync,
+                style: TextButton.styleFrom(
+                  minimumSize: const Size.fromHeight(54),
+                  foregroundColor: Colors.white,
+                  disabledForegroundColor: Colors.white70,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlRadius.pill)),
+                ),
+                child: _syncing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text(t.syncNow, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: () => authState.signOut(),
+              onPressed: _syncing ? null : () => authState.signOut(),
               style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(54)),
               child: Text(t.signOut),
             ),

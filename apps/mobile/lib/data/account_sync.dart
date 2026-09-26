@@ -31,8 +31,12 @@ const _backofficeUrl = String.fromEnvironment(
 /// l'app reste utilisable normalement (§01, offline-first) — la synchro se
 /// retentera à la prochaine connexion. Rejouable sans effet de bord des deux
 /// côtés (upsert sur localId/clientSessionId/badgeKey/remoteId).
-Future<void> syncAccount(ClerkAuthState authState, AppDatabase db) async {
-  if (!authState.isSignedIn) return;
+/// Renvoie true si l'aller-retour complet a abouti. L'appel automatique (à
+/// la connexion) ignore ce retour — il reste silencieux, jamais bloquant ;
+/// c'est le déclenchement manuel (bouton « Synchroniser », écran profil)
+/// qui s'en sert pour dire à l'utilisateur si ça a marché.
+Future<bool> syncAccount(ClerkAuthState authState, AppDatabase db) async {
+  if (!authState.isSignedIn) return false;
   try {
     final token = await authState.sessionToken();
     final headers = {
@@ -46,8 +50,10 @@ Future<void> syncAccount(ClerkAuthState authState, AppDatabase db) async {
 
     await _pullGameData(db, headers);
     await _syncGameData(db, headers);
+    return true;
   } catch (_) {
     // Best-effort — voir docstring. Pas de remontée d'erreur à l'UI.
+    return false;
   }
 }
 

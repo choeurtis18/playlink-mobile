@@ -626,6 +626,24 @@ abstract class AppLocalizations {
   /// **'Connecté'**
   String get profileSignedInFallback;
 
+  /// No description provided for @syncNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchroniser les données'**
+  String get syncNow;
+
+  /// No description provided for @syncSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Données synchronisées'**
+  String get syncSuccess;
+
+  /// No description provided for @syncFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisation impossible — réessaie plus tard'**
+  String get syncFailed;
+
   /// No description provided for @signOut.
   ///
   /// In fr, this message translates to:
