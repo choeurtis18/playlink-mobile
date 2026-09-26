@@ -7,7 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { ButtonLink, EmptyState, PageHeader } from "@/components/ui";
 import { relativeTime } from "@/lib/activity";
 import { registrationWhere, type RegistrationFilters } from "@/lib/registrations";
-import { RegistrationFiltersBar, RegistrationRow, TABLE_ID } from "./Registrations";
+import { MarkSignupsSeen, RegistrationFiltersBar, RegistrationRow, TABLE_ID } from "./Registrations";
+import { signupsSeenSince } from "@/lib/shell";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Pré-inscriptions" };
@@ -59,8 +60,14 @@ export default async function Inscriptions({ searchParams }: { searchParams: Pro
   const filtered = total !== all;
   const exportQs = new URLSearchParams(Object.entries(filters).filter((e): e is [string, string] => !!e[1])).toString();
 
+  // Nouveautés non vues : seulement dans ce cas, on marque l'écran comme vu
+  // (évite un aller-retour serveur à chaque visite).
+  const seen = await signupsSeenSince();
+  const newSignups = await prisma.landingPreRegistration.count({ where: { createdAt: { gt: seen.since } } });
+
   return (
     <>
+      <MarkSignupsSeen pending={newSignups > 0} />
       <PageHeader
         title="Pré-inscriptions"
         description="Adresses laissées sur la landing pour être prévenu de la sortie. Données personnelles : exporte-les seulement quand c’est utile, et efface une adresse dès qu’on te le demande."

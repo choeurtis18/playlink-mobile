@@ -1,14 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon, TrashIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { Badge, ConfirmButton, Segmented } from "@/components/ui";
-import { deletePreRegistration } from "@/lib/actions";
+import { deletePreRegistration, markSignupsSeen } from "@/lib/actions";
 import { useUrlFilters } from "@/lib/use-url-filters";
 import type { RegistrationFilters } from "@/lib/registrations";
 
 export const TABLE_ID = "inscriptions-liste";
 const LEAVE_MS = 220;
+
+/** Ouverture de l'écran = inscriptions vues : le badge « +N » de la
+ * sidebar disparaît (rafraîchi aussitôt). */
+export function MarkSignupsSeen({ pending }: { pending: boolean }) {
+  const router = useRouter();
+  useEffect(() => {
+    if (pending) markSignupsSeen().then(() => router.refresh());
+  }, [pending, router]);
+  return null;
+}
 
 export function RegistrationFiltersBar({ sp }: { sp: RegistrationFilters & { page?: string } }) {
   const { apply, applyLater, reset, pending } = useUrlFilters(sp);

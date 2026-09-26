@@ -620,3 +620,14 @@ export async function deletePreRegistration(id: string): Promise<ActionResult> {
     return { ok: false, error: humanize(e) };
   }
 }
+
+/** Écran Pré-inscriptions ouvert : les inscriptions arrivées jusqu'ici ne
+ * sont plus « nouvelles » (badge de la sidebar, tableau de bord). */
+export async function markSignupsSeen(): Promise<void> {
+  await requireEditor();
+  const { cookies } = await import("next/headers");
+  const { SIGNUPS_SEEN_COOKIE } = await import("./shell");
+  (await cookies()).set(SIGNUPS_SEEN_COOKIE, new Date().toISOString(), {
+    httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 365 * 24 * 60 * 60,
+  });
+}

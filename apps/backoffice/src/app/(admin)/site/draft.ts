@@ -1,5 +1,5 @@
 import {
-  LANDING_FIELDS, LANDING_SECTIONS, landingEnGaps, type LandingKey,
+  LANDING_FIELDS, LANDING_SECTIONS, type LandingKey,
 } from "@playlink/content-schema/landing-keys.ts";
 import type { SitePublishPayload } from "@/lib/actions";
 import type { SiteDraft, SiteSettings } from "./types";
@@ -21,6 +21,10 @@ const SECTION_SETTINGS: Partial<Record<SectionId, (keyof SiteSettings)[]>> = {
 const sameSetting = (a: SiteSettings[keyof SiteSettings], b: SiteSettings[keyof SiteSettings]) =>
   Array.isArray(a) && Array.isArray(b) ? a.length === b.length && a.every((x) => b.includes(x)) : a === b;
 
+/** EN confirmé « à jour » sans être modifié : réenregistré tel quel. */
+const enConfirmed = (saved: SiteDraft, draft: SiteDraft, key: LandingKey) =>
+  !!saved.enStale[key] && !draft.enStale[key] && draft.texts[key].en === saved.texts[key].en;
+
 export function changedTexts(saved: SiteDraft, draft: SiteDraft) {
   const out: { locale: "fr" | "en"; key: LandingKey; value: string }[] = [];
   for (const f of LANDING_FIELDS) {
@@ -28,8 +32,22 @@ export function changedTexts(saved: SiteDraft, draft: SiteDraft) {
     for (const locale of ["fr", "en"] as const) {
       if (draft.texts[key][locale] !== saved.texts[key][locale]) out.push({ locale, key, value: draft.texts[key][locale] });
     }
+    if (enConfirmed(saved, draft, key)) out.push({ locale: "en", key, value: draft.texts[key].en });
   }
   return out;
+}
+
+/** État « publié » après une publication réussie : un FR modifié sans son
+ * EN rend l'anglais en retard ; un EN modifié ou confirmé est à jour. */
+export function afterPublish(saved: SiteDraft, draft: SiteDraft): SiteDraft {
+  const enStale: SiteDraft["enStale"] = {};
+  for (const f of LANDING_FIELDS) {
+    const key = f.key as LandingKey;
+    const frEdited = draft.texts[key].fr !== saved.texts[key].fr;
+    const enTouched = draft.texts[key].en !== saved.texts[key].en || enConfirmed(saved, draft, key);
+    enStale[key] = enTouched ? false : frEdited ? draft.texts[key].fr.trim() !== f.fr.trim() : !!draft.enStale[key];
+  }
+  return { ...draft, enStale };
 }
 
 export function changedSettings(saved: SiteDraft, draft: SiteDraft) {
@@ -57,17 +75,20 @@ export function publishPayload(saved: SiteDraft, draft: SiteDraft): SitePublishP
 }
 
 /** Clés dont l'anglais manque ou n'a pas suivi le FR. */
-export function enIssues(draft: SiteDraft): Map<LandingKey, "missing" | "stale"> {
+/** Avertissements EN, en direct pendant l'édition :
+ * - `missing` : EN vide (la landing EN affiche le FR) ;
+ * - `stale` : FR personnalisé modifié sans l'EN, ou déjà en retard en
+ *   base et pas encore confirmé. */
+export function enIssues(saved: SiteDraft, draft: SiteDraft): Map<LandingKey, "missing" | "stale"> {
   const issues = new Map<LandingKey, "missing" | "stale">();
   for (const f of LANDING_FIELDS) {
     const key = f.key as LandingKey;
-    if (!draft.texts[key].en.trim()) issues.set(key, "missing");
+    const t = draft.texts[key];
+    if (!t.en.trim()) { issues.set(key, "missing"); continue; }
+    if (!t.fr.trim() || t.fr.trim() === f.fr.trim()) continue;
+    if (t.en !== saved.texts[key].en) continue;
+    if (t.fr !== saved.texts[key].fr || draft.enStale[key]) issues.set(key, "stale");
   }
-  const rows = LANDING_FIELDS.flatMap((f) => {
-    const t = draft.texts[f.key as LandingKey];
-    return [{ locale: "fr", key: f.key, value: t.fr }, { locale: "en", key: f.key, value: t.en }];
-  });
-  for (const gap of landingEnGaps(rows)) if (!issues.has(gap.key)) issues.set(gap.key, "stale");
   return issues;
 }
 

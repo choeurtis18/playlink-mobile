@@ -504,6 +504,15 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
   « Pré-inscriptions » compris).
 - [ ] Chaque onglet du navigateur porte le nom de l'écran
   (« Cartes · Playlink BO »).
+- [ ] Compteurs de la sidebar : **gris** = total (Jeux, Catégories,
+  Cartes actives, Règles, Badges) ; **orange** = à faire, disparaît une
+  fois fait (Traductions : éléments sans anglais ; Contenu du site : textes
+  EN à revoir) ; **rose** = nouveautés (Pré-inscriptions : « +N » depuis ta
+  dernière visite de l'écran ; Publication : modifications à publier).
+- [ ] « +N » sur Pré-inscriptions : ouvrir l'écran → le badge disparaît
+  aussitôt ; le tableau de bord affiche « Aucune nouvelle pré-inscription —
+  Depuis ta dernière visite ». Une nouvelle inscription → « +1 ».
+  (Mémorisé par navigateur : un autre ordinateur a son propre « vu ».)
 - [ ] Compteurs : Jeux = nombre de jeux, Cartes = cartes actives.
 - [ ] Encart en bas de la sidebar : « N modifications à publier » (point
   rose qui pulse) après avoir modifié une carte, une catégorie, un jeu,
@@ -579,6 +588,11 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
 - [ ] Taper `*mot*` dans l'accroche (ou tout champ autre que les deux
   titres) → alerte sous le champ ; sur la landing, les étoiles
   disparaissent (le mot reste).
+
+- [ ] Texte FR modifié : sous l'EN, « Le FR a changé depuis l'anglais »
+  et un bouton « L'anglais est à jour ». Si l'anglais convient déjà : clic
+  → l'avertissement disparaît (1 modification) → Publier → il ne revient
+  pas au rechargement, et le compteur « Contenu du site » baisse.
 
 ### 12.4 Jeux, Cartes, Catégories (lot 12a)
 - [ ] Jeux : lignes avec bande et pastille aux couleurs du jeu, chiffres
