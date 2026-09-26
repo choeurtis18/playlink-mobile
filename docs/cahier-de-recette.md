@@ -447,6 +447,14 @@ Tester dans une fenêtre privée, pour repartir sans choix enregistré.
 - [ ] Dans PostHog, aucun événement ne porte d'e-mail ni de nom :
   seulement la langue, le jeu, la catégorie, l'intensité, le numéro de
   carte et le vote.
+- [ ] Relais : outils de développement → Réseau, après « Tout accepter » :
+  les envois partent vers `playlink-game.fr/relais/…`, **aucun** vers
+  `posthog.com`. Les événements arrivent bien dans PostHog → Activity.
+- [ ] Avec un bloqueur de publicité (uBlock Origin) : les événements
+  arrivent quand même.
+- [ ] Écran Stats du back-office, le lendemain : la répartition par pays
+  est toujours remplie (le relais transmet l'adresse IP du visiteur à
+  PostHog pour la géolocalisation).
 
 ### 11.8 Pages légales et SEO (lot 7)
 - [ ] Pied de page : Mentions légales, Politique de confidentialité,

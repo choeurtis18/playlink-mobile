@@ -11,6 +11,11 @@ import type { PostHog } from "posthog-js";
 
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY_LANDING;
 const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST_LANDING ?? "https://eu.i.posthog.com";
+// Envoi par le relais du site (voir next.config.ts), moins filtré par les
+// bloqueurs de publicité. `ui_host` : liens vers l'interface PostHog
+// (barre d'outils), qui ne passent pas par le relais.
+const RELAY = "/relais";
+const UI_HOST = HOST.replace(/^https:\/\/(\w+)\.i\.posthog\.com\/?$/, "https://$1.posthog.com");
 
 /** Événements suivis, et leurs propriétés. Rien d'autre ne part. */
 export type AnalyticsEvents = {
@@ -70,7 +75,8 @@ function load(): Promise<PostHog | null> {
   loading ??= import("posthog-js")
     .then(({ default: posthog }) => {
       posthog.init(KEY!, {
-        api_host: HOST,
+        api_host: RELAY,
+        ui_host: UI_HOST,
         person_profiles: "never",
         autocapture: false,
         capture_pageview: false, // envoyé à la main, avec la langue
