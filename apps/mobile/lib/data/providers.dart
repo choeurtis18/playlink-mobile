@@ -35,6 +35,19 @@ final badgesRepositoryProvider =
 final customCardsRepositoryProvider =
     Provider<CustomCardsRepository>((ref) => CustomCardsRepository(ref.watch(databaseProvider)));
 
+// `autoDispose` : sans lui, ce provider ne se recalcule JAMAIS une fois lu
+// une première fois (ex. un tour de curiosité sur cet écran avant de
+// jouer) — l'écran resterait figé sur « tout verrouillé » pour le reste
+// de la session, même après un badge réellement débloqué en base.
+final badgesListProvider = FutureProvider.autoDispose<List<BadgeVm>>((ref) {
+  final locale = ref.watch(localeProvider).languageCode;
+  return ref.watch(badgesRepositoryProvider).all(locale);
+});
+
+final myCardsListProvider = FutureProvider<List<CustomCardVm>>((ref) {
+  return ref.watch(customCardsRepositoryProvider).all();
+});
+
 // ─── Préférences ─────────────────────────────────────────────────────
 
 class PrefKeys {

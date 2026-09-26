@@ -8,8 +8,6 @@ import '../data/auth_config.dart';
 import '../data/providers.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
-import 'badges_screen.dart' show badgesListProvider;
-import 'my_cards_screen.dart' show myCardsListProvider;
 
 /// D1 : profil du compte — en V1 sans compte, l'écran explique le mode local
 /// et donne accès à ce qui n'a besoin de rien d'autre (§00). Les cartes

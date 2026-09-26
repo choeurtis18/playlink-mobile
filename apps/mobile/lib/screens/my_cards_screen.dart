@@ -10,10 +10,6 @@ import '../widgets/game_scaffold.dart';
 import 'game_screen.dart' show categoriesProvider;
 import 'home_screen.dart' show gamesProvider;
 
-final myCardsListProvider = FutureProvider<List<CustomCardVm>>((ref) {
-  return ref.watch(customCardsRepositoryProvider).all();
-});
-
 /// C1/C3 : liste des cartes créées sur l'appareil + CTA « Créer une
 /// carte ». Fonctionne 100 % en local (voir `CustomCards`) — jamais
 /// visible par un autre utilisateur (pas de compte en V1).

@@ -8,7 +8,6 @@ import '../core/session.dart';
 import '../data/content_repository.dart';
 import '../data/database.dart';
 import '../data/providers.dart';
-import '../screens/badges_screen.dart' show badgesListProvider;
 
 /// Écran à afficher, dérivé de l'état — jamais stocké à part (B3→B6).
 enum GameStage { turn, card, vote, pass, results }

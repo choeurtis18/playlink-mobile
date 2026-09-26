@@ -6,15 +6,6 @@ import '../data/providers.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
-// `autoDispose` : sans lui, ce provider ne se recalcule JAMAIS une fois lu
-// une première fois (ex. un tour de curiosité sur cet écran avant de
-// jouer) — l'écran resterait figé sur « tout verrouillé » pour le reste
-// de la session, même après un badge réellement débloqué en base.
-final badgesListProvider = FutureProvider.autoDispose<List<BadgeVm>>((ref) {
-  final locale = ref.watch(localeProvider).languageCode;
-  return ref.watch(badgesRepositoryProvider).all(locale);
-});
-
 /// D4 : grille des badges gagnés + verrouillés (avec la condition),
 /// évalués localement en fin de partie (§01/§09) — accessible depuis le
 /// profil.
