@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/account_sync.dart';
 import '../data/auth_config.dart';
-import '../data/providers.dart';
+import '../data/sync_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
@@ -122,17 +121,12 @@ class _SignedInCardState extends ConsumerState<_SignedInCard> {
     final authState = ClerkAuth.of(context, listen: false);
 
     setState(() => _syncing = true);
-    final ok = await syncAccount(authState, ref.read(databaseProvider));
+    // Le rafraîchissement de l'UI fait partie de `sync` (voir
+    // sync_controller.dart) — il a lieu même si cet écran est quitté
+    // entre-temps. Ici, `mounted` ne protège plus que l'affichage.
+    final ok = await ref.read(syncControllerProvider.notifier).sync(authState);
     if (!mounted) return;
     setState(() => _syncing = false);
-
-    // Les écrans qui lisent ces données (joueurs, cartes, badges) ne se
-    // rafraîchissent pas tout seuls après une écriture faite hors de leur
-    // notifier — sans ceci, la synchro réussit mais l'UI reste figée.
-    if (ok) await ref.read(playersProvider.notifier).load();
-    if (!mounted) return;
-    ref.invalidate(myCardsListProvider);
-    ref.invalidate(badgesListProvider);
 
     messenger
       ..hideCurrentSnackBar()

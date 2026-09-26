@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/account_sync.dart';
-import '../data/providers.dart';
+import '../data/sync_controller.dart';
 import '../l10n/app_localizations.dart';
 
 /// Connexion joueur (phase 4, §04) — instance Clerk JOUEURS, distincte de
@@ -53,12 +52,17 @@ class SignInScreen extends ConsumerWidget {
               ClerkSignedIn(
                 child: Builder(builder: (context) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    // Best-effort, ne bloque jamais la redirection (§04) —
-                    // voir account_sync.dart.
-                    unawaited(syncAccount(
-                      ClerkAuth.of(context, listen: false),
-                      ref.read(databaseProvider),
-                    ));
+                    // Lus AVANT la navigation : elle démonte cet écran, et
+                    // tout ce qui dépend de son contexte devient alors
+                    // inutilisable.
+                    final authState = ClerkAuth.of(context, listen: false);
+                    final syncController = ref.read(syncControllerProvider.notifier);
+
+                    // Best-effort, ne bloque jamais la redirection (§04). Le
+                    // rafraîchissement de l'UI qui suit la synchro vit dans le
+                    // contrôleur, pas ici : il doit survivre au démontage de
+                    // cet écran (voir sync_controller.dart).
+                    unawaited(syncController.sync(authState));
                     if (context.mounted) context.go('/profile');
                   });
                   return Center(child: Text(t.signInSuccess));
