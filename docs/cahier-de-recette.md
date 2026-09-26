@@ -675,6 +675,24 @@ Prérequis : `POSTHOG_PERSONAL_API_KEY` (Query : Read), `POSTHOG_PROJECT_ID`,
 - [ ] Aucune pré-inscription : message vide explicite, pas de bouton
   d'export.
 
+### 12.8 E-mails d'inscription
+Prérequis : `RESEND_API_KEY` sur le projet Vercel du back-office, domaine
+`playlink-game.fr` « Verified » dans Resend.
+- [ ] Double opt-in désactivé : s'inscrire sur la landing avec une vraie
+  adresse → e-mail « C'est noté… » (FR) ou « You're on the list… » (EN)
+  selon la langue du site : logo, bouton « Essayer la démo », liens
+  Instagram/TikTok s'ils sont renseignés, lien « Te désinscrire ».
+- [ ] En même temps, gamesplaylink@gmail.com reçoit « Nouvelle
+  pré-inscription · adresse » (total, langue, dernières 24 h, bouton vers
+  l'écran Pré-inscriptions). « Répondre » écrit à l'inscrit.
+- [ ] Même adresse une seconde fois : aucun nouvel e-mail.
+- [ ] Double opt-in activé : d'abord l'e-mail de confirmation (même
+  design) ; bienvenue et alerte seulement après le clic, une seule fois.
+- [ ] Gmail web et mobile, Outlook : fond sombre, bouton lisible, pas de
+  défilement horizontal sur téléphone.
+- [ ] `ADMIN_NOTIFY_EMAIL=off` puis redéploiement : plus d'alerte, la
+  bienvenue part toujours.
+
 ---
 
 ## Ce qui reste à développer
