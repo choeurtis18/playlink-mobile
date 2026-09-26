@@ -53,6 +53,17 @@ export const TranslationInput = z.object({
   text: z.string().trim().min(1).max(500),
 });
 
+/** Traduction anglaise d'un contenu autre qu'une carte. Mêmes bornes que
+ * les champs d'origine (snapshot). Champs facultatifs : vide = null. */
+const optionalText = (max: number) => z.string().trim().max(max).transform((v) => v || null);
+export const ContentTranslationInput = {
+  game: z.object({ name: z.string().trim().min(1, "Le nom anglais est obligatoire").max(100), description: optionalText(500) }),
+  category: z.object({ name: z.string().trim().min(1, "Le nom anglais est obligatoire").max(120), description: optionalText(500) }),
+  slide: z.object({ title: z.string().trim().min(1, "Le titre anglais est obligatoire").max(200), content: z.string().trim().min(1, "Le contenu anglais est obligatoire").max(2000) }),
+  badge: z.object({ name: z.string().trim().min(1, "Le nom anglais est obligatoire").max(100), description: z.string().trim().min(1, "La description anglaise est obligatoire").max(300) }),
+} as const;
+export type ContentKind = keyof typeof ContentTranslationInput;
+
 // ── Landing (SiteContent, une seule ligne id "default") ───────────────
 
 /** URL de réseau social : vide = réseau masqué sur la landing. */
