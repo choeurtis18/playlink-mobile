@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { getShellCounts } from "@/lib/shell";
 import { parisDay, recentActivity, relativeTime, type ActivityIcon } from "@/lib/activity";
 import { Card, PageHeader, Stat } from "@/components/ui";
+import { missingByKind } from "@/lib/content-translations";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ const nf = new Intl.NumberFormat("fr-FR");
 
 export default async function Home() {
   const now = new Date();
-  const [shell, categories, slides, badges, totalCards, untranslated, landingRows, signups, activity] = await Promise.all([
+  const [shell, categories, slides, badges, totalCards, untranslated, landingRows, signups, activity, contentMissing] = await Promise.all([
     getShellCounts(),
     prisma.category.count(),
     prisma.gameRuleSlide.count(),
@@ -33,6 +34,7 @@ export default async function Home() {
       select: { createdAt: true },
     }),
     recentActivity(6),
+    missingByKind(),
   ]);
 
   const stats: { label: string; value: string; icon: Icon; href: string }[] = [
@@ -53,11 +55,23 @@ export default async function Home() {
 
   const gaps = landingEnGaps(landingRows);
   const coverage = totalCards ? Math.round(((totalCards - untranslated) / totalCards) * 100) : 100;
+  // Cartes + jeux, catégories, slides et badges : l'app mélange les
+  // langues dès qu'un seul de ces éléments manque en anglais.
+  const translateParts = [
+    { n: untranslated, one: "carte", many: "cartes", type: "" },
+    { n: contentMissing.game, one: "jeu", many: "jeux", type: "jeux" },
+    { n: contentMissing.category, one: "catégorie", many: "catégories", type: "categories" },
+    { n: contentMissing.slide, one: "slide", many: "slides", type: "regles" },
+    { n: contentMissing.badge, one: "badge", many: "badges", type: "badges" },
+  ].filter((p) => p.n > 0);
+  const toTranslate = translateParts.reduce((s, p) => s + p.n, 0);
+  const translateDetail = translateParts.map((p) => `${p.n} ${p.n > 1 ? p.many : p.one}`).join(" · ") + (untranslated ? ` — cartes couvertes à ${coverage} %` : "");
+  const translateHref = translateParts[0]?.type ? `/traductions?type=${translateParts[0].type}` : "/traductions";
 
   const todos: Todo[] = [
-    untranslated > 0
-      ? { icon: TranslateIcon, tone: "blue", title: `${nf.format(untranslated)} carte${untranslated > 1 ? "s" : ""} sans traduction EN`, sub: `Couverture ${coverage} %`, href: "/traductions" }
-      : { icon: CheckCircleIcon, tone: "success", title: "Toutes les cartes sont traduites", sub: "Couverture 100 %", href: "/traductions" },
+    toTranslate > 0
+      ? { icon: TranslateIcon, tone: "blue", title: `${nf.format(toTranslate)} élément${toTranslate > 1 ? "s" : ""} sans traduction EN`, sub: translateDetail, href: translateHref }
+      : { icon: CheckCircleIcon, tone: "success", title: "Tout le contenu est traduit", sub: "Cartes, jeux, catégories, règles et badges", href: "/traductions" },
     shell.pending > 0
       ? { icon: RocketLaunchIcon, tone: "accent", title: `${shell.pending} modification${shell.pending > 1 ? "s" : ""} non publiée${shell.pending > 1 ? "s" : ""}`, sub: shell.version ? `Version en ligne : v${shell.version}` : "Aucune version publiée", href: "/publication" }
       : { icon: CheckCircleIcon, tone: "success", title: "Rien à publier", sub: shell.version ? `v${shell.version} en ligne dans l’app` : "Aucune version publiée", href: "/publication" },

@@ -595,6 +595,18 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
   défilent horizontalement).
 
 ### 12.5 Traductions, Règles, Badges, Publication (lot 12b)
+- [ ] Traductions : onglets Cartes · Jeux · Catégories · Règles ·
+  Badges, chacun avec son nombre d'éléments à traduire (✓ quand tout
+  est fait). Jeux, catégories, règles, badges : français à gauche,
+  anglais à droite ; quitter l'élément enregistre tous ses champs.
+  Champ obligatoire vide (ex. contenu d'une slide) → message d'erreur.
+  Tout vider → la traduction est supprimée (l'app affiche le français).
+- [ ] Dans l'app, en anglais, après publication : noms et descriptions
+  des jeux, catégories, règles et badges traduits (plus de mélange).
+- [ ] Tableau de bord : « N éléments sans traduction EN » détaille
+  cartes, jeux, catégories, slides et badges.
+- [ ] Badges → Éditer : la fenêtre s'ouvre en plein écran, au-dessus de
+  la page (plus coincée dans la carte du badge).
 - [ ] Traductions : grande jauge de couverture anglaise ; à droite,
   avancement par jeu (clic = filtre sur ce jeu, re-clic = retire le
   filtre). Recherche FR ou EN, jeu et catégorie s'appliquent sans bouton.

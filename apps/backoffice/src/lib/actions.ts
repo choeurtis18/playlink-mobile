@@ -8,7 +8,7 @@ import { BADGE_RULES } from "./badge-rules";
 import { normalizeTags } from "@playlink/content-schema/tag-mapping.ts";
 import { LandingTextInputSchema, DemoSettingsSchema } from "@playlink/content-schema/landing-keys.ts";
 import {
-  CardInput, CategoryInput, GameInput, BadgeInput, SlideInput, TranslationInput,
+  CardInput, CategoryInput, GameInput, BadgeInput, SlideInput, TranslationInput, ContentTranslationInput, type ContentKind,
   SiteSettingsInput,
 } from "./validation";
 
@@ -128,6 +128,43 @@ export async function saveTranslation(form: FormData): Promise<ActionResult> {
     });
     await logAction(adminId, "saved_translation", "card", cardId, { locale });
   }, ["/traductions", "/cartes", "/"]);
+}
+
+/** Traduction anglaise d'un jeu, d'une catégorie, d'une slide de règles
+ * ou d'un badge (écran Traductions). Tous les champs vides = suppression :
+ * l'app retombe alors sur le français. */
+export async function saveContentTranslation(kind: ContentKind, id: string, fields: Record<string, string>): Promise<ActionResult> {
+  return run(async (adminId) => {
+    const schema = ContentTranslationInput[kind];
+    if (!schema) throw new Error("Type de contenu inconnu.");
+    const locale = "en";
+    const empty = Object.values(fields).every((v) => !String(v ?? "").trim());
+    if (empty) {
+      if (kind === "game") await prisma.gameTranslation.deleteMany({ where: { gameId: id, locale } });
+      if (kind === "category") await prisma.categoryTranslation.deleteMany({ where: { categoryId: id, locale } });
+      if (kind === "slide") await prisma.gameRuleSlideTranslation.deleteMany({ where: { slideId: id, locale } });
+      if (kind === "badge") await prisma.badgeTranslation.deleteMany({ where: { badgeId: id, locale } });
+      await logAction(adminId, "deleted_translation", kind, id, { locale });
+      return;
+    }
+    const parsed = schema.safeParse(fields);
+    if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+    const data = parsed.data as Record<string, string | null>;
+    if (kind === "game") {
+      const d = { name: data.name!, description: data.description };
+      await prisma.gameTranslation.upsert({ where: { gameId_locale: { gameId: id, locale } }, create: { gameId: id, locale, ...d }, update: d });
+    } else if (kind === "category") {
+      const d = { name: data.name!, description: data.description };
+      await prisma.categoryTranslation.upsert({ where: { categoryId_locale: { categoryId: id, locale } }, create: { categoryId: id, locale, ...d }, update: d });
+    } else if (kind === "slide") {
+      const d = { title: data.title!, content: data.content! };
+      await prisma.gameRuleSlideTranslation.upsert({ where: { slideId_locale: { slideId: id, locale } }, create: { slideId: id, locale, ...d }, update: d });
+    } else {
+      const d = { name: data.name!, description: data.description! };
+      await prisma.badgeTranslation.upsert({ where: { badgeId_locale: { badgeId: id, locale } }, create: { badgeId: id, locale, ...d }, update: d });
+    }
+    await logAction(adminId, "saved_translation", kind, id, { locale });
+  }, ["/traductions", "/"]);
 }
 
 export async function deleteTranslation(cardId: string, locale: string): Promise<ActionResult> {
