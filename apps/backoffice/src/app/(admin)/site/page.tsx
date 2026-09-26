@@ -4,6 +4,7 @@ import { SiteEditor } from "./SiteEditor";
 import type { EditorGame, SiteDraft, SiteTexts } from "./types";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Contenu du site" };
 
 /** Actions qui publient la landing (l'ancien formulaire en écrivait trois). */
 const SITE_ACTIONS = ["published_site", "updated_landing_texts", "updated_landing_settings", "updated_site_content"];

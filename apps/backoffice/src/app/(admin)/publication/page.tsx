@@ -11,6 +11,7 @@ import { recentActivity, relativeTime, type ActivityIcon } from "@/lib/activity"
 import { PublishButton } from "./PublishForm";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Publication" };
 
 const nf = new Intl.NumberFormat("fr-FR");
 const ENTITY_LABELS: Record<string, [string, string]> = {

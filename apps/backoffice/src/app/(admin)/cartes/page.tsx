@@ -6,6 +6,7 @@ import { importCards } from "@/lib/actions";
 import { ActiveSwitch, CardFilters, DeleteCardButton, EditCardButton, IntensityPips, NewCardButton } from "./CardEditor";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Cartes" };
 
 const PER_PAGE = 50;
 const nf = new Intl.NumberFormat("fr-FR");

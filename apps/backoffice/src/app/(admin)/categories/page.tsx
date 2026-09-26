@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui";
 import { DeleteCategoryButton, DistBars, EditCategoryButton, NewCategoryButton } from "./CategoryTable";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Catégories" };
 
 const nf = new Intl.NumberFormat("fr-FR");
 

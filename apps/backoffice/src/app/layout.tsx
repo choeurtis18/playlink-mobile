@@ -4,7 +4,9 @@ import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Playlink — Back-office",
+  // Un titre par écran (« Cartes · Playlink BO ») : onglets distincts,
+  // et le lecteur d'écran annonce l'écran atteint (WCAG 2.4.2).
+  title: { default: "Playlink — Back-office", template: "%s · Playlink BO" },
   description: "Gestion du contenu et des statistiques Playlink",
   robots: { index: false, follow: false },
 };

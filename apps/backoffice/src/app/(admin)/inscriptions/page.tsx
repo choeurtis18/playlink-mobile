@@ -10,6 +10,7 @@ import { registrationWhere, type RegistrationFilters } from "@/lib/registrations
 import { RegistrationFiltersBar, RegistrationRow, TABLE_ID } from "./Registrations";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Pré-inscriptions" };
 
 const PER_PAGE = 50;
 const DAY = 24 * 60 * 60 * 1000;

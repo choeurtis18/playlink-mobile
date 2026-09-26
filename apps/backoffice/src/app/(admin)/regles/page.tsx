@@ -6,6 +6,7 @@ import { NewSlideButton } from "./SlideEditor";
 import { SlideList } from "./SlideList";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Règles du jeu" };
 
 export default async function Regles({ searchParams }: { searchParams: Promise<{ jeu?: string }> }) {
   const sp = await searchParams;

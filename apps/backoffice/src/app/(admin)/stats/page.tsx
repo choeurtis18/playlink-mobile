@@ -13,6 +13,7 @@ import { TrendCharts } from "./TrendCharts";
 import { SyncButton } from "./SyncButton";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Stats landing" };
 
 const PERIODS = [7, 30, 90] as const;
 const nf = new Intl.NumberFormat("fr-FR");
