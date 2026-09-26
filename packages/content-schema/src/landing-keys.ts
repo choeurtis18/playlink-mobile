@@ -148,21 +148,38 @@ export function resolveLandingTexts(
   ) as LandingTexts;
 }
 
+/** Écart toléré entre deux écritures d'une même publication (FR et EN
+ * enregistrés dans la même transaction, à quelques millisecondes près). */
+const SAME_PUBLISH_MS = 2000;
+
 /** Textes que l'anglais n'a pas suivis : le FR a été personnalisé au
- * back-office, mais l'EN est vide ou encore au texte par défaut. La
- * landing EN affiche alors un texte qui ne correspond plus au FR.
+ * back-office, et l'EN est vide, jamais enregistré, ou plus ancien que le
+ * FR. La landing EN affiche alors un texte qui ne correspond plus au FR.
+ *
+ * Avec les dates (`updatedAt`, lignes lues en base) : l'EN est à jour dès
+ * qu'il a été enregistré après le FR — même identique au texte par
+ * défaut (« L'anglais est à jour » au back-office). Sans date : l'EN
+ * resté au texte par défaut compte comme non suivi.
  * Renvoie la clé et sa section, dans l'ordre de la page. */
 export function landingEnGaps(
-  rows: readonly { locale: string; key: string; value: string }[],
+  rows: readonly { locale: string; key: string; value: string; updatedAt?: Date | string | null }[],
 ): { key: LandingKey; sectionId: string }[] {
-  const value = (locale: string, key: string) => rows.find((r) => r.locale === locale && r.key === key)?.value.trim() ?? '';
+  const row = (locale: string, key: string) => rows.find((r) => r.locale === locale && r.key === key);
+  const time = (d: Date | string | null | undefined) => (d ? new Date(d).getTime() : NaN);
   const gaps: { key: LandingKey; sectionId: string }[] = [];
   for (const section of LANDING_SECTIONS) {
     for (const field of section.fields) {
-      const fr = value('fr', field.key);
-      if (!fr || fr === field.fr.trim()) continue;
-      const en = value('en', field.key);
-      if (!en || en === field.en.trim()) gaps.push({ key: field.key as LandingKey, sectionId: section.id });
+      const fr = row('fr', field.key);
+      const frText = fr?.value.trim() ?? '';
+      if (!frText || frText === field.fr.trim()) continue;
+      const en = row('en', field.key);
+      const enText = en?.value.trim() ?? '';
+      const frAt = time(fr?.updatedAt), enAt = time(en?.updatedAt);
+      const stale = !enText
+        || (Number.isFinite(frAt) && Number.isFinite(enAt)
+          ? frAt - enAt > SAME_PUBLISH_MS
+          : enText === field.en.trim());
+      if (stale) gaps.push({ key: field.key as LandingKey, sectionId: section.id });
     }
   }
   return gaps;

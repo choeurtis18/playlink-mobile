@@ -27,7 +27,7 @@ export default async function Home() {
     prisma.badge.count(),
     prisma.card.count(),
     prisma.card.count({ where: { translations: { none: { locale: "en" } } } }),
-    prisma.landingText.findMany({ select: { locale: true, key: true, value: true } }),
+    prisma.landingText.findMany({ select: { locale: true, key: true, value: true, updatedAt: true } }),
     // Volume faible (pré-inscriptions de 14 jours) : regroupées ici par
     // jour. Les stats détaillées liront des agrégats (écran Stats).
     prisma.landingPreRegistration.findMany({
@@ -89,12 +89,12 @@ export default async function Home() {
       ? { icon: RocketLaunchIcon, tone: "accent", title: `${shell.pending} modification${shell.pending > 1 ? "s" : ""} non publiée${shell.pending > 1 ? "s" : ""}`, sub: shell.version ? `Version en ligne : v${shell.version}` : "Aucune version publiée", href: "/publication" }
       : { icon: CheckCircleIcon, tone: "success", title: "Rien à publier", sub: shell.version ? `v${shell.version} en ligne dans l’app` : "Aucune version publiée", href: "/publication" },
     gaps.length > 0
-      ? { icon: WarningIcon, tone: "warning", title: `${gaps.length} texte${gaps.length > 1 ? "s" : ""} EN à mettre à jour sur le site`, sub: "Modifiés en FR, l’anglais affiche encore l’ancien texte", href: `/site?sec=${gaps[0].sectionId}` }
+      ? { icon: WarningIcon, tone: "warning", title: `${gaps.length} texte${gaps.length > 1 ? "s" : ""} EN à mettre à jour sur le site`, sub: "FR modifié après l’anglais : à revoir, ou à confirmer (« L’anglais est à jour »)", href: `/site?sec=${gaps[0].sectionId}` }
       : { icon: CheckCircleIcon, tone: "success", title: "Site traduit", sub: "Les textes EN suivent le FR", href: "/site" },
     {
       icon: EnvelopeSimpleIcon, tone: "success",
       title: shell.newSignups > 0 ? `${shell.newSignups} nouvelle${shell.newSignups > 1 ? "s" : ""} pré-inscription${shell.newSignups > 1 ? "s" : ""}` : "Aucune nouvelle pré-inscription",
-      sub: "Dernières 24 h",
+      sub: shell.signupsVisited ? "Depuis ta dernière visite de l’écran" : "Dernières 24 h",
       href: "/inscriptions",
     },
   ];
@@ -122,7 +122,7 @@ export default async function Home() {
             {hasViews && <Kpi label="Vues" value={nf.format(views7)} delta={delta(views7, viewsPrev7)} />}
             {hasViews && <Kpi label="Démos lancées" value={nf.format(demos7)} delta={delta(demos7, demosPrev7)} />}
             <Kpi label="Pré-inscriptions" value={nf.format(last7)} delta={delta(last7, prev7)} />
-            <Kpi label="Dernières 24 h" value={nf.format(shell.newSignups)} />
+            <Kpi label="Dernières 24 h" value={nf.format(signups.filter((x) => x.createdAt.getTime() > now.getTime() - DAY).length)} />
           </dl>
           {hasViews
             ? <Sparkline values={viewsPerDay} label={`Vues par jour sur ${SPARK_DAYS} jours : ${viewsPerDay.join(", ")}`} />

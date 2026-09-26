@@ -22,6 +22,10 @@ export type SiteDraft = {
   settings: SiteSettings;
   /** Catégorie → jouable dans la démo de la landing. */
   eligible: Record<string, boolean>;
+  /** Clé → l'anglais publié n'a pas suivi le FR (FR modifié après l'EN).
+   * Passe à `false` avec « L'anglais est à jour » : l'EN est alors
+   * réenregistré tel quel à la publication. */
+  enStale: Partial<Record<LandingKey, boolean>>;
 };
 
 export type EditorCategory = {

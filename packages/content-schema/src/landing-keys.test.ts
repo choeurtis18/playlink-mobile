@@ -70,6 +70,30 @@ test('landingEnGaps : FR personnalisé sans EN à jour', () => {
   );
 });
 
+test('landingEnGaps avec dates : l\'EN est à jour s\'il a été enregistré après le FR', () => {
+  const d = defaultLandingTexts('en');
+  const fr = (at: string) => ({ locale: 'fr', key: 'hero.title', value: 'Playlink', updatedAt: at });
+  const en = (value: string, at: string) => ({ locale: 'en', key: 'hero.title', value, updatedAt: at });
+  const gap = [{ key: 'hero.title', sectionId: 'hero' }];
+  assert.deepEqual(landingEnGaps([fr('2026-09-01T10:00:00Z')]), gap, 'EN jamais enregistré');
+  assert.deepEqual(
+    landingEnGaps([fr('2026-09-01T10:00:00Z'), en(d['hero.title'], '2026-09-02T10:00:00Z')]),
+    [],
+    'EN par défaut confirmé après le FR',
+  );
+  assert.deepEqual(
+    landingEnGaps([fr('2026-09-03T10:00:00Z'), en('Playlink EN', '2026-09-02T10:00:00Z')]),
+    gap,
+    'FR modifié après l\'EN',
+  );
+  assert.deepEqual(
+    landingEnGaps([fr('2026-09-03T10:00:00.900Z'), en('Playlink EN', '2026-09-03T10:00:00.100Z')]),
+    [],
+    'FR et EN publiés ensemble',
+  );
+  assert.deepEqual(landingEnGaps([fr('2026-09-01T10:00:00Z'), en('  ', '2026-09-02T10:00:00Z')]), gap, 'EN vide');
+});
+
 test('étoiles : gardées dans les titres, retirées ailleurs', () => {
   assert.equal(stripEmphasis('Les jeux qui ont *brisé* des amitiés'), 'Les jeux qui ont brisé des amitiés');
   assert.equal(stripEmphasis('Note * isolée'), 'Note * isolée');

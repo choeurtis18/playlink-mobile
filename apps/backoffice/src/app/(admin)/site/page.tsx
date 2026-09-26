@@ -1,4 +1,4 @@
-import { LANDING_FIELDS, LANDING_SECTIONS } from "@playlink/content-schema/landing-keys.ts";
+import { LANDING_FIELDS, LANDING_SECTIONS, landingEnGaps } from "@playlink/content-schema/landing-keys.ts";
 import { prisma } from "@/lib/prisma";
 import { SiteEditor } from "./SiteEditor";
 import type { EditorGame, SiteDraft, SiteTexts } from "./types";
@@ -13,7 +13,7 @@ export default async function Site({ searchParams }: { searchParams: Promise<{ s
   const sp = await searchParams;
   const [site, rows, games, counts, samples, lastPublish] = await Promise.all([
     prisma.siteContent.findUnique({ where: { id: "default" } }),
-    prisma.landingText.findMany({ select: { locale: true, key: true, value: true } }),
+    prisma.landingText.findMany({ select: { locale: true, key: true, value: true, updatedAt: true } }),
     prisma.game.findMany({
       orderBy: { order: "asc" },
       select: {
@@ -54,6 +54,7 @@ export default async function Site({ searchParams }: { searchParams: Promise<{ s
       redditUrl: site?.redditUrl ?? "",
     },
     eligible: Object.fromEntries(games.flatMap((g) => g.categories.map((c) => [c.id, c.previewEligible]))),
+    enStale: Object.fromEntries(landingEnGaps(rows).map((g) => [g.key, true])),
   };
 
   const editorGames: EditorGame[] = games.map((g) => ({

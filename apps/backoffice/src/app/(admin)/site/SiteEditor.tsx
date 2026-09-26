@@ -11,7 +11,7 @@ import { DEMO_DECK_SIZES, EMPHASIS_KEYS, LANDING_SECTIONS, type LandingKey } fro
 import { Button, Card, Input, PageHeader, Segmented, Switch, Textarea, useToast } from "@/components/ui";
 import { publishSite } from "@/lib/actions";
 import {
-  changeCount, enIssues, exposedCards, publishPayload, sectionStatus, type SectionId, type SectionStatus,
+  afterPublish, changeCount, enIssues, exposedCards, publishPayload, sectionStatus, type SectionId, type SectionStatus,
 } from "./draft";
 import { SitePreview } from "./SitePreview";
 import type { EditorGame, SiteDraft, SiteSettings } from "./types";
@@ -41,6 +41,8 @@ type Action =
   | { type: "text"; key: LandingKey; locale: "fr" | "en"; value: string }
   | { type: "setting"; name: keyof SiteSettings; value: SiteSettings[keyof SiteSettings] }
   | { type: "eligible"; id: string }
+  | { type: "confirmEn"; key: LandingKey }
+  | { type: "enStale"; value: SiteDraft["enStale"] }
   | { type: "reset"; to: SiteDraft };
 
 function reducer(state: SiteDraft, action: Action): SiteDraft {
@@ -51,6 +53,10 @@ function reducer(state: SiteDraft, action: Action): SiteDraft {
       return { ...state, settings: { ...state.settings, [action.name]: action.value } };
     case "eligible":
       return { ...state, eligible: { ...state.eligible, [action.id]: !state.eligible[action.id] } };
+    case "confirmEn":
+      return { ...state, enStale: { ...state.enStale, [action.key]: false } };
+    case "enStale":
+      return { ...state, enStale: action.value };
     case "reset":
       return action.to;
   }
@@ -86,7 +92,7 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
 
   const count = changeCount(saved, draft);
   const dirty = count > 0;
-  const issues = useMemo(() => enIssues(draft), [draft]);
+  const issues = useMemo(() => enIssues(saved, draft), [saved, draft]);
 
   // Quitter la page avec des modifications non publiées : le navigateur
   // demande confirmation.
@@ -108,7 +114,11 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
       setError(null);
       const r = await publishSite(publishPayload(saved, draft));
       if (r.ok) {
-        setSaved(draft);
+        const next = afterPublish(saved, draft);
+        setSaved(next);
+        // Seul l'état « EN en retard » change : une saisie faite pendant
+        // la publication reste dans le brouillon.
+        dispatch({ type: "enStale", value: next.enStale });
         setPublished(new Date().toISOString());
         if (r.notify && !r.notify.ok) {
           setSyncWarning(r.notify.reason);
@@ -231,8 +241,23 @@ export function SiteEditor({ initial, games, initialSection, lastPublishedAt }: 
                         onChange={(e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>) => dispatch({ type: "text", key, locale: "en", value: e.target.value })}
                       />
                       {issue && (
-                        <span id={`${key}-issue`} className="text-[11px] text-warning">
-                          {issue === "missing" ? "Traduction manquante — la landing EN affiche le FR" : "Le FR a changé — l’anglais est encore le texte d’origine"}
+                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span id={`${key}-issue`} className="text-[11px] text-warning">
+                            {issue === "missing" ? "Traduction manquante — la landing EN affiche le FR" : "Le FR a changé depuis l’anglais"}
+                          </span>
+                          {/* Le texte anglais convient déjà : l'avertissement
+                              disparaît, et l'EN est réenregistré tel quel à la
+                              prochaine publication. */}
+                          {issue === "stale" && (
+                            <button
+                              type="button"
+                              onClick={() => dispatch({ type: "confirmEn", key })}
+                              aria-describedby={`${key}-issue`}
+                              className="rounded-md border border-hairline px-2 py-0.5 text-[11px] text-ink-soft transition-colors hover:border-hairline-firm hover:text-ink"
+                            >
+                              L’anglais est à jour
+                            </button>
+                          )}
                         </span>
                       )}
                     </div>

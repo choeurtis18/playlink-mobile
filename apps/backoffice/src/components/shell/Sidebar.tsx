@@ -28,13 +28,30 @@ const ICONS: Record<NavKey, Icon> = {
 
 const nf = new Intl.NumberFormat("fr-FR");
 
-/** Compteur affiché à droite d'une entrée ; `hot` = à traiter (rose). */
-function badgeFor(key: NavKey, c: ShellCounts): { text: string; hot: boolean } | null {
+type BadgeTone = "count" | "todo" | "new";
+const BADGE_TONE: Record<BadgeTone, string> = {
+  count: "bg-raised text-neutral-faint",
+  todo: "bg-warning/12 text-warning",
+  new: "bg-accent/15 text-accent-deep",
+};
+
+/** Compteur affiché à droite d'une entrée :
+ * - `count` (gris) : un total, toujours affiché ;
+ * - `todo` (orange) : du travail à faire, disparaît quand c'est fait ;
+ * - `new` (rose) : nouveautés, disparaissent une fois vues ou publiées.
+ * `label` : lu par les lecteurs d'écran à la place du nombre seul. */
+function badgeFor(key: NavKey, c: ShellCounts): { text: string; tone: BadgeTone; label: string } | null {
+  const n = (v: number, one: string, many: string) => `${nf.format(v)} ${v > 1 ? many : one}`;
   switch (key) {
-    case "jeux": return { text: String(c.games), hot: false };
-    case "cartes": return { text: nf.format(c.cards), hot: false };
-    case "inscriptions": return c.newSignups > 0 ? { text: `+${c.newSignups}`, hot: true } : null;
-    case "publication": return c.pending > 0 ? { text: String(c.pending), hot: true } : null;
+    case "jeux": return { text: nf.format(c.games), tone: "count", label: n(c.games, "jeu", "jeux") };
+    case "categories": return { text: nf.format(c.categories), tone: "count", label: n(c.categories, "catégorie", "catégories") };
+    case "cartes": return { text: nf.format(c.cards), tone: "count", label: n(c.cards, "carte active", "cartes actives") };
+    case "regles": return { text: nf.format(c.slides), tone: "count", label: n(c.slides, "slide", "slides") };
+    case "badges": return { text: nf.format(c.badges), tone: "count", label: n(c.badges, "badge", "badges") };
+    case "traductions": return c.untranslated > 0 ? { text: nf.format(c.untranslated), tone: "todo", label: n(c.untranslated, "élément sans anglais", "éléments sans anglais") } : null;
+    case "site": return c.siteEnGaps > 0 ? { text: nf.format(c.siteEnGaps), tone: "todo", label: n(c.siteEnGaps, "texte anglais à revoir", "textes anglais à revoir") } : null;
+    case "inscriptions": return c.newSignups > 0 ? { text: `+${nf.format(c.newSignups)}`, tone: "new", label: n(c.newSignups, "nouvelle", "nouvelles") } : null;
+    case "publication": return c.pending > 0 ? { text: nf.format(c.pending), tone: "new", label: n(c.pending, "modification à publier", "modifications à publier") } : null;
     default: return null;
   }
 }
@@ -76,8 +93,9 @@ export function Sidebar({ counts, editorLabel }: { counts: ShellCounts; editorLa
                   <span className="flex-1">{item.label}</span>
                   {item.soon && <span className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-neutral-faint">bientôt</span>}
                   {badge && (
-                    <span className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] font-semibold ${badge.hot ? "bg-accent/15 text-accent-deep" : "bg-raised text-neutral-faint"}`}>
-                      {badge.text}
+                    <span className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] font-semibold ${BADGE_TONE[badge.tone]}`}>
+                      <span aria-hidden>{badge.text}</span>
+                      <span className="sr-only">{badge.label}</span>
                     </span>
                   )}
                 </>
