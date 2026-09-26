@@ -12,6 +12,7 @@ import { Card, PageHeader, Stat } from "@/components/ui";
 import { missingByKind } from "@/lib/content-translations";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Tableau de bord" };
 
 const DAY = 24 * 60 * 60 * 1000;
 const SPARK_DAYS = 14;

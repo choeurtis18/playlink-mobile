@@ -5,6 +5,7 @@ import { BADGE_RULES, badgeRule } from "@/lib/badge-rules";
 import { CreatePlannedBadge, DeleteBadgeButton, EditBadgeButton, NewBadgeButton } from "./BadgeEditor";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Badges" };
 
 export default async function Badges() {
   const badges = await prisma.badge.findMany({ orderBy: [{ order: "asc" }, { id: "asc" }] });

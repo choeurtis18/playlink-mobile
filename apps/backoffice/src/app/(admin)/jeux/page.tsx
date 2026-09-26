@@ -6,6 +6,7 @@ import { NewGameButton } from "./GameEditor";
 import { GameList } from "./GameList";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Jeux" };
 
 export default async function Jeux() {
   const games = await prisma.game.findMany({

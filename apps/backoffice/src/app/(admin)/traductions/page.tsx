@@ -8,6 +8,7 @@ import { ContentTab } from "./ContentTab";
 import { missingByKind } from "@/lib/content-translations";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Traductions" };
 
 const TABS: { type: string; label: string; kind: ContentKind | null }[] = [
   { type: "cartes", label: "Cartes", kind: null },

@@ -484,13 +484,15 @@ Prérequis : `WEB_URL` sur le projet Vercel du back-office (URL du site).
 
 ---
 
-## 12. Back-office v2 — refonte en cours
+## 12. Back-office v2
 
 ### 12.1 Structure générale et composants (lot 9)
 - [ ] Sidebar en 4 groupes (Général, Contenu de l'app, Landing,
   Diffusion) avec icônes ; l'écran ouvert est surligné, avec une barre
-  rose à gauche. « Stats » et « Pré-inscriptions » sont grisés
-  (« bientôt ») et ne sont pas cliquables.
+  rose à gauche. Tous les écrans sont cliquables (« Stats » et
+  « Pré-inscriptions » compris).
+- [ ] Chaque onglet du navigateur porte le nom de l'écran
+  (« Cartes · Playlink BO »).
 - [ ] Compteurs : Jeux = nombre de jeux, Cartes = cartes actives.
 - [ ] Encart en bas de la sidebar : « N modifications à publier » (point
   rose qui pulse) après avoir modifié une carte, une catégorie, un jeu,
@@ -706,6 +708,44 @@ Prérequis : `RESEND_API_KEY` sur le projet Vercel du back-office, domaine
 - [ ] Gmail : bouton « Se désabonner » à côté de l'expéditeur sur l'e-mail
   de bienvenue (peut n'apparaître qu'après quelques envois) → l'adresse
   est effacée de la même façon.
+
+### 12.9 Recette de bout en bout (lot 15)
+Passée automatiquement le 26/09/2026 (navigateur piloté, back-office en
+local, landing en build de production) — à refaire à la main en production
+avec les points du bas, que le local ne peut pas couvrir.
+
+**Vérifié automatiquement**
+- 19 écrans et variantes (filtres, onglets, sections) × 1024, 1280 et
+  1440 px : rien ne dépasse, pas d'erreur console, 0 violation axe
+  (WCAG 2.1 AA + bonnes pratiques).
+- 15 fenêtres (créer / éditer carte, jeu, catégorie, slide, badge ;
+  imports ; recherche ⌘K) : nom accessible, focus dans le premier champ,
+  Tab et Maj+Tab restent dans la fenêtre, page derrière bloquée, Échap
+  ferme et rend le focus au bouton d'origine.
+- Au clavier seul : recherche ⌘K → Entrée ouvre l'écran ; création d'une
+  carte complète (Tab jusqu'à « Enregistrer ») → notification, fenêtre
+  fermée, focus rendu ; enregistrement vide bloqué sur le champ manquant.
+- Texte du site modifié en FR et EN → « Publier sur le site » → la
+  landing affiche les deux langues en 1 à 2 s ; retour au texte d'origine
+  aussi rapide.
+- Landing arrêtée pendant une publication → notification « la landing
+  n'a pas été prévenue » + bandeau avec la cause ; textes enregistrés.
+- Carte supprimée → compteur de cartes de la landing mis à jour.
+- Pré-inscription depuis le formulaire de la landing → visible et
+  cherchable dans Pré-inscriptions, badge de la sidebar.
+- Publication d'une version de l'app : snapshot valide ; l'envoi vers
+  Vercel Blob n'est pas testable en local (clé absente).
+
+**À vérifier en production (hors local)**
+- [ ] Connexion Clerk réelle, déconnexion, accès refusé sans compte.
+- [ ] Publication d'une version de l'app (Vercel Blob) puis mise à jour
+  du contenu dans l'app.
+- [ ] Texte du site modifié → visible sur playlink-game.fr en quelques
+  secondes, en FR et en EN (dont en navigation privée : pas de cache CDN).
+- [ ] Stats : synchro PostHog manuelle et cron de la nuit (12.6).
+- [ ] E-mails réels et désinscription (12.8).
+- [ ] Largeurs 1024 / 1280 / 1440 px sur ton écran (zoom 100 %) : sidebar,
+  tableaux et éditeur du site lisibles sans défilement horizontal.
 
 ---
 
